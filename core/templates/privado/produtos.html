@@ -1,0 +1,77 @@
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Bem-vindo de volta. Confira o resumo abaixo.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="section-card-header">
+      <h2>Gerenciamento de Produtos</h2>
+      <a href="{% url 'add_produtos' %}">
+      <button class="btn-sm btn-primary">＋ Cadastrar Produtos</button>
+      </a>
+    </div>
+    <div class="section-card-body">
+      <div class="table-toolbar">
+        <input type="text" class="search-input" placeholder="🔍  Buscar produto..." />
+        <select class="filter-select">
+          <option>Todos os Produtos</option>
+          <option>Informática</option>
+          <option>Eventos</option>
+          <option>Eletromecânica</option>
+          <option>Mecânica</option>
+        </select>
+        <select class="filter-select">
+          <option>Todos os públicos</option>
+          <option>Discente</option>
+          <option>Docente</option>
+          <option>Externo</option>
+        </select>
+        <button class="btn-sm btn-outline-sm">Filtrar</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <!--<th>Foto</th>-->
+              <th>Nome do Produto</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for produto in produtos %}
+            <tr>
+              <!-- <td><div class="td-img">💻</div></td> -->
+              <td><div class="td-name">{{produto.nome}}</div></td>
+              <td><div class="td-actions">
+                <a href="#">
+                <button class="btn-sm btn-outline-sm">✏ Editar</button>
+                </a>
+                <a href="{% url 'produto_delete' produto.id %}">
+                <button class="btn-sm btn-danger-sm">🗑 Remover</button>
+                </a>
+              </div></td>
+            </tr>
+            {% endfor %}
+            
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="page-btn">‹</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <span style="color:var(--text-muted);padding:0 .2rem">…</span>
+        <button class="page-btn">5</button>
+        <button class="page-btn">›</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+{% endblock %}

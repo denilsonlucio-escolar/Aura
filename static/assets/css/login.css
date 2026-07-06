@@ -1,0 +1,228 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background-color: #0e0e0e;
+  color: #f0f0f0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+header.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 40px;
+  background-color: #111;
+  border-bottom: 2px solid #444;
+}
+
+.logo-header {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 10px #fff;
+  text-decoration: none;
+  color: #fff;
+}
+
+.links-header a {
+  margin: 0 12px;
+  text-decoration: none;
+  color: #ddd;
+  transition: color 0.3s;
+}
+
+.links-header a:hover {
+  color: #fff;
+}
+
+.botoes-login a {
+  text-decoration: none;
+  margin-left: 10px;
+  padding: 6px 15px;
+  border-radius: 5px;
+  font-weight: 500;
+  border: 1px solid #fff;
+  transition: all 0.3s ease;
+}
+
+.botoes-login .entrar {
+  background: #000;
+  color: #fff;
+}
+
+.botoes-login .registrar {
+  background: #fff;
+  color: #000;
+}
+
+.botoes-login a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px #fff;
+}
+
+/* LOGIN AREA */
+.login-area {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.login-container {
+  display: flex;
+  gap: 80px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 60px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.login-box,
+.cadastro-box {
+  flex: 1;
+}
+
+/* FORM ORGANIZAÇÃO */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* TITULOS */
+h2 {
+  color: #fff;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* INPUTS */
+input {
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  background: #2a2a2a;
+  color: #fff;
+  width: 100%;
+}
+
+/* CAMPO SENHA */
+.senha-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.senha-input input {
+  width: 100%;
+  padding-right: 35px;
+}
+
+.mostrar-senha {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* LINKS */
+.link-senha {
+  color: #ccc;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.link-senha:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* BOTÕES */
+.botao {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.primario {
+  background: #fff;
+  color: #000;
+}
+
+.primario:hover {
+  background: #ddd;
+}
+
+.secundario {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.secundario:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* DIVISOR */
+.divisor {
+  width: 2px;
+  background: #333;
+  border-radius: 2px;
+}
+
+/* RODAPÉ */
+footer.rodape {
+  background: #000;
+  color: #fff;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 30px;
+  padding: 50px 60px;
+}
+
+footer a {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+footer a:hover {
+  color: #fff;
+}
+
+.logo-rodape {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 10px #fff;
+}
+
+.rodape h4 {
+  margin-bottom: 10px;
+}
+
+/* RESPONSIVO */
+@media (max-width: 900px) {
+  .login-container {
+    flex-direction: column;
+    padding: 40px 20px;
+  }
+
+  .divisor {
+    display: none;
+  }
+}

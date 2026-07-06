@@ -1,0 +1,105 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: Inter, system-ui, Arial;
+  background: #0b0b0b;
+  color: #eee;
+}
+
+.pagina-pagamento {
+  max-width: 1100px;
+  margin: 30px auto;
+  display: flex;
+  gap: 24px;
+  padding: 0 4%;
+}
+
+.pagamento-left,
+.pagamento-right {
+  background: linear-gradient(180deg, #0f0f0f, #111);
+  border-radius: 14px;
+  padding: 26px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.pagamento-left { width: 65%; }
+.pagamento-right { width: 35%; }
+
+.pagamento-left h2,
+.pagamento-right h3 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  border-left: 4px solid #1e5dc6;
+  padding-left: 12px;
+}
+
+.opcao-pagamento {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 20px;
+}
+
+.form-cartao label {
+  display: block;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.form-cartao input,
+.form-cartao select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #fff;
+}
+
+.linha {
+  display: flex;
+  gap: 14px;
+}
+
+.linha-resumo {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.linha-resumo.desconto {
+  color: #4f8ef7;
+}
+
+.linha-resumo.total {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.btn-finalizar {
+  width: 100%;
+  margin-top: 22px;
+  padding: 14px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(90deg, #1e5dc6, #4f8ef7);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}

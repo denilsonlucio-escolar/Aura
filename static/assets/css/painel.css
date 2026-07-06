@@ -1,0 +1,328 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  font-family: "Poppins", sans-serif;
+}
+
+/* =========================
+   BODY
+========================= */
+
+body {
+  background: #0d0d0d;
+  color: #f5f5f5;
+
+  min-height: 100vh;
+}
+
+/* =========================
+   CONTAINERS
+========================= */
+
+.painel-container,
+.form-container,
+.gerenciar-container {
+  width: 100%;
+  max-width: 1200px;
+
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+/* =========================
+   TITULOS
+========================= */
+
+.painel-header,
+.form-header,
+.topo {
+  text-align: center;
+
+  margin-bottom: 35px;
+}
+
+.painel-header h1,
+.form-header h1,
+.topo h1 {
+  font-size: 38px;
+  font-weight: 700;
+
+  color: #fff;
+
+  margin-bottom: 10px;
+}
+
+.painel-header p,
+.form-header p {
+  color: #aaa;
+}
+
+/* =========================
+   CAIXA CENTRAL
+========================= */
+
+.cards,
+form,
+.tabela-container {
+  background: #1a1a1a;
+
+  border: 1px solid #2d2d2d;
+
+  border-radius: 16px;
+
+  box-shadow:
+  0 0 25px rgba(0, 0, 0, 0.4);
+
+  overflow: hidden;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.cards {
+  display: grid;
+
+  grid-template-columns:
+  repeat(auto-fit, minmax(250px, 1fr));
+
+  gap: 20px;
+
+  padding: 25px;
+}
+
+.card {
+  background: #222;
+
+  border: 1px solid #333;
+
+  border-radius: 12px;
+
+  padding: 30px;
+
+  text-decoration: none;
+
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+
+  border-color: #2563eb;
+
+  box-shadow:
+  0 0 15px rgba(37, 99, 235, 0.2);
+}
+
+.card h2 {
+  color: #fff;
+
+  margin-bottom: 12px;
+}
+
+.card p {
+  color: #bbb;
+
+  line-height: 1.6;
+}
+
+/* =========================
+   FORMULÁRIO
+========================= */
+
+form {
+  max-width: 750px;
+
+  margin: auto;
+
+  padding: 40px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  margin-bottom: 8px;
+
+  font-weight: 500;
+
+  color: #ddd;
+}
+
+.input-group input,
+.input-group textarea {
+  background: #2a2a2a;
+
+  border: 1px solid #444;
+
+  border-radius: 8px;
+
+  padding: 14px;
+
+  color: white;
+
+  outline: none;
+
+  transition: 0.3s;
+
+  font-size: 15px;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+  0 0 10px rgba(37, 99, 235, 0.2);
+}
+
+textarea {
+  resize: none;
+}
+
+/* =========================
+   BOTÃO
+========================= */
+
+.btn-submit {
+  width: 100%;
+
+  background:
+  linear-gradient(
+    135deg,
+    #2563eb,
+    #1d4ed8
+  );
+
+  color: white;
+
+  border: none;
+
+  border-radius: 8px;
+
+  padding: 14px;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+  0 0 15px rgba(37, 99, 235, 0.3);
+}
+
+/* =========================
+   TABELA
+========================= */
+
+.tabela-container {
+  padding: 20px;
+
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+
+  border-collapse: collapse;
+}
+
+thead {
+  background: #222;
+}
+
+thead th {
+  padding: 18px;
+
+  text-align: left;
+
+  color: white;
+}
+
+tbody td {
+  padding: 18px;
+
+  border-top: 1px solid #333;
+
+  color: #ccc;
+}
+
+/* =========================
+   AÇÕES
+========================= */
+
+.acoes {
+  display: flex;
+
+  gap: 10px;
+}
+
+.btn-editar,
+.btn-remover {
+  border: none;
+
+  padding: 10px 16px;
+
+  border-radius: 8px;
+
+  color: white;
+
+  cursor: pointer;
+
+  font-weight: 600;
+
+  transition: 0.3s;
+}
+
+.btn-editar {
+  background: #2563eb;
+}
+
+.btn-remover {
+  background: #dc2626;
+}
+
+.btn-editar:hover,
+.btn-remover:hover {
+  transform: translateY(-2px);
+
+  opacity: 0.9;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media (max-width: 768px) {
+
+  .painel-header h1,
+  .form-header h1,
+  .topo h1 {
+    font-size: 30px;
+  }
+
+  form {
+    padding: 25px;
+  }
+
+  .acoes {
+    flex-direction: column;
+  }
+
+  table {
+    font-size: 14px;
+  }
+
+}

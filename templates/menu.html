@@ -1,0 +1,71 @@
+<nav class="navbar">
+
+  <div class="nav-inner">
+
+    <!-- LOGO -->
+    <a href="{% url 'inicial' %}" class="logo">
+
+      <div class="logo-text">
+        Aura
+      </div>
+
+    </a>
+
+    <!-- MENU MOBILE -->
+    <button class="hamburger" id="hamburger">
+
+      <span></span>
+      <span></span>
+      <span></span>
+
+    </button>
+
+    <!-- LINKS -->
+    <div class="nav-links" id="nav-links">
+
+      <a href="{% url 'inicial' %}">
+        Inicial
+      </a>
+
+      <a href="{% url 'catalogo' %}">
+        Catálogo
+      </a>
+
+      <a href="#">
+        Contato
+      </a>
+
+      <div class="nav-divider"></div>
+
+      <div class="nav-buttons">
+
+        <a href="{% url 'login' %}" class="btn-nav btn-login">
+          Entrar
+        </a>
+
+        <a href="{% url 'cadastro' %}" class="btn-nav btn-cadastro">
+          Cadastro
+        </a>
+
+        <a href="#" class="btn-nav btn-perfil">
+          Perfil
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</nav>
+
+<script>
+
+  const hamburger = document.getElementById("hamburger");
+  const navLinks = document.getElementById("nav-links");
+
+  hamburger.addEventListener("click", () => {
+    navLinks.classList.toggle("active");
+  });
+
+</script>

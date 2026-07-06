@@ -1,0 +1,44 @@
+{%extends 'base.html'%}
+
+{% load static%}
+
+{%block titulo%} catalogo {%endblock%}
+
+{% block estilo %} <link rel="stylesheet" href="{% static 'assets/css/catalogo.css' %}" /> {% endblock %}
+
+{% block scripts %} <script src="{% static 'assets/js/catalogo.js' %}"></script> {% endblock %}
+
+
+
+{%block conteudo%}
+
+  <main class="catalogo">
+    <h1>Catálogo de Produtos</h1>
+
+    <div class="card-grid">
+      {% for produto in produtos %}
+      <a href="" class="card-link">
+      <div class="card">
+        <div class="card-img">
+            <img src="{{ produto.imagem }}">
+          <span class="badge">-30% OFF</span>
+        </div>
+        <h3>{{ produto.nome }}</h3>
+        <!-- <div class="stars">★★★★★</div> -->
+        <div class="prices">
+          <!-- <span class="old">R$ 210,00</span> -->
+          <span class="new">{{ produto.preco }}</span>
+          <!-- <span class="parcel">5x de R$ 30,00</span> -->
+        </div>
+        <span class="frete">Frete grátis disponível</span>
+      </div>
+      </a>
+      {% endfor %}
+    </div>
+
+      
+
+
+  </main>
+
+{%endblock%}

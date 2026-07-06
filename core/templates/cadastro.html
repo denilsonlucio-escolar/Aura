@@ -1,0 +1,59 @@
+{%extends 'base.html'%}
+
+{% load static%}
+
+{%block titulo%} cadastro {%endblock%}
+
+{% block estilo %} <link rel="stylesheet" href="{% static 'assets/css/cadastro.css' %}" /> {% endblock %}
+
+{% block scripts %} <script src="{% static 'assets/js/cadastro.js' %}"></script> {% endblock %}
+
+
+
+{%block conteudo%}
+<main class="container">
+  <div class="form-box">
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <h2>Cadastro</h2>
+
+      <!-- LOGIN -->
+      <input type="text" name="username" placeholder="Usuário" required>
+      <input type="password" name="password" placeholder="Senha" required>
+
+      <!-- DADOS PESSOAIS -->
+      <input type="text" name="nome" placeholder="Nome" required>
+      <input type="text" name="sobrenome" placeholder="Sobrenome" required>
+
+      <label>Sexo:</label>
+      <input type="radio" name="sexo" value="F"> Feminino
+      <input type="radio" name="sexo" value="M"> Masculino
+
+      <h4>Data de nascimento</h4>
+      <input type="text" name="dia" placeholder="Dia">
+      <input type="text" name="mes" placeholder="Mês">
+      <input type="text" name="ano" placeholder="Ano">
+
+      <input type="text" name="cpf" placeholder="CPF">
+      <input type="text" name="celular" placeholder="Celular">
+      <input type="email" name="email" placeholder="Email">
+
+      <h4>Endereço</h4>
+      <input type="text" name="cep" placeholder="CEP">
+      <input type="text" name="estado" placeholder="Estado">
+      <input type="text" name="cidade" placeholder="Cidade">
+      <input type="text" name="bairro" placeholder="Bairro">
+      <input type="text" name="rua" placeholder="Rua">
+      <input type="text" name="numero" placeholder="Número">
+      <input type="text" name="complemento" placeholder="Complemento">
+
+      <button type="submit">Cadastrar</button>
+
+    </form>
+
+  </div>
+</main>
+
+{%endblock%}
