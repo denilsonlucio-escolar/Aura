@@ -48,7 +48,7 @@
               <!-- <td><div class="td-img">💻</div></td> -->
               <td><div class="td-name">{{produto.nome}}</div></td>
               <td><div class="td-actions">
-                <a href="#">
+                <a href="{% url 'produto_editar' produto.id %}">
                 <button class="btn-sm btn-outline-sm">✏ Editar</button>
                 </a>
                 <a href="{% url 'produto_delete' produto.id %}">
@@ -60,15 +60,6 @@
             
           </tbody>
         </table>
-      </div>
-      <div class="pagination">
-        <button class="page-btn">‹</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <span style="color:var(--text-muted);padding:0 .2rem">…</span>
-        <button class="page-btn">5</button>
-        <button class="page-btn">›</button>
       </div>
     </div>
   </div>

@@ -51,6 +51,19 @@ def produto_delete(request, id):
     produto.delete()
     return redirect('produtos')
 
+def produto_editar(request, id):
+    produto = Produto.objects.get(pk=id)
+    form = ProdutoForm(request.POST or None, instance=produto)
+    if form.is_valid():
+        form.save()
+        return redirect('produtos')
+    context = {
+        'form' : form
+        
+    }
+
+    return render (request, 'privado/add_produtos.html', context)
+
 
 
 
