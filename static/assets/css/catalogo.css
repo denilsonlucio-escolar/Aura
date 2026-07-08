@@ -75,6 +75,8 @@ header.topo {
 .catalogo {
   padding: 50px;
   text-align: center;
+  min-height: 100vh; 
+  
 }
 
 .catalogo h1 {
