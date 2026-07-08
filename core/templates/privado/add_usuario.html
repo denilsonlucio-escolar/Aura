@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %} Editar Usuário {% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/painel.css' %}" />
+{% endblock %}
+
+{% block conteudo %}
+<main class="form-container">
+
+  <div class="form-header">
+    <h1>Editar Usuário</h1>
+  </div>
+
+  {% include 'mensagens.html' %}
+
+  <form method="POST">
+    {% csrf_token %}
+
+    <div class="input-group">
+      <label>Usuário</label>
+      {{ form.username }}
+    </div>
+
+    <div class="input-group">
+      <label>E-mail</label>
+      {{ form.email }}
+    </div>
+
+    <button type="submit" class="btn-submit">Salvar</button>
+  </form>
+
+</main>
+{% endblock %}

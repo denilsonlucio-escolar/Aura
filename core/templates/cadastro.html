@@ -4,9 +4,11 @@
 
 {%block titulo%} cadastro {%endblock%}
 
-{% block estilo %} <link rel="stylesheet" href="{% static 'assets/css/cadastro.css' %}" /> {% endblock %}
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/cadastro.css' %}" /> {% endblock %}
 
-{% block scripts %} <script src="{% static 'assets/js/cadastro.js' %}"></script> {% endblock %}
+{% block scripts %}
+<script src="{% static 'assets/js/cadastro.js' %}"></script> {% endblock %}
 
 
 
@@ -35,10 +37,8 @@
       <input type="text" name="dia" placeholder="Dia">
       <input type="text" name="mes" placeholder="Mês">
       <input type="text" name="ano" placeholder="Ano">
-
       <input type="text" name="cpf" placeholder="CPF">
-      <input type="text" name="celular" placeholder="Celular">
-      <input type="email" name="email" placeholder="Email">
+      <input type="text" name="telefone" placeholder="Celular"> <input type="email" name="email" placeholder="Email">
 
       <h4>Endereço</h4>
       <input type="text" name="cep" placeholder="CEP">

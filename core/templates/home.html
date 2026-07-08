@@ -1,16 +1,13 @@
-{%extends 'base.html'%}
+{% extends 'base.html' %}
+{% load static %}
 
-{% load static%}
-
-{%block titulo%} Home {%endblock%}
+{% block titulo %} Home {% endblock %}
 
 {% block estilo %} <link rel="stylesheet" href="{% static 'assets/css/home.css' %}" /> {% endblock %}
 
 {% block scripts %} <script src="{% static 'assets/js/home.js' %}"></script> {% endblock %}
 
-
-
-{%block conteudo%}
+{% block conteudo %}
   <section class="hero">
     <video class="videofundo" autoplay muted loop playsinline>
       <source src="{% static 'assets/imagens/bc.mp4' %}" type="video/mp4"/>
@@ -20,8 +17,8 @@
       <h1>Aura que transborda</h1>
       <p>Equipamentos, notícias e paixão pelo esporte — para todo mundo.</p>
       <div class="hero-cta">
-        <a href="../PG_2_Pedro_Neto/siteesportes.html" class="cta">Ver Produtos</a>
-        <a href="../PG_2_Pedro_Neto/siteesportes.html" class="cta secondary">Mais Vendidos</a>
+        <a href="{% url 'catalogo' %}" class="cta">Ver Produtos</a>
+        <a href="#" class="cta secondary">Mais Vendidos</a>
       </div>
     </div>
   </section>
@@ -33,50 +30,17 @@
   <main class="anuncios" id="gridProdutos" role="main" aria-label="Categorias e Produtos em destaque">
     <article class="imagem-container" data-keywords="basquete bola calçado basquete">
       <img src="{% static 'assets/imagens/basquete1.jpg' %}" alt="Basquete - equipamentos" loading="lazy" />
-      <a href="/PG_2_Pedro Neto/index.html#basquete" class="botao-imagens">Basquete</a>
+      <a href="#" class="botao-imagens">Basquete</a>
     </article>
 
     <article class="imagem-container" data-keywords="futebol chuteira camisa futebol">
       <img src="{% static 'assets/imagens/futebol.jpg' %}" alt="Futebol - equipamentos" loading="lazy" />
-      <a href="../PG_2_Pedro_Neto/siteesportes.html" class="botao-imagens">Futebol</a>
+      <a href="#" class="botao-imagens">Futebol</a>
     </article>
 
     <article class="imagem-container" data-keywords="tenis corrida treino tenis">
       <img src="{% static 'assets/imagens/tenis.jpg' %}" alt="Tênis - corrida" loading="lazy" />
-      <a href="/PG_2_Pedro Neto/index.html#tenis" class="botao-imagens">Tênis</a>
+      <a href="#" class="botao-imagens">Tênis</a>
     </article>
   </main>
-
-  <footer class="rodape" role="contentinfo">
-    <div class="rodape-grid">
-      <div class="rodape-col">
-        <h4>Suporte</h4>
-        <ul>
-          <li><a href="/PG_4_João Guilherme/login.html">Ajuda / Login</a></li>
-          <li><a href="/PG_5_Samuel/index.html">Registrar</a></li>
-          <li><a href="/PG_2_Pedro Neto/index.html">Carrinho</a></li>
-        </ul>
-      </div>
-
-      <div class="rodape-col">
-        <h4>Informações</h4>
-        <ul>
-          <li><a href="/PG_3_Pedro Coelho/index.html">Sobre o site</a></li>
-          <li><a href="#">Política de privacidade</a></li>
-        </ul>
-      </div>
-
-      <div class="rodape-col">
-        <h4>Links rápidos</h4>
-        <ul>
-          <li><a href="/PG_2_Pedro Neto/index.html">Produtos</a></li>
-          <li><a href="/PG_3_Pedro Coelho/index.html">Página do produto</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="rodape-copy">
-      <small>© Trabalho de faculdade — Desenvolvido por Denilson, Samuel, Pedro Gabriel, Pedro Fonseca, João Guilherme</small>
-    </div>
-  </footer>
-{%endblock%}
+{% endblock %}

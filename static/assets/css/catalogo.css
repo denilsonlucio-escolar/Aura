@@ -255,3 +255,84 @@ footer.rodape {
     gap: 15px;
   }
 }
+
+/* ==========================================
+   PRODUTO INDIVIDUAL (novo)
+   ========================================== */
+.produto-detalhe {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  gap: 40px;
+  text-align: left;
+  background: #101010;
+  border: 1px solid #1e1e1e;
+  border-radius: 12px;
+  padding: 30px;
+}
+
+.produto-detalhe-img {
+  flex: 1;
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.produto-detalhe-img img {
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+}
+
+.produto-detalhe-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.produto-detalhe-info h1 {
+  color: #fff;
+  font-size: 26px;
+}
+
+.produto-detalhe-desc {
+  color: #ccc;
+  line-height: 1.6;
+}
+
+.produto-detalhe-info .frete {
+  width: max-content;
+}
+
+.produto-detalhe .botao {
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+  text-align: center;
+  text-decoration: none;
+  width: max-content;
+}
+
+.produto-detalhe .secundario {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.produto-detalhe .secundario:hover {
+  background: #fff;
+  color: #000;
+}
+
+@media (max-width: 700px) {
+  .produto-detalhe {
+    flex-direction: column;
+  }
+}

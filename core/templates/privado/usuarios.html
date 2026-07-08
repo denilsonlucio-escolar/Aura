@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %} Usuários {% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/painel.css' %}" />
+{% endblock %}
+
+{% block conteudo %}
+<main class="painel-container">
+
+  <div class="painel-header">
+    <h1>Usuários Cadastrados</h1>
+  </div>
+
+  {% include 'mensagens.html' %}
+
+  <div class="tabela-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Usuário</th>
+          <th>E-mail</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+          <td>{{ usuario.username }}</td>
+          <td>{{ usuario.email }}</td>
+          <td class="acoes">
+            <a href="{% url 'usuario_editar' usuario.id %}" class="btn-editar">Editar</a>
+            <a href="{% url 'usuario_delete' usuario.id %}" class="btn-remover">Excluir</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</main>
+{% endblock %}

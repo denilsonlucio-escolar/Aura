@@ -326,3 +326,9 @@ tbody td {
   }
 
 }
+
+a.btn-editar, a.btn-remover, a.btn-submit {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
