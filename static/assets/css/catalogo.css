@@ -79,6 +79,31 @@ header.topo {
   
 }
 
+#campoBusca{
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  margin: 20px auto 35px;
+  padding: 14px 18px;
+  font-size: 16px;
+  color: #333;
+  background: #fff;
+  border: 2px solid #dcdcdc;
+  border-radius: 30px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+#campoBusca::placeholder {
+  color: #999;
+}
+
+#campoBusca:focus {
+  border-color: #1e5dc6;
+  box-shadow: 0 0 0 4px rgba(30, 93, 198, 0.15);
+}
+
 .catalogo h1 {
   font-size: 28px;
   margin-bottom: 40px;
