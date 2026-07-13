@@ -1,33 +1,25 @@
 document.addEventListener("DOMContentLoaded", () => {
   const busca = document.getElementById("campoBusca");
-  const items = Array.from(document.querySelectorAll(".imagem-container"));
+  const lista = document.getElementById("lista");
 
-  if (busca) {
-    busca.addEventListener("input", (e) => {
-      const q = e.target.value.trim().toLowerCase();
-      if (!q) {
-        items.forEach(i => i.style.display = "");
-        return;
-      }
-      items.forEach(item => {
-        const keys = (item.dataset.keywords || "").toLowerCase();
-        const title = (item.textContent || "").toLowerCase();
-        const match = keys.includes(q) || title.includes(q);
-        item.style.display = match ? "" : "none";
-      });
-    });
+  busca.addEventListener('keyup',()=>{
+    const termo = busca.value.toLowerCase();
+    const linhas = lista.querySelectorAll('.card-link');
 
-    busca.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        const q = busca.value.trim();
-        if (q.length) {
-          window.location.href = `/PG_2_Pedro Neto/index.html?q=${encodeURIComponent(q)}`;
-        } else {
-          window.location.href = `/PG_2_Pedro Neto/index.html`;
-        }
-      }
-    });
-  }
+    for (let i = 0; i < linhas.length; i++) {
+      const ele = linhas[i];
+      const nome = ele.id.toLocaleLowerCase();
+     
+    
+      ele.style.display = nome.includes(termo) ? "block" : "none";
+    
+      
+
+    }
+    
+
+  })
+
 
   document.querySelectorAll(".imagem-container, .botao-imagens").forEach(el => {
     el.addEventListener("click", (e) => {

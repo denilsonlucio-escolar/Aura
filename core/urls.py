@@ -22,5 +22,5 @@ urlpatterns = [
     path('usuarios/editar/<int:id>/', usuario_editar, name='usuario_editar'),
     path('usuarios/excluir/<int:id>/', usuario_delete, name='usuario_delete'),
 
-    path('painel/', painel, name='painel'),
+    path('painel/', painel, name='painel')
 ]

@@ -16,17 +16,18 @@
 
 <main class="catalogo">
   <h1>Catálogo de Produtos</h1>
-
-  <div class="card-grid">
+  <h1>Barra de pesquisa</h1>
+  <input type="text" id="campoBusca">
+  <div class="card-grid" id="lista">
     {% for produto in produtos %}
-    <a href="{% url 'produto_detalhe' produto.id %}" class="card-link">
+    <a href="{% url 'produto_detalhe' produto.id %}" class="card-link" id="{{ produto.nome }}">
       <div class="card">
         <div class="card-img">
           {% if produto.imagem %}
           <img src="{{ produto.imagem.url }}">
           {% endif %} <span class="badge">-30% OFF</span>
         </div>
-        <h3>{{ produto.nome }}</h3>
+        <h3 id="nome">{{ produto.nome }}</h3>
         <!-- <div class="stars">★★★★★</div> -->
         <div class="prices">
           <!-- <span class="old">R$ 210,00</span> -->

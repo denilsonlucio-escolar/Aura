@@ -1,5 +1,6 @@
 import datetime
 
+from django.http import JsonResponse
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
