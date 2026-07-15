@@ -29,11 +29,44 @@ def produto_detalhe(request, id):
 
 
 def carrinho(request):
-    return render(request, 'carrinho.html')
+    carrinho = request.session.get("carrinho", {})
+
+    produtos = []
+    total = 0
+
+    for id, quantidade in carrinho.items():
+        produto = Produto.objects.get(pk=id)
+
+        subtotal = produto.preco * quantidade
+        total += subtotal
+
+        produtos.append({
+            "produto": produto,
+            "quantidade": quantidade,
+            "subtotal": subtotal
+        })
+
+    return render(request, "carrinho.html", {
+        "produtos": produtos,
+        "total": total
+    })
 
 
 def pagamento(request):
-    return render(request, 'pagamento.html')
+    carrinho = request.session.get("carrinho", {})
+
+    total = 0
+
+    for id, quantidade in carrinho.items():
+        produto = get_object_or_404(Produto, pk=id)
+        total += produto.preco * quantidade
+
+    context = {
+        "total": total,
+        "pagina": "pagamento",
+    }
+
+    return render(request, "pagamento.html", context)
 
 
 def cadastro(request):
@@ -360,3 +393,33 @@ def meus_dados(request):
      "pagina": "meus_dados",
     }
     return render(request, 'privado/meus_dados.html', context)
+
+
+def adicionar_carrinho(request, id):
+    produto = get_object_or_404(Produto, pk=id)
+
+    carrinho = request.session.get("carrinho", {})
+
+    if str(id) in carrinho:
+        carrinho[str(id)] += 1
+    else:
+        carrinho[str(id)] = 1
+
+    request.session["carrinho"] = carrinho
+
+    return redirect("carrinho")
+
+def remover_carrinho(request, id):
+    carrinho = request.session.get("carrinho", {})
+
+    if str(id) in carrinho:
+        if carrinho[str(id)] > 1:
+            carrinho[str(id)] -= 1
+        else:
+            del carrinho[str(id)]
+
+    request.session["carrinho"] = carrinho
+
+    return redirect("carrinho")
+
+ 

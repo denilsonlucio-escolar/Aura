@@ -58,9 +58,9 @@
 
         {% if produto.estoque > 0 %}
 
-        <a href="{% url 'carrinho' %}" class="botao primario">
-          Adicionar ao carrinho
-        </a>
+      <a href="{% url 'adicionar_carrinho' produto.id %}" class="botao primario">
+    Adicionar ao carrinho
+</a>
 
         {% else %}
 

@@ -1,77 +1,95 @@
-{%extends 'base.html'%}
+{% extends 'base.html' %}
 
-{% load static%}
+{% load static %}
 
-{%block titulo%} Adicionar Produto {%endblock%}
+{% block titulo %}Pagamento{% endblock %}
 
-{% block estilo %} <link rel="stylesheet" href="{% static 'assets/css/pagamento.css' %}" /> {% endblock %}
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/pagamento.css' %}" />
+{% endblock %}
 
-{% block scripts %}  {% endblock %}
+{% block scripts %}
+{% endblock %}
 
+{% block conteudo %}
 
-{%block conteudo%}
+<div class="pagina-pagamento">
 
-  <div class="pagina-pagamento">
     <div class="pagamento-left">
-      <h2>Forma de pagamento</h2>
 
-      <div class="opcao-pagamento ativa">
-        <input type="radio" checked>
-        <div>
-          <strong>Cartão de crédito</strong>
-          <p>Pague em até 12x</p>
-        </div>
-      </div>
+        <h2>Forma de pagamento</h2>
 
-      <form class="form-cartao">
-        <label>Número do cartão</label>
-        <input type="text" placeholder="0000 0000 0000 0000">
-
-        <label>Nome impresso no cartão</label>
-        <input type="text" placeholder="Nome completo">
-
-        <div class="linha">
-          <div style="flex:1">
-            <label>Validade</label>
-            <input type="text" placeholder="MM/AA">
-          </div>
-
-          <div style="flex:1">
-            <label>CVV</label>
-            <input type="text" placeholder="123">
-          </div>
+        <div class="opcao-pagamento ativa">
+            <input type="radio" checked>
+            <div>
+                <strong>Cartão de crédito</strong>
+                <p>Pague em até 12x</p>
+            </div>
         </div>
 
-        <label>Parcelas</label>
-        <select>
-          <option>1x sem juros</option>
-          <option>2x sem juros</option>
-          <option>3x sem juros</option>
-        </select>
-      </form>
+        <form class="form-cartao">
+
+            <label>Número do cartão</label>
+            <input type="text" placeholder="0000 0000 0000 0000">
+
+            <label>Nome impresso no cartão</label>
+            <input type="text" placeholder="Nome completo">
+
+            <div class="linha">
+
+                <div style="flex:1">
+                    <label>Validade</label>
+                    <input type="text" placeholder="MM/AA">
+                </div>
+
+                <div style="flex:1">
+                    <label>CVV</label>
+                    <input type="text" placeholder="123">
+                </div>
+
+            </div>
+
+            <label>Parcelas</label>
+
+            <select>
+                <option>1x sem juros</option>
+                <option>2x sem juros</option>
+                <option>3x sem juros</option>
+            </select>
+
+        </form>
+
     </div>
+
     <div class="pagamento-right">
-      <h3>Resumo</h3>
 
-      <div class="linha-resumo">
-        <span>Produtos</span>
-        <span id="valor-produtos">R$ 0,00</span>
-      </div>
+        <h3>Resumo</h3>
 
-      <div class="linha-resumo desconto">
-        <span>Desconto</span>
-        <span>R$ 0,00</span>
-      </div>
+        {% for item in produtos %}
 
-      <div class="linha-resumo total">
-        <span>Total</span>
-        <span id="valor-total">R$ 0,00</span>
-      </div>
+        <div class="linha-resumo">
+            <span>{{ item.produto.nome }} x{{ item.quantidade }}</span>
+            <span>R$ {{ item.subtotal }}</span>
+        </div>
 
-      <button class="btn-finalizar" onclick="finalizarPagamento()">
-        Finalizar pagamento
-      </button>
+        {% endfor %}
+
+        <div class="linha-resumo desconto">
+            <span>Desconto</span>
+            <span>R$ 0,00</span>
+        </div>
+
+        <div class="linha-resumo total">
+            <span>Total</span>
+            <span id="valor-total">R$ {{ total }}</span>
+        </div>
+
+        <button class="btn-finalizar">
+            Finalizar pagamento
+        </button>
+
     </div>
 
-  </div>
-{%endblock%}
+</div>
+
+{% endblock %}
