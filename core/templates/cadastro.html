@@ -1,59 +1,113 @@
-{%extends 'base.html'%}
+{% extends 'base.html' %}
 
-{% load static%}
+{% load static %}
 
-{%block titulo%} cadastro {%endblock%}
+{% block titulo %}Cadastro{% endblock %}
 
 {% block estilo %}
-<link rel="stylesheet" href="{% static 'assets/css/cadastro.css' %}" /> {% endblock %}
+<link rel="stylesheet" href="{% static 'assets/css/cadastro.css' %}">
+{% endblock %}
 
 {% block scripts %}
-<script src="{% static 'assets/js/cadastro.js' %}"></script> {% endblock %}
+<script src="{% static 'assets/js/cadastro.js' %}"></script>
+{% endblock %}
 
 
+{% block conteudo %}
 
-{%block conteudo%}
 <main class="container">
-  <div class="form-box">
 
-    <form method="POST">
-      {% csrf_token %}
+    <div class="form-box">
 
-      <h2>Cadastro</h2>
+        <form method="POST">
+            {% csrf_token %}
 
-      <!-- LOGIN -->
-      <input type="text" name="username" placeholder="Usuário" required>
-      <input type="password" name="password" placeholder="Senha" required>
+            <h2>Criar Cadastro</h2>
 
-      <!-- DADOS PESSOAIS -->
-      <input type="text" name="nome" placeholder="Nome" required>
-      <input type="text" name="sobrenome" placeholder="Sobrenome" required>
+            <!-- CONTA -->
+            <h3>Dados de acesso</h3>
 
-      <label>Sexo:</label>
-      <input type="radio" name="sexo" value="F"> Feminino
-      <input type="radio" name="sexo" value="M"> Masculino
+            <div class="grupo">
+                <input type="text" name="username" placeholder="Usuário" required>
+                <input type="password" name="password" placeholder="Senha" required>
+            </div>
 
-      <h4>Data de nascimento</h4>
-      <input type="text" name="dia" placeholder="Dia">
-      <input type="text" name="mes" placeholder="Mês">
-      <input type="text" name="ano" placeholder="Ano">
-      <input type="text" name="cpf" placeholder="CPF">
-      <input type="text" name="telefone" placeholder="Celular"> <input type="email" name="email" placeholder="Email">
 
-      <h4>Endereço</h4>
-      <input type="text" name="cep" placeholder="CEP">
-      <input type="text" name="estado" placeholder="Estado">
-      <input type="text" name="cidade" placeholder="Cidade">
-      <input type="text" name="bairro" placeholder="Bairro">
-      <input type="text" name="rua" placeholder="Rua">
-      <input type="text" name="numero" placeholder="Número">
-      <input type="text" name="complemento" placeholder="Complemento">
+            <!-- DADOS PESSOAIS -->
+            <h3>Dados pessoais</h3>
 
-      <button type="submit">Cadastrar</button>
+            <div class="grupo">
+                <input type="text" name="nome" placeholder="Nome" required>
+                <input type="text" name="sobrenome" placeholder="Sobrenome" required>
+            </div>
 
-    </form>
 
-  </div>
+            <label class="titulo">Sexo</label>
+
+            <div class="sexo">
+                <label>
+                    <input type="radio" name="sexo" value="F">
+                    Feminino
+                </label>
+
+                <label>
+                    <input type="radio" name="sexo" value="M">
+                    Masculino
+                </label>
+            </div>
+
+
+            <h3>Informações pessoais</h3>
+
+            <div class="grupo tres">
+                <input type="text" name="dia" placeholder="Dia">
+                <input type="text" name="mes" placeholder="Mês">
+                <input type="text" name="ano" placeholder="Ano">
+            </div>
+
+
+            <div class="grupo">
+                <input type="text" name="cpf" placeholder="CPF">
+                <input type="text" name="telefone" placeholder="Celular">
+            </div>
+
+
+            <input type="email" name="email" placeholder="Email">
+
+
+            <!-- ENDEREÇO -->
+            <h3>Endereço</h3>
+
+            <div class="grupo">
+                <input type="text" name="cep" placeholder="CEP">
+                <input type="text" name="estado" placeholder="Estado">
+            </div>
+
+
+            <div class="grupo">
+                <input type="text" name="cidade" placeholder="Cidade">
+                <input type="text" name="bairro" placeholder="Bairro">
+            </div>
+
+
+            <div class="grupo">
+                <input type="text" name="rua" placeholder="Rua">
+                <input type="text" name="numero" placeholder="Número">
+            </div>
+
+
+            <input type="text" name="complemento" placeholder="Complemento">
+
+
+            <button type="submit">
+                Cadastrar
+            </button>
+
+
+        </form>
+
+    </div>
+
 </main>
 
-{%endblock%}
+{% endblock %}

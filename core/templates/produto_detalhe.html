@@ -1,125 +1,86 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block titulo %} {{ produto.nome }} {% endblock %}
+{% block titulo %}{{ produto.nome }}{% endblock %}
 
 {% block estilo %}
-<link rel="stylesheet" href="{% static 'assets/css/catalogo.css' %}" />
-<style>
-  .produto-detalhe {
-    max-width: 900px;
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 40px;
-    text-align: left;
-    background: #101010;
-    border: 1px solid #1e1e1e;
-    border-radius: 12px;
-    padding: 30px;
-  }
-  .produto-detalhe-img {
-    flex: 1 1 300px;
-    background: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .produto-detalhe-img img {
-    max-width: 100%;
-    max-height: 320px;
-    object-fit: contain;
-  }
-  .produto-detalhe-info {
-    flex: 1 1 300px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .produto-detalhe-info h1 {
-    color: #fff;
-    font-size: 26px;
-  }
-  .produto-detalhe-desc {
-    color: #ccc;
-    line-height: 1.6;
-  }
-  .produto-detalhe-acoes {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .produto-detalhe .botao {
-    padding: 12px 20px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.3s;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .produto-detalhe .primario {
-    background: #d1ff34;
-    color: #000;
-  }
-  .produto-detalhe .primario:hover {
-    opacity: 0.85;
-  }
-  .produto-detalhe .secundario {
-    background: transparent;
-    border: 1px solid #fff;
-    color: #fff;
-  }
-  .produto-detalhe .secundario:hover {
-    background: #fff;
-    color: #000;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'assets/css/catalogo.css' %}">
 {% endblock %}
 
 {% block conteudo %}
+
 <main class="catalogo">
 
-  <div class="produto-detalhe">
+  <section class="produto-detalhe">
 
     <div class="produto-detalhe-img">
+
       {% if produto.imagem %}
-        <img src="{{ produto.imagem.url }}">
+      <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
       {% endif %}
+
     </div>
 
+
     <div class="produto-detalhe-info">
+
       <h1>{{ produto.nome }}</h1>
 
+
       <div class="prices">
-        <span class="new">R$ {{ produto.preco }}</span>
+        <span class="new">
+          R$ {{ produto.preco }}
+        </span>
       </div>
 
-      <span class="frete">
-        {% if produto.estoque > 0 %}
-          {{ produto.estoque }} em estoque
-        {% else %}
-          Fora de estoque
-        {% endif %}
-      </span>
 
-      <p class="produto-detalhe-desc">{{ produto.descricao }}</p>
+      <div class="estoque">
+
+        {% if produto.estoque > 0 %}
+        <span class="disponivel">
+          {{ produto.estoque }} unidades disponíveis
+        </span>
+        {% else %}
+        <span class="indisponivel">
+          Produto fora de estoque
+        </span>
+        {% endif %}
+
+      </div>
+
+
+      <p class="produto-detalhe-desc">
+        {{ produto.descricao }}
+      </p>
+
 
       <div class="produto-detalhe-acoes">
+
+        {% if produto.estoque > 0 %}
+
         <a href="{% url 'carrinho' %}" class="botao primario">
           Adicionar ao carrinho
         </a>
+
+        {% else %}
+
+        <button class="botao primario" disabled>
+          Indisponível
+        </button>
+
+        {% endif %}
+
+
         <a href="{% url 'catalogo' %}" class="botao secundario">
           Voltar ao catálogo
         </a>
+
       </div>
+
     </div>
 
-  </div>
+  </section>
 
 </main>
+
 {% endblock %}

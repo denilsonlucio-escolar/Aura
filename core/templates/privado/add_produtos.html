@@ -1,54 +1,83 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block titulo %} Cadastrar Produto {% endblock %}
-
-{% block estilo %}
-<link rel="stylesheet" href="{% static 'assets/css/painel.css' %}" />
-{% endblock %}
+{% extends 'privado/base.html' %}
 
 {% block conteudo %}
-<main class="form-container">
+<main class="main">
 
-  <div class="form-header">
-    <h1>Cadastrar / Editar Produto</h1>
-  </div>
-
-  {% include 'mensagens.html' %}
-
-  <form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-
-    <div class="input-group">
-      <label>Nome</label>
-      {{ form.nome }}
+    <div>
+        <h1 class="page-title">Cadastrar Produto</h1>
+        <p class="page-subtitle">
+            Preencha os dados do produto abaixo.
+        </p>
     </div>
 
-    <div class="input-group">
-      <label>Descrição</label>
-      {{ form.descricao }}
-    </div>
+    {% include 'mensagens.html' %}
 
-    <div class="input-group">
-      <label>Preço</label>
-      {{ form.preco }}
-    </div>
+    <div class="section-card">
 
-    <div class="input-group">
-      <label>Estoque</label>
-      {{ form.estoque }}
-    </div>
+        <div class="section-card-header">
+            <h2>Informações do Produto</h2>
+        </div>
 
-    <div class="input-group">
-      <label>Imagem (recomendado: quadrada, fundo branco, máx. 2MB)</label>
-      {{ form.imagem }}
-      {% if form.imagem.errors %}
-        <span style="color:#f87171; font-size: 13px;">{{ form.imagem.errors|join:", " }}</span>
-      {% endif %}
-    </div>
+        <div class="section-card-body">
 
-    <button type="submit" class="btn-submit">Salvar Produto</button>
-  </form>
+            <form method="POST" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <div class="form-section">
+
+                    <div class="form-group full">
+                        <label>Nome</label>
+                        {{ form.nome }}
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Descrição</label>
+                        {{ form.descricao }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Preço</label>
+                        {{ form.preco }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estoque</label>
+                        {{ form.estoque }}
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Imagem</label>
+                        {{ form.imagem }}
+
+                        <span class="hint">
+                            Recomendado: imagem quadrada, fundo branco e tamanho máximo de 2 MB.
+                        </span>
+
+                        {% if form.imagem.errors %}
+                            <span style="color:#dc2626; font-size:.8rem;">
+                                {{ form.imagem.errors|join:", " }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-form-primary">
+                        Salvar Produto
+                    </button>
+
+                    <a href="{% url 'produtos' %}" class="btn-form-secondary">
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
 
 </main>
 {% endblock %}

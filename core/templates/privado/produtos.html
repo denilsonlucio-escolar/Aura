@@ -1,51 +1,99 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block titulo %} Produtos {% endblock %}
-
-{% block estilo %}
-<link rel="stylesheet" href="{% static 'assets/css/painel.css' %}" />
-{% endblock %}
+{% extends 'privado/base.html' %}
 
 {% block conteudo %}
-<main class="painel-container">
+<main class="main">
 
-  <div class="painel-header">
-    <h1>Gerenciamento de Produtos</h1>
-    <p>Cadastre, edite e remova produtos do catálogo</p>
-  </div>
+    <div>
+        <h1 class="page-title">Produtos</h1>
+        <p class="page-subtitle">
+            Gerencie os produtos cadastrados no sistema.
+        </p>
+    </div>
 
-  {% include 'mensagens.html' %}
+    {% include 'mensagens.html' %}
 
-  <a href="{% url 'add_produtos' %}" class="btn-submit" style="display:inline-block; width:auto; padding: 12px 24px; margin-bottom: 20px;">
-    + Cadastrar Produto
-  </a>
+    <div class="section-card">
 
-  <div class="tabela-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Preço</th>
-          <th>Estoque</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for produto in produtos %}
-        <tr>
-          <td>{{ produto.nome }}</td>
-          <td>R$ {{ produto.preco }}</td>
-          <td>{{ produto.estoque }}</td>
-          <td class="acoes">
-            <a href="{% url 'produto_editar' produto.id %}" class="btn-editar">Editar</a>
-            <a href="{% url 'produto_delete' produto.id %}" class="btn-remover">Remover</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+        <div class="section-card-header">
+            <h2>Produtos Cadastrados</h2>
+
+            <a href="{% url 'add_produtos' %}" class="btn-sm btn-primary">
+                Novo Produto
+            </a>
+        </div>
+
+        <div class="section-card-body">
+
+            <div class="table-wrap">
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Imagem</th>
+                            <th>Produto</th>
+                            <th>Preço</th>
+                            <th>Estoque</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for produto in produtos %}
+                        <tr>
+
+                            <td>
+                                {% if produto.imagem %}
+                                    <img src="{{ produto.imagem.url }}"
+                                         width="45"
+                                         height="45"
+                                         style="border-radius:8px; object-fit:cover;">
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+
+                            <td class="td-name">
+                                {{ produto.nome }}
+                                <span>{{ produto.categoria }}</span>
+                            </td>
+
+                            <td>R$ {{ produto.preco }}</td>
+
+                            <td>{{ produto.estoque }}</td>
+
+                            <td class="td-actions">
+
+                                <a href="{% url 'produto_editar' produto.id %}"
+                                   class="btn-sm btn-primary">
+                                    Editar
+                                </a>
+
+                                <a href="{% url 'produto_delete' produto.id %}"
+                                   class="btn-sm btn-danger-sm">
+                                    Excluir
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align:center;">
+                                Nenhum produto cadastrado.
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+
+    </div>
 
 </main>
 {% endblock %}

@@ -18,7 +18,10 @@ urlpatterns = [
     path('produtos/editar/<int:id>/', produto_editar, name='produto_editar'),
     path('produtos/excluir/<int:id>/', produto_delete, name='produto_delete'),
 
+    path('meus_dados/', meus_dados, name='meus_dados'),
+
     path('usuarios/', usuarios, name='usuarios'),
+    path('usuarios/adicionar/', add_usuario, name='add_usuario'),
     path('usuarios/editar/<int:id>/', usuario_editar, name='usuario_editar'),
     path('usuarios/excluir/<int:id>/', usuario_delete, name='usuario_delete'),
 

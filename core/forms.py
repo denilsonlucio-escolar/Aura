@@ -63,10 +63,33 @@ class CadastroForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['first_name', 'last_name', 'username', 'email']
 
 
-class UsuarioForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['username', 'email']
+class UsuarioForm(forms.Form):
+    username = forms.CharField()
+    email = forms.EmailField()
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(),
+        required=False
+    )
+
+    nome = forms.CharField()
+    sobrenome = forms.CharField()
+
+    cpf = forms.CharField(required=False)
+    telefone = forms.CharField(required=False)
+    sexo = forms.CharField(required=False)
+
+    dia = forms.CharField(required=False)
+    mes = forms.CharField(required=False)
+    ano = forms.CharField(required=False)
+
+    cep = forms.CharField(required=False)
+    estado = forms.CharField(required=False)
+    cidade = forms.CharField(required=False)
+    bairro = forms.CharField(required=False)
+    rua = forms.CharField(required=False)
+    numero = forms.CharField(required=False)
+    complemento = forms.CharField(required=False)

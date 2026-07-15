@@ -1,70 +1,45 @@
-{% extends 'base.html' %} {% block conteudo %}
-<style>
-  /* Aproveitando a sua paleta de cores do Home */
-  .painel-hero {
-    padding: 40px 4%;
-    background: linear-gradient(180deg,#020202 0%, #0f0f0f 100%);
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-  }
-  .painel-hero h1 { font-size: clamp(24px, 4vw, 36px); font-weight: 800; }
-  .painel-hero p { color: #d0d7e9; margin-top: 8px; }
-  
-  .painel-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
-    padding: 50px 4%;
-  }
-  
-  .painel-card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border: 1px solid rgba(255,255,255,0.02);
-    border-radius: 12px;
-    padding: 30px 20px;
-    text-align: center;
-    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
-  }
-  .painel-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 18px 40px rgba(0,0,0,0.6);
-    border-color: rgba(30,93,198,0.3);
-  }
-  .painel-card h3 { font-size: 20px; margin-bottom: 15px; font-weight: 600; }
-  .painel-card p { color: #9b9b9b; margin-bottom: 25px; font-size: 0.95rem; }
-  
-  .btn-painel {
-    display: inline-block;
-    background: linear-gradient(90deg,#1e5dc6,#4f8ef7);
-    color: #fff;
-    padding: 10px 24px;
-    border-radius: 9px;
-    font-weight: 600;
-    box-shadow: 0 6px 18px rgba(30,93,198,0.18);
-    transition: transform .12s ease;
-  }
-  .btn-painel:hover { transform: translateY(-3px); }
-</style>
+{% extends 'privado/base.html' %}
 
-<div class="painel-grid">
-  
-  <div class="painel-card">
-    <h3>👥 Usuários</h3>
-    <p>Gerencie quem tem acesso ao sistema, edite e remova cadastros.</p>
-    <a href="{% url 'usuarios' %}" class="btn-painel">Gerenciar Usuários</a>
+{% block conteudo %}
+<main class="main">
+
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Bem-vindo de volta, {{ user.username }}. Confira o resumo abaixo.</p>
   </div>
 
-  <div class="painel-card">
-    <h3>📦 Produtos</h3>
-    <p>Adicione novos itens ao catálogo, edite preços e controle o estoque.</p>
-    <a href="{% url 'produtos' %}" class="btn-painel">Gerenciar Produtos</a>
-  </div>
+   <div class="section-card">
+        <div class="section-card-body">
+            <h3>📦 Produtos</h3>
+            <h1>{{ total_produtos }}</h1>
+            <p>Produtos cadastrados</p>
+        </div>
+    </div>
 
-  <div class="painel-card">
-    <h3>👤 Meus Dados</h3>
-    <p>Mantenha suas informações pessoais e endereço de entrega atualizados.</p>
-    <a href="#" class="btn-painel">Editar Perfil</a>
-  </div>
+    <div class="section-card">
+        <div class="section-card-body">
+            <h3>👥 Clientes</h3>
+            <h1>{{ total_clientes }}</h1>
+            <p>Clientes cadastrados</p>
+        </div>
+    </div>
 
-</div>
-</div>
+    <div class="section-card">
+        <div class="section-card-body">
+            <h3>🛒 Pedidos</h3>
+            <h1>{{ total_pedidos }}</h1>
+            <p>Pedidos realizados</p>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <div class="section-card-body">
+            <h3>📋 Estoque</h3>
+            <h1>{{ estoque_total }}</h1>
+            <p>Itens disponíveis</p>
+        </div>
+    </div>
+
+
+</main>
 {% endblock %}

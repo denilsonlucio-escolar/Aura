@@ -8,9 +8,10 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.db.models import Sum
 
 from .forms import ProdutoForm, CadastroForm, UsuarioForm
-from .models import Produto, Cliente, Endereco
+from .models import Produto, Cliente, Endereco, Pedido
 
 
 def inicial(request):
@@ -36,33 +37,32 @@ def pagamento(request):
 
 
 def cadastro(request):
+
     if request.user.is_authenticated:
         return redirect('inicial')
 
     form = CadastroForm(request.POST or None)
 
     if request.method == 'POST':
+
         if form.is_valid():
+
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
             cpf = form.cleaned_data.get('cpf')
 
-            # 1. Checa se o username já existe no User
             if User.objects.filter(username=username).exists():
-                messages.error(request, 'Nome de usuário já existe.')
+                messages.error(request, 'Usuário já existe.')
                 return render(request, 'cadastro.html', {'form': form})
 
-            # 2. Checa se o e-mail já existe no User OU no Cliente
-            if email and (User.objects.filter(email=email).exists() or Cliente.objects.filter(email=email).exists()):
+            if User.objects.filter(email=email).exists() or Cliente.objects.filter(email=email).exists():
                 messages.error(request, 'E-mail já cadastrado.')
                 return render(request, 'cadastro.html', {'form': form})
-            
-            # 3. Checa se o CPF já existe no Cliente
+
             if cpf and Cliente.objects.filter(cpf=cpf).exists():
                 messages.error(request, 'CPF já cadastrado.')
                 return render(request, 'cadastro.html', {'form': form})
 
-            # Se passou em todas as checagens, cria o usuário
             usuario = User.objects.create_user(
                 username=username,
                 email=email,
@@ -70,13 +70,18 @@ def cadastro(request):
             )
 
             data_nascimento = None
+
             dia = form.cleaned_data.get('dia')
             mes = form.cleaned_data.get('mes')
             ano = form.cleaned_data.get('ano')
 
             if dia and mes and ano:
                 try:
-                    data_nascimento = datetime.date(int(ano), int(mes), int(dia))
+                    data_nascimento = datetime.date(
+                        int(ano),
+                        int(mes),
+                        int(dia)
+                    )
                 except ValueError:
                     data_nascimento = None
 
@@ -85,7 +90,6 @@ def cadastro(request):
                 nome=form.cleaned_data['nome'],
                 sobrenome=form.cleaned_data['sobrenome'],
                 email=email,
-                senha='',
                 telefone=form.cleaned_data.get('telefone') or '',
                 sexo=form.cleaned_data.get('sexo') or '',
                 data_nascimento=data_nascimento,
@@ -109,15 +113,18 @@ def cadastro(request):
                     cep=cep
                 )
 
-            return redirect(f"{reverse('login')}?cadastro=sucesso")
-        
+            messages.success(request, 'Cadastro realizado com sucesso!')
+            return redirect('login')
+
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    nome_campo = field.capitalize() if field != '__all__' else 'Erro'
-                    messages.error(request, f"{nome_campo}: {error}")
+                    messages.error(request, error)
+
+            return render(request, 'cadastro.html', {'form': form})
 
     return render(request, 'cadastro.html', {'form': form})
+
 
 def login(request):
     if request.user.is_authenticated:
@@ -141,25 +148,35 @@ def login(request):
 @login_required
 def logout(request):
     auth_logout(request)
-    return redirect('login')
+    return redirect('inicial')
 
 
 @login_required
 def produtos(request):
     produtos = Produto.objects.all()
-    return render(request, 'privado/produtos.html', {'produtos': produtos})
+    context = {
+    'produtos': produtos,
+     "pagina": "produtos",
+    }
+    return render(request, 'privado/produtos.html', context)
 
 
 @login_required
 def add_produtos(request):
     form = ProdutoForm(request.POST or None, request.FILES or None)
 
+    context = {
+     "pagina": "produtos_1",
+     'form': form
+    }
+
     if form.is_valid():
         form.save()
         messages.success(request, 'Produto cadastrado.')
         return redirect('produtos')
 
-    return render(request, 'privado/add_produtos.html', {'form': form})
+    return render(request, 'privado/add_produtos.html', context)
+
 
 
 @login_required
@@ -167,12 +184,17 @@ def produto_editar(request, id):
     produto = get_object_or_404(Produto, pk=id)
     form = ProdutoForm(request.POST or None, request.FILES or None, instance=produto)
 
+    context = {
+     "pagina": "produtos_1",
+     'form': form
+    }
+
     if form.is_valid():
         form.save()
         messages.success(request, 'Produto atualizado.')
         return redirect('produtos')
 
-    return render(request, 'privado/add_produtos.html', {'form': form})
+    return render(request, 'privado/add_produtos.html', context)
 
 
 @login_required
@@ -182,36 +204,148 @@ def produto_delete(request, id):
     messages.success(request, 'Produto removido.')
     return redirect('produtos')
 
-
 @login_required
 def painel(request):
-    return render(request, 'privado/painel.html')
+
+    total_produtos = Produto.objects.count()
+    total_clientes = Cliente.objects.count()
+    total_pedidos = Pedido.objects.count()
+
+    estoque_total = Produto.objects.aggregate(
+        total=Sum("estoque")
+    )["total"] or 0
+
+    context = {
+        "total_produtos": total_produtos,
+        "total_clientes": total_clientes,
+        "total_pedidos": total_pedidos,
+        "estoque_total": estoque_total,
+        "pagina": "painel",
+    }
+
+    return render(request, "privado/painel.html", context)
 
 
 @login_required
 def usuarios(request):
-    usuarios = User.objects.all()
-    return render(request, 'privado/usuarios.html', {'usuarios': usuarios})
+    lista = User.objects.all()
+
+    context = {
+        "pagina": "usuarios",
+        "usuarios": lista,
+    }
+
+    return render(request, "privado/usuarios.html", context)
+
+@login_required
+def add_usuario(request):
+
+    form = UsuarioForm(request.POST or None)
+
+    print(request.user.username)
+    print(form.initial)
+
+    context = {
+        "pagina": "usuarios_1",
+        "form": form,
+    }
+
+    if request.method == "POST":
+
+        if form.is_valid():
+
+            username = form.cleaned_data["username"]
+            email = form.cleaned_data["email"]
+
+            if User.objects.filter(username=username).exists():
+                messages.error(request, "Usuário já existe.")
+                return render(request, "privado/add_usuario.html", context)
+
+            if User.objects.filter(email=email).exists():
+                messages.error(request, "E-mail já cadastrado.")
+                return render(request, "privado/add_usuario.html", context)
+
+            usuario = User.objects.create_user(
+                username=username,
+                email=email,
+                password=form.cleaned_data["password"]
+            )
+
+            Cliente.objects.create(
+                usuario=usuario,
+                nome=form.cleaned_data["nome"],
+                sobrenome=form.cleaned_data["sobrenome"],
+                cpf=form.cleaned_data.get("cpf") or "",
+                telefone=form.cleaned_data.get("telefone") or "",
+                sexo=form.cleaned_data.get("sexo") or "",
+                email=email
+            )
+
+            messages.success(request, "Usuário cadastrado com sucesso.")
+            return redirect("usuarios")
+
+    return render(request, "privado/add_usuario.html", context)
 
 
 @login_required
 def usuario_editar(request, id):
     usuario = get_object_or_404(User, pk=id)
-    form = UsuarioForm(request.POST or None, instance=usuario)
 
-    if request.method == 'POST':
+    cliente = Cliente.objects.filter(usuario=usuario).first()
+
+    endereco = None
+    if cliente:
+        endereco = Endereco.objects.filter(cliente=cliente).first()
+
+    dados = {
+        "username": usuario.username,
+        "email": usuario.email,
+
+        "nome": cliente.nome if cliente else "",
+        "sobrenome": cliente.sobrenome if cliente else "",
+        "cpf": cliente.cpf if cliente else "",
+        "telefone": cliente.telefone if cliente else "",
+        "sexo": cliente.sexo if cliente else "",
+
+        "cep": endereco.cep if endereco else "",
+        "estado": endereco.estado if endereco else "",
+        "cidade": endereco.cidade if endereco else "",
+        "bairro": endereco.bairro if endereco else "",
+        "rua": endereco.rua if endereco else "",
+        "numero": endereco.numero if endereco else "",
+        "complemento": endereco.complemento if endereco else "",
+    }
+
+    form = UsuarioForm(
+        request.POST or None,
+        initial=dados
+    )
+
+    if request.method == "POST":
+
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Usuário atualizado.')
-            return redirect('usuarios')
-        else:
-            # Se der erro de validação, pega os erros e manda para a tela
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"{field.capitalize()}: {error}")
 
-    return render(request, 'privado/add_usuario.html', {'form': form})
+            usuario.username = form.cleaned_data["username"]
+            usuario.email = form.cleaned_data["email"]
+            usuario.save()
 
+            if cliente:
+                cliente.nome = form.cleaned_data["nome"]
+                cliente.sobrenome = form.cleaned_data["sobrenome"]
+                cliente.cpf = form.cleaned_data["cpf"]
+                cliente.telefone = form.cleaned_data["telefone"]
+                cliente.sexo = form.cleaned_data["sexo"]
+                cliente.save()
+
+            messages.success(request, "Usuário atualizado com sucesso.")
+            return redirect("usuarios")
+
+    context = {
+        "pagina": "usuarios_1",
+        "form": form,
+    }
+
+    return render(request, "privado/add_usuario.html", context)
 
 @login_required
 def usuario_delete(request, id):
@@ -219,3 +353,10 @@ def usuario_delete(request, id):
     usuario.delete()
     messages.success(request, 'Usuário removido.')
     return redirect('usuarios')
+
+@login_required
+def meus_dados(request):
+    context = {
+     "pagina": "meus_dados",
+    }
+    return render(request, 'privado/meus_dados.html', context)
