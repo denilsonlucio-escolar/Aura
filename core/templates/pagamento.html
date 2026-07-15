@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
 {% block titulo %}Pagamento{% endblock %}
@@ -27,13 +26,16 @@
             </div>
         </div>
 
+
         <form class="form-cartao">
 
             <label>Número do cartão</label>
             <input type="text" placeholder="0000 0000 0000 0000">
 
+
             <label>Nome impresso no cartão</label>
             <input type="text" placeholder="Nome completo">
+
 
             <div class="linha">
 
@@ -42,12 +44,14 @@
                     <input type="text" placeholder="MM/AA">
                 </div>
 
+
                 <div style="flex:1">
                     <label>CVV</label>
                     <input type="text" placeholder="123">
                 </div>
 
             </div>
+
 
             <label>Parcelas</label>
 
@@ -57,39 +61,70 @@
                 <option>3x sem juros</option>
             </select>
 
+
         </form>
 
+
     </div>
+
 
     <div class="pagamento-right">
 
         <h3>Resumo</h3>
 
+
         {% for item in produtos %}
 
         <div class="linha-resumo">
-            <span>{{ item.produto.nome }} x{{ item.quantidade }}</span>
-            <span>R$ {{ item.subtotal }}</span>
+
+            <span>
+                {{ item.produto.nome }} x{{ item.quantidade }}
+            </span>
+
+            <span>
+                R$ {{ item.subtotal }}
+            </span>
+
         </div>
 
         {% endfor %}
 
+
         <div class="linha-resumo desconto">
-            <span>Desconto</span>
-            <span>R$ 0,00</span>
+
+            <span>
+                Desconto
+            </span>
+
+            <span>
+                R$ 0,00
+            </span>
+
         </div>
 
+
         <div class="linha-resumo total">
-            <span>Total</span>
-            <span id="valor-total">R$ {{ total }}</span>
+
+            <span>
+                Total
+            </span>
+
+            <span id="valor-total">
+                R$ {{ total }}
+            </span>
+
         </div>
+
 
         <button class="btn-finalizar">
             Finalizar pagamento
         </button>
 
+
     </div>
 
+
 </div>
+
 
 {% endblock %}
