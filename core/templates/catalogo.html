@@ -19,7 +19,7 @@
   <input type="text" id="campoBusca" placeholder="Barra de pesquisa">
   <div class="card-grid" id="lista">
     {% for produto in produtos %}
-    <a href="{% url 'produto_detalhe' produto.id %}" class="card-link" id="{{ produto.nome }}">
+    <a href="{% url 'produto_detalhe' produto.id %}" class="card-link">
       <br>
       <br>
       <div class="card">
@@ -28,7 +28,7 @@
           <img src="{{ produto.imagem.url }}">
           {% endif %} <span class="badge">-30% OFF</span>
         </div>
-        <h3 id="nome">{{ produto.nome }}</h3>
+        <h3 class="nome-produto">{{ produto.nome }}</h3>
         <!-- <div class="stars">★★★★★</div> -->
         <div class="prices">
           <!-- <span class="old">R$ 210,00</span> -->
