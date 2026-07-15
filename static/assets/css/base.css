@@ -44,9 +44,7 @@ body{
   justify-content: space-between;
 }
 
-/* =========================
-   LOGO
-========================= */
+/* LOGO*/
 
 .logo{
   text-decoration: none;
@@ -64,9 +62,7 @@ body{
   letter-spacing: 1px;
 }
 
-/* =========================
-   LINKS MENU
-========================= */
+/* LINKS MENU */
 
 .nav-links{
   display: flex;
@@ -93,7 +89,7 @@ body{
 }
 
 /* =========================
-   BOTÕES
+   BOTÕES (EDITADO - TODOS IGUAIS)
 ========================= */
 
 .nav-buttons{
@@ -116,58 +112,21 @@ body{
 
   font-weight: 600;
   font-size: 14px;
+  text-decoration: none;
 
   transition: .3s;
 
+  /* Borda azul e fundo transparente para todos os botões */
   border: 1px solid #2563eb;
-}
-
-/* ENTRAR */
-
-.btn-login{
   background: transparent;
-
   color: #3b82f6 !important;
 }
 
-.btn-login:hover{
+.btn-nav:hover{
+  /* Efeito de hover idêntico para todos */
   background: #2563eb;
   color: white !important;
-}
-
-/* CADASTRO */
-
-.btn-cadastro{
-  background: linear-gradient(
-    135deg,
-    #2563eb,
-    #0ea5e9
-  );
-
-  border: none;
-
-  color: white !important;
-
-  box-shadow: 0 0 15px rgba(37,99,235,.25);
-}
-
-.btn-cadastro:hover{
   transform: translateY(-1px);
-
-  opacity: .95;
-}
-
-/* PERFIL */
-
-.btn-perfil{
-  background: transparent;
-
-  color: #3b82f6 !important;
-}
-
-.btn-perfil:hover{
-  background: #2563eb;
-  color: white !important;
 }
 
 /* =========================
@@ -196,7 +155,7 @@ body{
 }
 
   /* =========================
-    FOOTER CORRIGIDO - AURA
+     FOOTER CORRIGIDO - AURA
 ========================= */
 
 .footer {

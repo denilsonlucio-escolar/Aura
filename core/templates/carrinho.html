@@ -1,3 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}Cadastro{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/carrinho.css' %}">
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'assets/js/carrinho.js' %}"></script>
+{% endblock %}
+
+
+{% block conteudo %}
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -5,30 +20,11 @@
   <meta charset="UTF-8">
   <title>Carrinho</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="carrinho.css">
-  <script src="carrinho.js" defer></script>
+  <link rel="stylesheet" href=" {% static 'carrinho.css'%}">
+  <script src=" {% static 'carrinho.js' %}" defer></script>
 </head>
 
 <body>
-
-  <header class="topo">
-      <div class="logo-header">AURA</div>
-  
-      <nav class="links-header">
-        <a href="../PG_1_Denilson/siteesportes.html">Página inicial</a>
-        <a href="../PG_2_Pedro_Neto/siteesportes.html">Produtos</a>
-        <a href="carrinho.html">Carrinho</a>
-        <a href="#">Recursos</a>
-        <a href="#">Preços</a>
-        <a href="#">Contato</a>
-      </nav>
-  
-      <div class="botoes-login">
-        <a href="../PG_4_Joao_Guilherme/login.html" class="entrar">Entrar</a>
-        <a href="../PG_5_Samuel/index.html" class="registrar">Registrar</a>
-      </div>
-    </header>
-
   <div class="pagina-carrinho">
     <h2>Carrinho</h2>
 
@@ -54,11 +50,11 @@
         </div>
 
         <button class="btn-continuar" onclick="irParaEntrega()">Continuar</button>
-        <a href="../PG_2_Pedro_Neto/siteesportes.html" class="voltar">Buscar mais produtos</a>
+        <a href="catalogo.html" class="voltar">Buscar mais produtos</a>
       </div>
     </div>
   </div>
 
 </body>
-
 </html>
+{% endblock %}

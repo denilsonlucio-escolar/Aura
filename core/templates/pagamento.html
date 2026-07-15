@@ -1,16 +1,16 @@
-{%extends 'base.html'%}
+{% extends 'base.html' %}
+{% load static %}
 
-{% load static%}
-
-{%block titulo%} Adicionar Produto {%endblock%}
+{% block titulo %} Adicionar Produto {% endblock %}
 
 {% block estilo %} <link rel="stylesheet" href="{% static 'assets/css/pagamento.css' %}" /> {% endblock %}
 
-{% block scripts %}  {% endblock %}
+{% block scripts %}
+<link rel="stylesheet" href="{% static 'assets/js/pagamento.js' %}">
+{% endblock %}
 
 
-{%block conteudo%}
-
+{% block conteudo %}
   <div class="pagina-pagamento">
     <div class="pagamento-left">
       <h2>Forma de pagamento</h2>
@@ -74,4 +74,4 @@
     </div>
 
   </div>
-{%endblock%}
+{% endblock %}
