@@ -23,11 +23,6 @@ def catalogo(request):
     return render(request, 'catalogo.html', {'produtos': produtos})
 
 
-def produto_detalhe(request, id):
-    produto = get_object_or_404(Produto, pk=id)
-    return render(request, 'produto_detalhe.html', {'produto': produto})
-
-
 def carrinho(request):
     carrinho = request.session.get("carrinho", {})
 
@@ -184,58 +179,6 @@ def logout(request):
     return redirect('inicial')
 
 
-@login_required
-def produtos(request):
-    produtos = Produto.objects.all()
-    context = {
-    'produtos': produtos,
-     "pagina": "produtos",
-    }
-    return render(request, 'privado/produtos.html', context)
-
-
-@login_required
-def add_produtos(request):
-    form = ProdutoForm(request.POST or None, request.FILES or None)
-
-    context = {
-     "pagina": "produtos_1",
-     'form': form
-    }
-
-    if form.is_valid():
-        form.save()
-        messages.success(request, 'Produto cadastrado.')
-        return redirect('produtos')
-
-    return render(request, 'privado/add_produtos.html', context)
-
-
-
-@login_required
-def produto_editar(request, id):
-    produto = get_object_or_404(Produto, pk=id)
-    form = ProdutoForm(request.POST or None, request.FILES or None, instance=produto)
-
-    context = {
-     "pagina": "produtos_1",
-     'form': form
-    }
-
-    if form.is_valid():
-        form.save()
-        messages.success(request, 'Produto atualizado.')
-        return redirect('produtos')
-
-    return render(request, 'privado/add_produtos.html', context)
-
-
-@login_required
-def produto_delete(request, id):
-    produto = get_object_or_404(Produto, pk=id)
-    produto.delete()
-    messages.success(request, 'Produto removido.')
-    return redirect('produtos')
 
 @login_required
 def painel(request):
@@ -319,6 +262,13 @@ def add_usuario(request):
 
     return render(request, "privado/add_usuario.html", context)
 
+@login_required
+def usuario_delete(request, id):
+    usuario = get_object_or_404(User, pk=id)
+    usuario.delete()
+    messages.success(request, 'Usuário removido.')
+    return redirect('usuarios')
+
 
 @login_required
 def usuario_editar(request, id):
@@ -379,13 +329,6 @@ def usuario_editar(request, id):
     }
 
     return render(request, "privado/add_usuario.html", context)
-
-@login_required
-def usuario_delete(request, id):
-    usuario = get_object_or_404(User, pk=id)
-    usuario.delete()
-    messages.success(request, 'Usuário removido.')
-    return redirect('usuarios')
 
 @login_required
 def meus_dados(request):

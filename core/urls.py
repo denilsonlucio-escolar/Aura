@@ -9,14 +9,8 @@ urlpatterns = [
     path('cadastro/', cadastro, name='cadastro'),
 
     path('catalogo/', catalogo, name='catalogo'),
-    path('produto/<int:id>/', produto_detalhe, name='produto_detalhe'),
     path('carrinho/', carrinho, name='carrinho'),
     path('pagamento/', pagamento, name='pagamento'),
-
-    path('produtos/', produtos, name='produtos'),
-    path('produtos/adicionar/', add_produtos, name='add_produtos'),
-    path('produtos/editar/<int:id>/', produto_editar, name='produto_editar'),
-    path('produtos/excluir/<int:id>/', produto_delete, name='produto_delete'),
 
     path('meus_dados/', meus_dados, name='meus_dados'),
 
