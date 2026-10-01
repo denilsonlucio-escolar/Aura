@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib import admin
-from .models import Cliente, Endereco, Pagamento, Produto, Pedido, ItemPedido
+from .models import Pagamento, Produto, Pedido, ItemPedido
+from .models import Pagamento, Produto, Pedido, ItemPedido
+from usuarios.models import Cliente, Endereco
 
 admin.site.register(Cliente)
 admin.site.register(Endereco)
