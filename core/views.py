@@ -12,7 +12,7 @@ from django.db.models import Sum
 
 from .forms import ProdutoForm
 from usuarios.forms import CadastroForm, UsuarioForm
-from .models import Produto, Pedido
+from produtos.models import Produto
 from usuarios.models import Cliente, Endereco
 
 
@@ -93,4 +93,14 @@ def remover_carrinho(request, id):
 
     return redirect("carrinho")
 
+def transparencia(request):
+    qtd_produtos = Produto.objects.count()
+    
+    print("QUANTIDADE DE PRODUTOS:", qtd_produtos)
+
+    context = {
+        "qtd_produtos": qtd_produtos,
+    }
+
+    return render(request, "transparencia.html", context)
  

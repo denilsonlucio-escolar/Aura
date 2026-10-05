@@ -10,4 +10,6 @@ urlpatterns = [
     
     path('carrinho/adicionar/<int:id>/',adicionar_carrinho, name='adicionar_carrinho'),
     path('carrinho/remover/<int:id>/',remover_carrinho, name='remover_carrinho'),
+
+    path('transparencia/',transparencia, name='transparencia'),
 ]

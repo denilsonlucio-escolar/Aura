@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}
+Transparência
+{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/transparencia.css' %}" />
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}
+
+{% block conteudo %}
+<div class="page-header">
+  <div class="page-header-inner">
+    <h1>Painel de Transparência</h1>
+  </div>
+</div>
+
+<div class="main-content">
+
+  <!-- ============ BLOCO 1: NÚMEROS GERAIS (Níveis 1 e 3) ============ -->
+  <div class="section-card">
+    <h2>📊 Números Gerais</h2>
+    <p>Resumo de produtos no sistema.</p>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">Produtos cadastrados</span>
+         {{ qtd_produtos }}
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Áreas</span>
+         {{ qtd_areas }}
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Públicos-alvo</span>
+        {{ qtd_publicos }}
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Vagas ofertadas</span>
+         {{vagas_abertas_1}}
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BLOCO 3: CARGA HORÁRIA (Nível 3) ============ -->
+  <div class="section-card">
+    <h2>$ Preços</h2>
+    <p>Menor, média e maior preço entre os produtos cadastrados.</p>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">Menor</span>
+         {{ menor_ch }}h
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Média</span>
+         {{media_ch}}h
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Maior</span>
+          {{ maior_ch }}h
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BLOCO 6: GRÁFICOS ============ -->
+  <div class="section-card">
+    <h2>Gráfico...</h2>
+    <div style="position: relative; height: 320px;">
+      <canvas id=""></canvas>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <h2>Gráfico...</h2>
+    <div style="position: relative; height: 320px;">
+      <canvas id=""></canvas>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
