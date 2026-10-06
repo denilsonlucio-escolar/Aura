@@ -96,8 +96,7 @@ def remover_carrinho(request, id):
 def transparencia(request):
     qtd_produtos = Produto.objects.count()
     
-    print("QUANTIDADE DE PRODUTOS:", qtd_produtos)
-
+    
     context = {
         "qtd_produtos": qtd_produtos,
     }

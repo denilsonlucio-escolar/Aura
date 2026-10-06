@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Produto
-from .forms import ProdutoForm
+from .forms import ProdutoForm, CategoriaForm
 
 def produto_detalhe(request, id):
     produto = get_object_or_404(Produto, pk=id)
@@ -58,3 +58,19 @@ def produtos(request):
      "pagina": "produtos",
     }
     return render(request, 'privado/produtos.html', context)
+
+@login_required
+def add_categoria(request):
+    form = CategoriaForm(request.POST or None)
+
+    context = {
+     "pagina": "categorias",
+     'form': form
+    }
+
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Categoria cadastrada com sucesso.')
+        return redirect('produtos')
+
+    return render(request, 'privado/add_categoria.html', context)

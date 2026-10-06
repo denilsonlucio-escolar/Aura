@@ -1,0 +1,52 @@
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+    <div>
+        <h1 class="page-title">Cadastrar Produto</h1>
+        <p class="page-subtitle">
+            Preencha os dados do produto abaixo.
+        </p>
+    </div>
+
+    {% include 'mensagens.html' %}
+
+    <div class="section-card">
+
+        <div class="section-card-header">
+            <h2>Informações do Produto</h2>
+        </div>
+
+        <div class="section-card-body">
+
+            <form method="POST" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <div class="form-section">
+
+                    <div class="form-group full">
+                        <label>Nome</label>
+                        {{ form.nome }}
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-form-primary">
+                        Salvar Categoria
+                    </button>
+
+                    <a href="{% url 'produtos' %}" class="btn-form-secondary">
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</main>
+{% endblock %}

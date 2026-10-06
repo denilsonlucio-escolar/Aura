@@ -42,6 +42,9 @@
           class="nav-icon">📚</span> Produtos </a>
       <a href="{% url 'add_usuario' %}" class="nav-item {% if pagina == 'usuarios_1' %}active{% endif %}"><span
           class="nav-icon">🔑</span> Usuários</a>
+      <a href="{% url 'add_categoria' %}" class="nav-item {% if pagina == 'usuarios_1' %}active{% endif %}"><span
+          class="nav-icon">🏷️</span> Categoria</a>
+      
 
       <div class="nav-section">Sessão</div>
       <a href="{% url 'inicial' %}" class="nav-item "><span class="nav-icon">🏠</span> Home</a>
