@@ -1,8 +1,9 @@
+
 /* =========================
    RESET
 ========================= */
 
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -12,7 +13,7 @@
    BODY
 ========================= */
 
-body{
+body {
   font-family: Arial, sans-serif;
   background: #050505;
   color: white;
@@ -22,85 +23,115 @@ body{
    NAVBAR
 ========================= */
 
-.navbar{
+.navbar {
   width: 100%;
   background: #080808;
-
   border-bottom: 1px solid #1e293b;
-
   position: sticky;
   top: 0;
   z-index: 1000;
 }
 
-.nav-inner{
+.nav-inner {
   max-width: 1200px;
-
   margin: auto;
   padding: 16px 24px;
 
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
 }
 
-/* LOGO*/
+/* =========================
+   LOGO
+========================= */
 
-.logo{
+.logo {
+  justify-self: start;
+
+  display: flex;
+  align-items: center;
+
   text-decoration: none;
-
-  display: flex;
-  align-items: center;
+  color: #dbe4f0;
 }
 
-.logo-text{
+.logo-text {
   font-size: 28px;
   font-weight: 700;
-
   color: white;
-
   letter-spacing: 1px;
+  transition: color 0.3s ease;
 }
 
-/* LINKS MENU */
+.logo:hover .logo-text {
+  color: #3b82f6;
+}
 
-.nav-links{
+/* =========================
+   LINKS MENU
+========================= */
+
+.nav-links {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 18px;
 }
 
-.nav-links a{
+.nav-links a {
+  position: relative;
+
   text-decoration: none;
   color: #dbe4f0;
 
-  transition: .3s;
+  transition: color 0.3s ease;
 }
 
-.nav-links a:hover{
+.nav-links a::after {
+  content: "";
+
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+
+  width: 0;
+  height: 1px;
+
+  background: #3b82f6;
+
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover {
   color: #3b82f6;
-  border: 3px solid #3b82f6;
-
 }
 
-.nav-divider{
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+.nav-divider {
   width: 1px;
   height: 25px;
-
   background: #334155;
 }
 
 /* =========================
-   BOTÕES (EDITADO - TODOS IGUAIS)
+   BOTÕES
 ========================= */
 
-.nav-buttons{
+.nav-buttons {
+  justify-self: end;
+
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+
   gap: 12px;
 }
 
-.btn-nav{
+.btn-nav {
   height: 42px;
   min-width: 110px;
 
@@ -116,16 +147,14 @@ body{
   font-size: 14px;
   text-decoration: none;
 
-  transition: .3s;
-
-  /* Borda azul e fundo transparente para todos os botões */
   border: 1px solid #2563eb;
   background: transparent;
   color: #3b82f6 !important;
+
+  transition: 0.3s;
 }
 
-.btn-nav:hover{
-  /* Efeito de hover idêntico para todos */
+.btn-nav:hover {
   background: #2563eb;
   color: white !important;
   transform: translateY(-1px);
@@ -135,7 +164,7 @@ body{
    MENU MOBILE
 ========================= */
 
-.hamburger{
+.hamburger {
   display: none;
 
   flex-direction: column;
@@ -147,7 +176,7 @@ body{
   cursor: pointer;
 }
 
-.hamburger span{
+.hamburger span {
   width: 25px;
   height: 3px;
 
@@ -156,22 +185,27 @@ body{
   border-radius: 5px;
 }
 
-  /* =========================
-     FOOTER CORRIGIDO - AURA
+/* =========================
+   FOOTER
 ========================= */
 
 .footer {
   margin-top: 80px;
-  background: #0b0b0b; /* Alterado para o preto padrão da sua Home */
-  border-top: 1px solid rgba(255, 255, 255, 0.05); /* Borda sutil que combina com o tema dark */
+
+  background: #0b0b0b;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .footer-container {
   max-width: 1200px;
   margin: auto;
+
   padding: 50px 24px;
+
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+
   gap: 40px;
 }
 
@@ -183,7 +217,7 @@ body{
 
 .footer-logo {
   font-size: 28px;
-  color: #4f8ef7; /* Azul gradiente da Aura para dar destaque à logo */
+  color: #4f8ef7;
 }
 
 .footer-section h3 {
@@ -199,18 +233,22 @@ body{
 .footer-section a {
   text-decoration: none;
   color: #94a3b8;
-  transition: .3s;
+  transition: 0.3s;
 }
 
 .footer-section a:hover {
-  color: #fff; /* Corrigido para não sumir no fundo preto */
+  color: #fff;
 }
 
 .footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.05); /* Borda sutil */
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+
   text-align: center;
+
   padding: 22px;
+
   color: #64748b;
+
   font-size: 14px;
 }
 
@@ -218,13 +256,18 @@ body{
    RESPONSIVO
 ========================= */
 
-@media(max-width: 768px){
+@media (max-width: 768px) {
 
-  .hamburger{
+  .hamburger {
     display: flex;
   }
 
-  .nav-links{
+  .nav-inner {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .nav-links {
     position: absolute;
 
     top: 80px;
@@ -241,55 +284,67 @@ body{
 
     display: none;
 
-    box-shadow: 0 0 20px rgba(0,0,0,.4);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
   }
 
-  .nav-links.active{
+  .nav-links.active {
     display: flex;
   }
 
-  .nav-divider{
+  .nav-divider {
     display: none;
   }
 
-  .logo-text{
+  .logo-text {
     font-size: 22px;
   }
 
-  .nav-buttons{
+  .nav-buttons {
     width: 100%;
 
     flex-direction: column;
     align-items: stretch;
   }
 
-  .btn-nav{
+  .btn-nav {
     width: 100%;
   }
 
-  .footer-container{
+  .footer-container {
     grid-template-columns: 1fr;
   }
-
 }
+
+/* =========================
+   ALERTAS
+========================= */
 
 .alerta {
   padding: 12px 16px;
+
   border-radius: 8px;
+
   margin-bottom: 16px;
+
   font-size: 14px;
   font-weight: 600;
+
   border-left: 4px solid;
 }
 
 .alerta-sucesso {
   background: rgba(37, 99, 235, 0.08);
+
   border-color: #2563eb;
+
   color: #93c5fd;
 }
 
 .alerta-erro {
   background: rgba(220, 38, 38, 0.08);
+
   border-color: #dc2626;
+
   color: #fca5a5;
 }
+

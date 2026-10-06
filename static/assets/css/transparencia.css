@@ -22,24 +22,32 @@ body {
 .transparencia-header {
   margin-bottom: 35px;
 }
-
 .page-header {
     margin: 26px;
-  }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page-header-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .transparencia-header h1 {
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  margin-bottom: 12px;
-  color: #ffffff;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+    color: #ffffff;
 }
 
 .section-card {
   background: linear-gradient(180deg, #121212 0%, #0f0f0f 100%);
   border-radius: 16px;
-  padding: 28px;
-  margin: 26px;
+  padding: 25px;
+  margin: 40px;
   border: 1px solid rgba(79, 142, 247, 0.35);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
 }

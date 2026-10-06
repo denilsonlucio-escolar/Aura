@@ -99,7 +99,7 @@ header.topo {
   color: #999;
 }
 
-#campoBusca:focus {
+#campoBusca:hover {
   border-color: #1e5dc6;
   box-shadow: 0 0 0 4px rgba(30, 93, 198, 0.15);
 }
@@ -129,7 +129,7 @@ header.topo {
    ========================================== */
 .card {
   background: #101010;
-  border: 1px solid #1e1e1e;
+  border:1px solid rgba(79, 142, 247, 0.35);
   border-radius: 12px;
   padding: 15px;
   text-align: left;
