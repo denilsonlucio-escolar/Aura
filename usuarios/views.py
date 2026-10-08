@@ -11,9 +11,14 @@ from django.contrib import messages
 from django.db.models import Sum
 
 from .forms import CadastroForm, UsuarioForm
+from produtos.forms import ProdutoForm, Categoria
+from produtos.models import Produto, Categoria
+from pedidos.forms import PedidoForm
+from pedidos.models import Pedido
 from .models import Cliente, Endereco
 
-from core.models import Produto, Pedido
+
+
 
 def cadastro(request):
 
@@ -133,10 +138,11 @@ def logout(request):
 
 @login_required
 def painel(request):
-
+     
     total_produtos = Produto.objects.count()
     total_clientes = Cliente.objects.count()
     total_pedidos = Pedido.objects.count()
+    total_categorias = Categoria.objects.count()
 
     estoque_total = Produto.objects.aggregate(
         total=Sum("estoque")
@@ -145,7 +151,7 @@ def painel(request):
     context = {
         "total_produtos": total_produtos,
         "total_clientes": total_clientes,
-        "total_pedidos": total_pedidos,
+        "total_categorias": total_categorias,
         "estoque_total": estoque_total,
         "pagina": "painel",
     }

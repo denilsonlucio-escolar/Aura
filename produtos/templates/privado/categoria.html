@@ -1,0 +1,99 @@
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+    <div>
+        <h1 class="page-title">categoria</h1>
+        <p class="page-subtitle">
+            Gerencie os categorias cadastradas no sistema.
+        </p>
+    </div>
+
+    {% include 'mensagens.html' %}
+
+    <div class="section-card">
+
+        <div class="section-card-header">
+            <h2>Categorias cadastradas</h2>
+
+            <a href="{% url 'add_categoria' %}" class="btn-sm btn-primary">
+                Nova Categoria
+            </a>
+        </div>
+
+        <div class="section-card-body">
+
+            <div class="table-wrap">
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Imagem</th>
+                            <th>Produto</th>
+                            <th>Preço</th>
+                            <th>Estoque</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for categoria in categorias %}
+                        <tr>
+
+                            <td>
+                                {% if produto.imagem %}
+                                    <img src="{{ produto.imagem.url }}"
+                                         width="45"
+                                         height="45"
+                                         style="border-radius:8px; object-fit:cover;">
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+
+                            <td class="td-name">
+                                {{ categoria.nome }}
+                                <span>{{ produto.categoria }}</span>
+                            </td>
+
+                            <td>R$ {{ produto.preco }}</td>
+
+                            <td>{{ produto.estoque }}</td>
+
+                            <td class="td-actions">
+
+                                <a href="{% url 'produto_editar' produto.id %}"
+                                   class="btn-sm btn-primary">
+                                    Editar
+                                </a>
+
+                                <a href="{% url 'produto_delete' produto.id %}"
+                                   class="btn-sm btn-danger-sm">
+                                    Excluir
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align:center;">
+                                Nenhum produto cadastrado.
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Produto
+from .models import Produto, Categoria
 from .forms import ProdutoForm, CategoriaForm
 
 def produto_detalhe(request, id):
@@ -72,5 +72,30 @@ def add_categoria(request):
         form.save()
         messages.success(request, 'Categoria cadastrada com sucesso.')
         return redirect('produtos')
+
+    return render(request, 'privado/add_categoria.html', context)
+
+@login_required
+def categoria_delete(request, id):
+    Categoria = get_object_or_404(Categoria, pk=id)
+    Categoria.delete()
+    messages.success(request, 'Categoria removida.')
+    return redirect('categoria')
+
+
+@login_required
+def categoria_editar(request, id):
+    categoria = get_object_or_404(Categoria, pk=id)
+    form = CategoriaForm(request.POST or None, instance=categoria)
+
+    context = {
+     "pagina": "categoria_1",
+     'form': form
+    }
+
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'categoria atualizada.')
+        return redirect('Categoria')
 
     return render(request, 'privado/add_categoria.html', context)

@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib.auth.models import User
 from usuarios.models import Cliente, Endereco
-from .models import Pagamento, Produto, Pedido, ItemPedido
+from .models import Pagamento
+from produtos.models import Produto
+from pedidos.models import Pedido, ItemPedido
 
 from PIL import Image
 
