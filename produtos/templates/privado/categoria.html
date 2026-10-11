@@ -1,0 +1,85 @@
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+    <div>
+        <h1 class="page-title">Categorias</h1>
+        <p class="page-subtitle">
+            Gerencie as categorias cadastradas no sistema.
+        </p>
+    </div>
+
+    {% include 'mensagens.html' %}
+
+    <div class="section-card">
+
+        <div class="section-card-header">
+            <h2>Categorias Cadastradas</h2>
+
+            <a href="{% url 'add_categoria' %}" class="btn-sm btn-primary">
+                Nova Categoria
+            </a>
+        </div>
+
+        <div class="section-card-body">
+
+            <div class="table-wrap">
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome da Categoria</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for categoria in categorias %}
+                        <tr>
+
+                            <td>
+                                {{ categoria.id }}
+                            </td>
+
+                            <td class="td-name">
+                                {{ categoria.nome }}
+                            </td>
+
+                            <td class="td-actions">
+
+                                <a href="{% url 'categoria_editar' categoria.id %}"
+                                   class="btn-sm btn-primary">
+                                    Editar
+                                </a>
+
+                                <a href="{% url 'categoria_delete' categoria.id %}"
+                                   class="btn-sm btn-danger-sm">
+                                    Excluir
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" style="text-align:center;">
+                                Nenhuma categoria cadastrada.
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+{% endblock %}

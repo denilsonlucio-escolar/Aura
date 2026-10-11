@@ -1,0 +1,88 @@
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+    <div>
+        <h1 class="page-title">Cadastrar Produto</h1>
+        <p class="page-subtitle">
+            Preencha os dados do produto abaixo.
+        </p>
+    </div>
+
+    {% include 'mensagens.html' %}
+
+    <div class="section-card">
+
+        <div class="section-card-header">
+            <h2>Informações do Produto</h2>
+        </div>
+
+        <div class="section-card-body">
+
+            <form method="POST" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <div class="form-section">
+
+                    <div class="form-group full">
+                        <label>Nome</label>
+                        {{ form.nome }}
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Descrição</label>
+                        {{ form.descricao }}
+                    </div>
+
+                    <div class="form-group">
+                        <label aria-placeholder="Selecione a Categoria">Categoria</label>
+                        {{ form.categoria }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Preço</label>
+                        {{ form.preco }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estoque</label>
+                        {{ form.estoque }}
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Imagem</label>
+                        {{ form.imagem }}
+
+                        <span class="hint">
+                            Recomendado: imagem quadrada, fundo branco e tamanho máximo de 2 MB.
+                        </span>
+
+                        {% if form.imagem.errors %}
+                            <span style="color:#dc2626; font-size:.8rem;">
+                                {{ form.imagem.errors|join:", " }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-form-primary">
+                        Salvar Produto
+                    </button>
+
+                    <a href="{% url 'produtos' %}" class="btn-form-secondary">
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</main>
+{% endblock %}

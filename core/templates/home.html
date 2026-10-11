@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %} Home {% endblock %}
+
+{% block estilo %} <link rel="stylesheet" href="{% static 'assets/css/home.css' %}" /> {% endblock %}
+
+{% block scripts %} <script src="{% static 'assets/js/home.js' %}"></script> {% endblock %}
+
+{% block conteudo %}
+  <section class="hero">
+    <video class="videofundo" autoplay muted loop playsinline>
+      <source src="{% static 'assets/imagens/bc.mp4' %}" type="video/mp4"/>
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Aura que transborda</h1>
+      <p>Equipamentos, notícias e paixão pelo esporte — para todo mundo.</p>
+      <div class="hero-cta">
+        <a href="{% url 'catalogo' %}" class="cta">Ver Produtos</a>
+        <a href="#" class="cta secondary">Mais Vendidos</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="slogan">
+    <h2>Qualidade, conforto e design — pensado para torcer</h2>
+  </section>
+
+  <main class="anuncios" id="gridProdutos" role="main" aria-label="Categorias e Produtos em destaque">
+    <article class="imagem-container" data-keywords="basquete bola calçado basquete">
+      <img src="{% static 'assets/imagens/basquete1.jpg' %}" alt="Basquete - equipamentos" loading="lazy" />
+      <a href="#" class="botao-imagens">Basquete</a>
+    </article>
+
+    <article class="imagem-container" data-keywords="futebol chuteira camisa futebol">
+      <img src="{% static 'assets/imagens/futebol.jpg' %}" alt="Futebol - equipamentos" loading="lazy" />
+      <a href="#" class="botao-imagens">Futebol</a>
+    </article>
+
+    <article class="imagem-container" data-keywords="tenis corrida treino tenis">
+      <img src="{% static 'assets/imagens/tenis.jpg' %}" alt="Tênis - corrida" loading="lazy" />
+      <a href="#" class="botao-imagens">Tênis</a>
+    </article>
+  </main>
+{% endblock %}

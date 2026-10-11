@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}{{ produto.nome }}{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/catalogo.css' %}">
+{% endblock %}
+
+{% block conteudo %}
+
+<main class="catalogo">
+
+  <section class="produto-detalhe">
+
+    <div class="produto-detalhe-img">
+
+      {% if produto.imagem %}
+      <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+      {% endif %}
+
+    </div>
+
+
+    <div class="produto-detalhe-info">
+
+      <h1>{{ produto.nome }}</h1>
+
+
+      <div class="prices">
+        <span class="new">
+          R$ {{ produto.preco }}
+        </span>
+      </div>
+
+
+      <div class="estoque">
+
+        {% if produto.estoque > 0 %}
+        <span class="disponivel">
+          {{ produto.estoque }} unidades disponíveis
+        </span>
+        {% else %}
+        <span class="indisponivel">
+          Produto fora de estoque
+        </span>
+        {% endif %}
+
+      </div>
+
+
+      <p class="produto-detalhe-desc">
+        {{ produto.descricao }}
+      </p>
+
+
+      <div class="produto-detalhe-acoes">
+
+        {% if produto.estoque > 0 %}
+
+      <a href="{% url 'adicionar_carrinho' produto.id %}" class="botao primario">
+    Adicionar ao carrinho
+</a>
+
+        {% else %}
+
+        <button class="botao primario" disabled>
+          Indisponível
+        </button>
+
+        {% endif %}
+
+
+        <a href="{% url 'catalogo' %}" class="botao secundario">
+          Voltar ao catálogo
+        </a>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+{% endblock %}

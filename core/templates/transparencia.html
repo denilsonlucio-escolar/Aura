@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}
+Transparência – Aura
+{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/transparencia.css' %}" />
+{% endblock %}
+
+{% block conteudo %}
+<div class="page-header">
+  <div class="page-header-inner">
+    <h1>Painel de Transparência Esportiva</h1>
+  </div>
+</div>
+
+<div class="main-content">
+
+  <!-- ============ BLOCO 1: NÚMEROS GERAIS DO E-COMMERCE ============ -->
+  <div class="section-card">
+    <h2>📊 Métricas Públicas da Plataforma</h2>
+    <p>Resumo de dados operacionais e catálogo de produtos esportivos do sistema Aura.</p>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">Produtos Cadastrados</span>
+        {{ qtd_produtos }}
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Categorias Esportivas</span>
+        {{ qtd_categorias }}
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Clientes Registrados</span>
+        {{ qtd_clientes }}
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Pedidos Efetuados</span>
+        {{ qtd_pedidos }}
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BLOCO 2: PREÇOS E VALORES ============ -->
+  <div class="section-card">
+    <h2>💲 Indicadores de Preços dos Produtos</h2>
+    <p>Menor, média e maior valor entre os artigos esportivos cadastrados.</p>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">Menor Preço</span>
+        R$ {{ menor_preco|floatformat:2 }}
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Preço Médio</span>
+        R$ {{ media_preco|floatformat:2 }}
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Maior Preço</span>
+        R$ {{ maior_preco|floatformat:2 }}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

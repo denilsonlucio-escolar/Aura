@@ -1,0 +1,60 @@
+<nav class="navbar">
+
+  <div class="nav-inner">
+
+    <a href="{% url 'inicial' %}" class="logo" aria-label="Aura Esportes - Página Inicial">
+      <div class="logo-text">
+        Aura
+      </div>
+    </a>
+
+    <button class="hamburger" id="hamburger" aria-label="Abrir menu de navegação">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="nav-links" id="nav-links">
+      <a href="{% url 'inicial' %}">
+        Inicial
+      </a>
+
+      <a href="{% url 'catalogo' %}">
+        Catálogo
+      </a>
+
+      <a href="{% url 'carrinho' %}">
+        Carrinho
+      </a>
+
+      <a href="{% url 'transparencia' %}">
+        Transparência
+      </a>
+    </div>
+
+    <div class="nav-buttons">
+      {% if user.is_authenticated %}
+      {% if user.is_staff %}
+      <a href="{% url 'painel' %}" class="btn-nav" aria-label="Acessar painel administrativo">Meu Painel</a>
+      {% else %}
+      <a href="{% url 'meus_dados' %}" class="btn-nav" aria-label="Acessar meus dados cadastrais">Meus Dados</a>
+      {% endif %}
+      <a href="{% url 'logout' %}" class="btn-nav" aria-label="Sair da conta">Sair</a>
+      {% else %}
+      <a href="{% url 'login' %}" class="btn-nav" aria-label="Fazer login">Entrar</a>
+      <a href="{% url 'cadastro' %}" class="btn-nav" aria-label="Cadastrar nova conta">Cadastrar</a>
+      {% endif %}
+    </div>
+
+  </div>
+
+</nav>
+
+<script>
+  const hamburger = document.getElementById("hamburger");
+  const navLinks = document.getElementById("nav-links");
+
+  hamburger.addEventListener("click", () => {
+    navLinks.classList.toggle("active");
+  });
+</script>

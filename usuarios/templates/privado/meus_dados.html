@@ -1,0 +1,62 @@
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Bem-vindo de volta, {{ user.username }}. Confira o resumo abaixo.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="section-card-header">
+        <h2>Meu Perfil</h2>
+    </div>
+
+    <div class="section-card-body">
+        <table>
+            <tbody>
+                <tr>
+                    <td><strong>Nome</strong></td>
+                    <td>{{ user.get_full_name|default:user.username }}</td>
+                </tr>
+
+                <tr>
+                    <td><strong>Usuário</strong></td>
+                    <td>{{ user.username }}</td>
+                </tr>
+
+                <tr>
+                    <td><strong>E-mail</strong></td>
+                    <td>{{ user.email }}</td>
+                </tr>
+
+                <tr>
+                    <td><strong>Tipo de Conta</strong></td>
+                    <td>
+                        {% if user.is_superuser %}
+                            Administrador
+                        {% elif user.is_staff %}
+                            Funcionário
+                        {% else %}
+                            Usuário
+                        {% endif %}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><strong>Data de Cadastro</strong></td>
+                    <td>{{ user.date_joined|date:"d/m/Y" }}</td>
+                </tr>
+
+                <tr>
+                    <td><strong>Último Acesso</strong></td>
+                    <td>{{ user.last_login|date:"d/m/Y H:i" }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</main>
+{% endblock %}
