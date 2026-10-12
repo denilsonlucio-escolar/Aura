@@ -1,99 +1,75 @@
 {% extends 'privado/base.html' %}
+{% load static %}
+
+{% block titulo %} Gerenciar Produtos - Aura Admin {% endblock %}
 
 {% block conteudo %}
-<main class="main">
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Gerenciar Produtos</h1>
+    <p class="page-subtitle">Consulte, cadastre e edite os artigos esportivos do seu catálogo.</p>
+  </div>
+  <a href="{% url 'add_produtos' %}" class="btn-action btn-action-primary">
+    + Novo Produto
+  </a>
+</div>
 
-    <div>
-        <h1 class="page-title">Produtos</h1>
-        <p class="page-subtitle">
-            Gerencie os produtos cadastrados no sistema.
-        </p>
+{% if messages %}
+  {% for message in messages %}
+    <div style="padding: 12px; border-radius: 6px; margin-bottom: 20px; background-color: rgba(34, 197, 94, 0.15); color: #4ade80; font-size: 14px;">
+      {{ message }}
     </div>
+  {% endfor %}
+{% endif %}
 
-    {% include 'mensagens.html' %}
-
-    <div class="section-card">
-
-        <div class="section-card-header">
-            <h2>Produtos Cadastrados</h2>
-
-            <a href="{% url 'add_produtos' %}" class="btn-sm btn-primary">
-                Novo Produto
-            </a>
-        </div>
-
-        <div class="section-card-body">
-
-            <div class="table-wrap">
-                <table>
-
-                    <thead>
-                        <tr>
-                            <th>Imagem</th>
-                            <th>Produto</th>
-                            <th>Preço</th>
-                            <th>Estoque</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        {% for produto in produtos %}
-                        <tr>
-
-                            <td>
-                                {% if produto.imagem %}
-                                    <img src="{{ produto.imagem.url }}"
-                                         width="45"
-                                         height="45"
-                                         style="border-radius:8px; object-fit:cover;">
-                                {% else %}
-                                    —
-                                {% endif %}
-                            </td>
-
-                            <td class="td-name">
-                                {{ produto.nome }}
-                                <span>{{ produto.categoria }}</span>
-                            </td>
-
-                            <td>R$ {{ produto.preco }}</td>
-
-                            <td>{{ produto.estoque }}</td>
-
-                            <td class="td-actions">
-
-                                <a href="{% url 'produto_editar' produto.id %}"
-                                   class="btn-sm btn-primary">
-                                    Editar
-                                </a>
-
-                                <a href="{% url 'produto_delete' produto.id %}"
-                                   class="btn-sm btn-danger-sm">
-                                    Excluir
-                                </a>
-
-                            </td>
-
-                        </tr>
-
-                        {% empty %}
-                        <tr>
-                            <td colspan="5" style="text-align:center;">
-                                Nenhum produto cadastrado.
-                            </td>
-                        </tr>
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-            </div>
-
-        </div>
-
-    </div>
-
-</main>
+<div class="panel-section">
+  {% if produtos %}
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th scope="col" style="width: 70px;">Imagem</th>
+        <th scope="col">Produto</th>
+        <th scope="col" style="text-align: center;">Preço</th>
+        <th scope="col" style="text-align: center;">Estoque</th>
+        <th scope="col" style="text-align: right;">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for produto in produtos %}
+      <tr>
+        <td>
+          {% if produto.imagem %}
+            <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" class="product-thumb">
+          {% else %}
+            <div class="product-thumb-empty">📷</div>
+          {% endif %}
+        </td>
+        <td>
+          <strong style="color: #fff; font-size: 15px;">{{ produto.nome }}</strong>
+          {% if produto.categoria %}
+            <br><small style="color: #94a3b8;">{{ produto.categoria.nome }}</small>
+          {% endif %}
+        </td>
+        <td style="text-align: center; font-weight: 600;">R$ {{ produto.preco }}</td>
+        <td style="text-align: center;">
+          {% if produto.estoque <= 5 %}
+            <span style="color: #f87171; font-weight: bold;">{{ produto.estoque }} un</span>
+          {% else %}
+            <span style="color: #4ade80; font-weight: bold;">{{ produto.estoque }} un</span>
+          {% endif %}
+        </td>
+        <td style="text-align: right;">
+          <div class="btn-action-group">
+            <a href="{% url 'produto_editar' produto.id %}" class="btn-action btn-action-edit">✏️ Editar</a>
+            <a href="{% url 'produto_delete' produto.id %}" class="btn-action btn-action-delete" onclick="return confirm('Excluir este produto?');">🗑️ Excluir</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color: #94a3b8; font-size: 14px;">Nenhum produto cadastrado no momento.</p>
+  {% endif %}
+</div>
 {% endblock %}

@@ -29,10 +29,25 @@
           {% endif %}
           <span class="badge">-30% OFF</span>
         </div>
+
+        <div class="card-info-top">
+          {% if produto.categoria %}
+          <span class="card-categoria">{{ produto.categoria.nome }}</span>
+          {% endif %}
+
+          {% if produto.estoque > 0 %}
+          <span class="disponivel card-estoque">Em estoque</span>
+          {% else %}
+          <span class="indisponivel card-estoque">Esgotado</span>
+          {% endif %}
+        </div>
+
         <h3 class="nome-produto">{{ produto.nome }}</h3>
+
         <div class="prices">
           <span class="new">R$ {{ produto.preco }}</span>
         </div>
+
         <span class="frete">Frete grátis disponível</span>
       </div>
     </a>

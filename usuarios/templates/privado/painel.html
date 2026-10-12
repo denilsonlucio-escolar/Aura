@@ -1,108 +1,121 @@
 {% extends 'privado/base.html' %}
+{% load static %}
+
+{% block titulo %} Dashboard Gerencial (SIG/SAD) - Aura Admin {% endblock %}
 
 {% block conteudo %}
-<main class="main">
+<div class="page-header">
+  <h1 class="page-title">Dashboard Gerencial (SIG / SAD)</h1>
+  <p class="page-subtitle">Bem-vindo de volta, <strong>{{ user.username }}</strong>. Acompanhe os indicadores estratégicos e tomada de decisão.</p>
+</div>
 
-  <div>
-    <h1 class="page-title">Dashboard</h1>
-    <p class="page-subtitle">Bem-vindo de volta, {{ user.username }}. Confira o resumo abaixo.</p>
+<!-- MÓDULO SIG -->
+<h2 class="section-title-sig">📈 SIG – Sistema de Informação Gerencial</h2>
+
+<div class="cards-grid">
+  <div class="stat-card">
+    <div class="stat-card-title">💰 Faturamento Total</div>
+    <div class="stat-card-value green">R$ {{ faturamento_total|floatformat:2 }}</div>
+    <div class="stat-card-sub">Valor bruto de vendas</div>
   </div>
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px;">
-    
-    <div class="section-card">
-      <div class="section-card-body">
-        <h3>💰 Faturamento</h3>
-        <h1>R$ {{ faturamento_total|floatformat:2 }}</h1>
-        <p>Valor total de vendas</p>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <div class="section-card-body">
-        <h3>🎯 Ticket Médio</h3>
-        <h1>R$ {{ ticket_medio|floatformat:2 }}</h1>
-        <p>Média por pedido</p>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <div class="section-card-body">
-        <h3>📦 Produtos</h3>
-        <h1>{{ total_produtos }}</h1>
-        <p>Produtos cadastrados</p>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <div class="section-card-body">
-        <h3>👥 Clientes</h3>
-        <h1>{{ total_clientes }}</h1>
-        <p>Clientes cadastrados</p>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <div class="section-card-body">
-        <h3>🏷️ Categorias</h3>
-        <h1>{{ total_categorias }}</h1>
-        <p>Categorias criadas</p>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <div class="section-card-body">
-        <h3>📋 Estoque</h3>
-        <h1>{{ estoque_total }}</h1>
-        <p>Itens disponíveis</p>
-      </div>
-    </div>
-
+  <div class="stat-card">
+    <div class="stat-card-title">🎯 Ticket Médio</div>
+    <div class="stat-card-value blue">R$ {{ ticket_medio|floatformat:2 }}</div>
+    <div class="stat-card-sub">Média por pedido</div>
   </div>
 
-  <div class="section-card" style="margin-top: 25px;">
-    <div class="section-card-header" style="display: flex; justify-content: space-between; align-items: center;">
-      <h2 style="color: #f87171; font-size: 18px;">⚠️ Alerta de Reposição de Estoque (SAD)</h2>
-      <span style="background: rgba(239, 68, 68, 0.2); color: #f87171; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold;">
-        {{ qtd_estoque_baixo }} Críticos
-      </span>
-    </div>
-
-    <div class="section-card-body">
-      {% if produtos_estoque_baixo %}
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Produto</th>
-              <th>Preço</th>
-              <th>Estoque Atual</th>
-              <th>Status</th>
-              <th>Ação</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for produto in produtos_estoque_baixo %}
-            <tr>
-              <td><strong>{{ produto.nome }}</strong></td>
-              <td>R$ {{ produto.preco }}</td>
-              <td style="color: #f87171; font-weight: bold;">{{ produto.estoque }} un</td>
-              <td><span style="color: #f87171;">Reposição Urgente</span></td>
-              <td>
-                <a href="{% url 'produto_editar' produto.id %}" class="btn-sm btn-primary">
-                  Repor Estoque
-                </a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      {% else %}
-      <p style="color: #4ade80;">Todos os produtos possuem níveis de estoque adequados no momento.</p>
-      {% endif %}
-    </div>
+  <div class="stat-card">
+    <div class="stat-card-title">⭐ Mais Vendido</div>
+    <div class="stat-card-value compact">{{ top_produto_nome }}</div>
+    <div class="stat-card-sub">{{ top_produto_qtd }} un. vendidas</div>
   </div>
 
-</main>
+  <div class="stat-card">
+    <div class="stat-card-title">📦 Produtos</div>
+    <div class="stat-card-value">{{ total_produtos }}</div>
+    <div class="stat-card-sub">No catálogo</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-title">👥 Clientes</div>
+    <div class="stat-card-value">{{ total_clientes }}</div>
+    <div class="stat-card-sub">Cadastrados</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-title">📋 Estoque Geral</div>
+    <div class="stat-card-value">{{ estoque_total }}</div>
+    <div class="stat-card-sub">Unidades totais</div>
+  </div>
+</div>
+
+<!-- MÓDULO SAD -->
+<h2 class="section-title-sad">🧠 SAD – Sistema de Apoio à Decisão (Ações Recomendadas)</h2>
+
+<!-- Alerta Ruptura -->
+<div class="panel-section panel-section-critical">
+  <h3 style="color: #f87171; margin-bottom: 12px; font-size: 16px;">⚠️ Alerta de Reposição de Estoque Crítico (Estoque ≤ 5)</h3>
+
+  {% if alertas_reabastecimento %}
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Produto</th>
+        <th>Preço</th>
+        <th>Estoque Atual</th>
+        <th>Sugestão de Compra</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in alertas_reabastecimento %}
+      <tr>
+        <td><strong>{{ item.produto.nome }}</strong></td>
+        <td>R$ {{ item.produto.preco }}</td>
+        <td style="color: #f87171; font-weight: bold;">{{ item.produto.estoque }} un</td>
+        <td style="color: #4ade80; font-weight: bold;">+{{ item.qtd_sugerida_comprar }} un</td>
+        <td>
+          <a href="{% url 'produto_editar' item.produto.id %}" class="btn-action btn-action-primary">
+            Repor Estoque
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color: #4ade80; margin: 0;">✅ Todos os produtos possuem níveis adequados de estoque.</p>
+  {% endif %}
+</div>
+
+<!-- Alerta Capital Parado -->
+<div class="panel-section panel-section-warning">
+  <h3 style="color: #fbbf24; margin-bottom: 12px; font-size: 16px;">💡 Alerta de Capital Parado (Produtos Sem Giro)</h3>
+
+  {% if produtos_sem_giro %}
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Produto</th>
+        <th>Estoque Parado</th>
+        <th>Preço Atual</th>
+        <th>Recomendação</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in produtos_sem_giro %}
+      <tr>
+        <td><strong>{{ p.nome }}</strong></td>
+        <td>{{ p.estoque }} un</td>
+        <td>R$ {{ p.preco }}</td>
+        <td style="color: #fbbf24;">Aplicar desconto ou promoção para liberar caixa</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color: #4ade80; margin: 0;">✅ Todos os produtos possuem histórico de vendas ativo.</p>
+  {% endif %}
+</div>
 {% endblock %}

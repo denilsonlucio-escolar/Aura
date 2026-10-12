@@ -306,3 +306,215 @@ body {
 
   color: #fca5a5;
 }
+
+/* ==========================================================================
+   Aura Admin - Estilos do Painel Privado (SIG / SAD)
+   ========================================================================== */
+
+body.body-privado {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  background-color: #0b0f19 !important;
+  color: #f8fafc !important;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.layout-privado {
+  display: flex !important;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Sidebar Lateral */
+.sidebar-privado {
+  width: 250px !important;
+  min-width: 250px !important;
+  background-color: #0f172a !important;
+  border-right: 1px solid #1e293b !important;
+  padding: 24px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box;
+}
+
+.sidebar-brand {
+  font-size: 20px;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 28px;
+  padding-left: 8px;
+}
+
+.sidebar-menu {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  color: #94a3b8 !important;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+.sidebar-link.ativo {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.sidebar-divider {
+  height: 1px;
+  background-color: #1e293b;
+  margin: 16px 0;
+}
+
+.sidebar-link.logout {
+  color: #f87171 !important;
+}
+
+/* Área de Conteúdo Principal */
+.main-content {
+  flex: 1 !important;
+  padding: 32px 40px !important;
+  background-color: #0b0f19 !important;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #f8fafc !important;
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #94a3b8 !important;
+}
+
+/* Seções SIG e SAD */
+.section-title-sig {
+  font-size: 15px;
+  font-weight: 700;
+  color: #38bdf8 !important;
+  margin: 24px 0 14px 0;
+  text-transform: uppercase;
+}
+
+.section-title-sad {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f87171 !important;
+  margin: 32px 0 14px 0;
+  text-transform: uppercase;
+}
+
+/* Grid de Cards */
+.cards-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 16px !important;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8 !important;
+  text-transform: uppercase;
+}
+
+.stat-card-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #f8fafc !important;
+}
+
+.stat-card-value.green { color: #4ade80 !important; }
+.stat-card-value.blue { color: #60a5fa !important; }
+.stat-card-value.compact { font-size: 16px !important; }
+
+.stat-card-sub {
+  font-size: 12px;
+  color: #64748b !important;
+}
+
+/* Tabelas Privadas */
+.panel-section {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.panel-section-critical { border-color: rgba(239, 68, 68, 0.4) !important; }
+.panel-section-warning { border-color: rgba(245, 158, 11, 0.4) !important; }
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.admin-table th {
+  background-color: #0f172a !important;
+  color: #94a3b8 !important;
+  padding: 10px 14px;
+  border-bottom: 1px solid #334155;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.admin-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0 !important;
+}
+
+/* Botões */
+.btn-action {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+.btn-action-primary { background-color: #2563eb; color: #fff !important; }
+.btn-action-edit { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa !important; }
+.btn-action-delete { background-color: rgba(239, 68, 68, 0.2); color: #f87171 !important; }

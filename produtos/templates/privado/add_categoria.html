@@ -1,52 +1,63 @@
 {% extends 'privado/base.html' %}
+{% load static %}
+
+{% block titulo %} Gerenciar Categorias - Aura Admin {% endblock %}
 
 {% block conteudo %}
-<main class="main">
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Gerenciar Categorias</h1>
+    <p class="page-subtitle">Cadastre novas categorias esportivas para organizar seu catálogo.</p>
+  </div>
+</div>
 
-    <div>
-        <h1 class="page-title">Cadastrar Produto</h1>
-        <p class="page-subtitle">
-            Preencha os dados do produto abaixo.
-        </p>
-    </div>
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
 
-    {% include 'mensagens.html' %}
+  <!-- Formulário -->
+  <div class="panel-section">
+    <h2 style="font-size: 16px; color: #fff; margin-bottom: 16px;">Nova Categoria</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="id_nome">Nome da Categoria</label>
+        <input type="text" id="id_nome" name="nome" class="form-control" placeholder="Ex: Basquete, Futebol..." required>
+      </div>
+      <button type="submit" class="btn-action btn-action-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+        Cadastrar Categoria
+      </button>
+    </form>
+  </div>
 
-    <div class="section-card">
+  <!-- Tabela de Categorias -->
+  <div class="panel-section">
+    <h2 style="font-size: 16px; color: #fff; margin-bottom: 16px;">Categorias Existentes</h2>
+    {% if categorias %}
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Nome</th>
+          <th scope="col" style="text-align: right;">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cat in categorias %}
+        <tr>
+          <td>#{{ cat.id }}</td>
+          <td><strong style="color: #fff;">{{ cat.nome }}</strong></td>
+          <td style="text-align: right;">
+            <a href="{% url 'categoria_delete' cat.id %}" class="btn-action btn-action-delete" onclick="return confirm('Deseja excluir esta categoria?');">
+              🗑️ Excluir
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="color: #94a3b8; font-size: 14px;">Nenhuma categoria cadastrada.</p>
+    {% endif %}
+  </div>
 
-        <div class="section-card-header">
-            <h2>Informações do Produto</h2>
-        </div>
-
-        <div class="section-card-body">
-
-            <form method="POST" enctype="multipart/form-data">
-
-                {% csrf_token %}
-
-                <div class="form-section">
-
-                    <div class="form-group full">
-                        <label>Nome</label>
-                        {{ form.nome }}
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn-form-primary">
-                        Salvar Categoria
-                    </button>
-
-                    <a href="{% url 'produtos' %}" class="btn-form-secondary">
-                        Cancelar
-                    </a>
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
-</main>
+</div>
 {% endblock %}

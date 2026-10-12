@@ -11,6 +11,16 @@
 
 <main class="catalogo">
 
+  <nav class="breadcrumb" aria-label="Caminho de navegação">
+    <a href="{% url 'catalogo' %}">Catálogo</a>
+    <span>/</span>
+    {% if produto.categoria %}
+    <span>{{ produto.categoria.nome }}</span>
+    <span>/</span>
+    {% endif %}
+    <span class="breadcrumb-atual">{{ produto.nome }}</span>
+  </nav>
+
   <section class="produto-detalhe">
 
     <div class="produto-detalhe-img">
@@ -23,6 +33,10 @@
 
 
     <div class="produto-detalhe-info">
+
+      {% if produto.categoria %}
+      <span class="produto-detalhe-categoria">{{ produto.categoria.nome }}</span>
+      {% endif %}
 
       <h1>{{ produto.nome }}</h1>
 
@@ -49,9 +63,33 @@
       </div>
 
 
-      <p class="produto-detalhe-desc">
-        {{ produto.descricao }}
-      </p>
+      <div class="produto-detalhe-descricao-bloco">
+        <h2>Descrição do produto</h2>
+        <p class="produto-detalhe-desc">
+          {{ produto.descricao }}
+        </p>
+      </div>
+
+
+      <div class="produto-detalhe-specs">
+        <h2>Informações do produto</h2>
+        <ul class="specs-lista">
+          <li>
+            <span class="specs-label">Categoria</span>
+            <span class="specs-valor">{{ produto.categoria.nome|default:"Não informada" }}</span>
+          </li>
+          <li>
+            <span class="specs-label">Código do produto</span>
+            <span class="specs-valor">#{{ produto.id }}</span>
+          </li>
+          <li>
+            <span class="specs-label">Disponibilidade</span>
+            <span class="specs-valor">
+              {% if produto.estoque > 0 %}Pronta entrega{% else %}Indisponível no momento{% endif %}
+            </span>
+          </li>
+        </ul>
+      </div>
 
 
       <div class="produto-detalhe-acoes">

@@ -1,0 +1,6352 @@
+##########################################################################################
+# EXTRAÇÃO COMPLETA DO PROJETO
+# Raiz do projeto: C:\Users\João Guilherme\Aura-main
+# Gerado em: 2026-10-11 20:54:46
+##########################################################################################
+
+==========================================================================================
+PARTE 1 — ESTRUTURA DE DIRETÓRIOS
+==========================================================================================
+
+Aura-main/
+├── Aura
+│   ├── asgi.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── core
+│   ├── templates
+│   │   ├── carrinho.html
+│   │   ├── catalogo.html
+│   │   ├── confirmacao.html
+│   │   ├── home.html
+│   │   ├── mensagens.html
+│   │   ├── pagamento.html
+│   │   └── transparencia.html
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── pedidos
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── tests.py
+│   └── views.py
+├── produtos
+│   ├── templates
+│   │   ├── privado
+│   │   │   ├── add_categoria.html
+│   │   │   ├── add_produtos.html
+│   │   │   ├── categoria.html
+│   │   │   └── produtos.html
+│   │   └── produto_detalhe.html
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── static
+│   └── assets
+│       ├── css
+│       │   ├── base.css
+│       │   ├── cadastro.css
+│       │   ├── carrinho.css
+│       │   ├── catalogo.css
+│       │   ├── confirmacao.css
+│       │   ├── home.css
+│       │   ├── login.css
+│       │   ├── pagamento.css
+│       │   ├── painel.css
+│       │   ├── perfil.css
+│       │   └── transparencia.css
+│       ├── imagens
+│       └── js
+│           ├── cadastro.js
+│           ├── carrinho.js
+│           ├── catalogo.js
+│           ├── pagamento.js
+│           ├── perfil.js
+│           └── script.js
+├── templates
+│   ├── privado
+│   │   └── base.html
+│   ├── base.html
+│   ├── menu.html
+│   └── rodape.html
+├── usuarios
+│   ├── templates
+│   │   ├── privado
+│   │   │   ├── add_usuario.html
+│   │   │   ├── meus_dados.html
+│   │   │   ├── painel.html
+│   │   │   └── usuarios.html
+│   │   ├── cadastro.html
+│   │   └── login.html
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── extrair_projeto.py
+├── manage.py
+└── requirements.txt
+
+
+==========================================================================================
+PARTE 2 — CONTEÚDO DOS ARQUIVOS
+==========================================================================================
+
+==========================================================================================
+ARQUIVO: extrair_projeto.py
+==========================================================================================
+"""
+extrair_projeto.py
+Extrai a estrutura completa + código-fonte de um projeto Django para um único arquivo .txt.
+
+Uso:
+    python extrair_projeto.py
+    python extrair_projeto.py "C:\\caminho\\do\\projeto"
+"""
+
+import os
+import sys
+from pathlib import Path
+from datetime import datetime
+
+# ============================================================
+# CONFIGURAÇÕES — ajuste conforme necessário
+# ============================================================
+
+OUTPUT_FILE = "estrutura_projeto.txt"
+
+# Extensões de código-fonte que DEVEM ser incluídas
+INCLUDE_EXTENSIONS = {
+    # Código
+    '.py', '.html', '.htm', '.css', '.js', '.jsx', '.ts', '.tsx',
+    '.sql', '.json', '.yml', '.yaml',
+    # Documentação / texto
+    '.txt', '.md', '.rst',
+    # Dados
+    '.csv',
+}
+
+# Pastas que devem ser IGNORADAS completamente
+EXCLUDE_DIRS = {
+    '.git', '.github', '.gitlab',
+    '.idea', '.vscode', '.vs',
+    '__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache',
+    'node_modules', 'bower_components',
+    '.venv', 'venv', 'env', 'ENV',
+    'dist', 'build', 'egg-info',
+    'media', 'staticfiles', 'logs', 'tmp',
+    '.migrations_backup',
+    'migrations',  # autogeradas pelo Django — ruído, não conteúdo útil
+}
+
+# Arquivos específicos a ignorar (por nome)
+EXCLUDE_FILES = {
+    'db.sqlite3', 'db.sqlite3-journal',
+    'package-lock.json', 'yarn.lock', 'poetry.lock', 'Pipfile.lock',
+    '.DS_Store', 'Thumbs.db', 'desktop.ini',
+    '.env', '.env.local', '.env.production',
+}
+
+# Trechos que, se presentes no nome do arquivo, indicam biblioteca de
+# terceiros vendorizada (ex: bootstrap.min.css, jquery.min.js) — não é
+# código do projeto, então é ignorado mesmo tendo extensão permitida
+EXCLUDE_NAME_SUBSTRINGS = {
+    '.min.',
+}
+
+# Tamanho máximo por arquivo (500 KB) — evita travar com arquivos enormes
+MAX_FILE_SIZE = 500 * 1024
+
+# ============================================================
+# LÓGICA
+# ============================================================
+
+def should_exclude_dir(name: str) -> bool:
+    return name in EXCLUDE_DIRS or name.startswith('.')
+
+
+def should_exclude_file(path: Path) -> bool:
+    if path.name in EXCLUDE_FILES:
+        return True
+    if any(sub in path.name for sub in EXCLUDE_NAME_SUBSTRINGS):
+        return True
+    if path.suffix.lower() not in INCLUDE_EXTENSIONS:
+        return True
+    try:
+        if path.stat().st_size > MAX_FILE_SIZE:
+            return True
+        if path.stat().st_size == 0:
+            return True
+    except OSError:
+        return True
+    return False
+
+
+def build_tree(root: Path) -> str:
+    """Gera representação visual em árvore do projeto."""
+    lines = [root.name + "/"]
+
+    def walk(current: Path, prefix: str = ""):
+        try:
+            entries = sorted(
+                current.iterdir(),
+                key=lambda e: (e.is_file(), e.name.lower())
+            )
+        except PermissionError:
+            return
+
+        entries = [
+            e for e in entries
+            if not (e.is_dir() and should_exclude_dir(e.name))
+            and not (e.is_file() and should_exclude_file(e))
+        ]
+
+        for i, entry in enumerate(entries):
+            is_last = (i == len(entries) - 1)
+            connector = "└── " if is_last else "├── "
+            lines.append(f"{prefix}{connector}{entry.name}")
+
+            if entry.is_dir():
+                extension = "    " if is_last else "│   "
+                walk(entry, prefix + extension)
+
+    walk(root)
+    return "\n".join(lines)
+
+
+def extract_files(root: Path, output):
+    """Percorre o projeto e escreve o conteúdo de cada arquivo relevante."""
+    total_files = 0
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if not should_exclude_dir(d)]
+
+        for filename in sorted(filenames):
+            file_path = Path(dirpath) / filename
+            if should_exclude_file(file_path):
+                continue
+
+            rel = file_path.relative_to(root)
+            output.write("\n" + "=" * 90 + "\n")
+            output.write(f"ARQUIVO: {rel}\n")
+            output.write("=" * 90 + "\n")
+
+            try:
+                content = file_path.read_text(encoding='utf-8', errors='replace')
+                output.write(content)
+                if not content.endswith('\n'):
+                    output.write('\n')
+                total_files += 1
+                print(f"  ✓ {rel}")
+            except Exception as e:
+                output.write(f"[ERRO AO LER ARQUIVO: {e}]\n")
+
+    return total_files
+
+
+def main():
+    # Define raiz do projeto
+    if len(sys.argv) > 1:
+        root = Path(sys.argv[1]).resolve()
+    else:
+        root = Path.cwd()
+
+    if not root.is_dir():
+        print(f"❌ Caminho inválido: {root}")
+        sys.exit(1)
+
+    print(f"📁 Projeto: {root}")
+    print(f"📄 Saída:   {OUTPUT_FILE}")
+    print("─" * 60)
+
+    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
+        # Cabeçalho
+        f.write("#" * 90 + "\n")
+        f.write("# EXTRAÇÃO COMPLETA DO PROJETO\n")
+        f.write(f"# Raiz do projeto: {root}\n")
+        f.write(f"# Gerado em: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write("#" * 90 + "\n\n")
+
+        # Parte 1 — Árvore de diretórios
+        f.write("=" * 90 + "\n")
+        f.write("PARTE 1 — ESTRUTURA DE DIRETÓRIOS\n")
+        f.write("=" * 90 + "\n\n")
+        f.write(build_tree(root))
+        f.write("\n\n\n")
+
+        # Parte 2 — Conteúdo dos arquivos
+        f.write("=" * 90 + "\n")
+        f.write("PARTE 2 — CONTEÚDO DOS ARQUIVOS\n")
+        f.write("=" * 90 + "\n")
+        total = extract_files(root, f)
+
+    size_mb = os.path.getsize(OUTPUT_FILE) / (1024 * 1024)
+    print("─" * 60)
+    print(f"✅ Arquivo gerado: {OUTPUT_FILE}")
+    print(f"📦 Tamanho: {size_mb:.2f} MB")
+    print(f"📄 Total de arquivos incluídos: {total}")
+
+
+if __name__ == "__main__":
+    main()
+
+==========================================================================================
+ARQUIVO: manage.py
+==========================================================================================
+#!/usr/bin/env python
+"""Django's command-line utility for administrative tasks."""
+import os
+import sys
+
+
+def main():
+    """Run administrative tasks."""
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Aura.settings')
+    try:
+        from django.core.management import execute_from_command_line
+    except ImportError as exc:
+        raise ImportError(
+            "Couldn't import Django. Are you sure it's installed and "
+            "available on your PYTHONPATH environment variable? Did you "
+            "forget to activate a virtual environment?"
+        ) from exc
+    execute_from_command_line(sys.argv)
+
+
+if __name__ == '__main__':
+    main()
+
+==========================================================================================
+ARQUIVO: requirements.txt
+==========================================================================================
+asgiref==3.11.1
+Django==6.0.7
+django-widget-tweaks==1.5.1
+pillow==12.3.0
+sqlparse==0.5.5
+tzdata==2026.2
+
+==========================================================================================
+ARQUIVO: Aura\asgi.py
+==========================================================================================
+"""
+ASGI config for Aura project.
+
+It exposes the ASGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/6.0/howto/deployment/asgi/
+"""
+
+import os
+
+from django.core.asgi import get_asgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Aura.settings')
+
+application = get_asgi_application()
+
+==========================================================================================
+ARQUIVO: Aura\settings.py
+==========================================================================================
+"""
+Django settings for Aura project.
+
+Generated by 'django-admin startproject' using Django 6.0.4.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/6.0/topics/settings/
+
+For the full list of settings and their values, see
+https://docs.djangoproject.com/en/6.0/ref/settings/
+"""
+
+from pathlib import Path
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-v&8h8+-to1iw^mwceq6$am)k+tk!9d1!%$e_$v@_za5^$v3yx4'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+ALLOWED_HOSTS = []
+
+
+# Application definition
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'widget_tweaks',
+    'core',
+    'produtos',
+    'usuarios',
+    'pedidos',
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'Aura.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': ['templates',],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'Aura.wsgi.application'
+
+
+# Database
+# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+
+# Password validation
+# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+
+# Internationalization
+# https://docs.djangoproject.com/en/6.0/topics/i18n/
+
+LANGUAGE_CODE = 'pt-br'
+
+TIME_ZONE = 'America/Recife'
+
+USE_I18N = True
+
+USE_TZ = True
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/6.0/howto/static-files/
+
+STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    'static'
+    ]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+LOGIN_URL = 'login' 
+
+==========================================================================================
+ARQUIVO: Aura\urls.py
+==========================================================================================
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+
+    path('', include('core.urls')),
+    path('', include('usuarios.urls')),
+
+    path('produto/', include('produtos.urls')),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
+    )
+
+==========================================================================================
+ARQUIVO: Aura\wsgi.py
+==========================================================================================
+"""
+WSGI config for Aura project.
+
+It exposes the WSGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/6.0/howto/deployment/wsgi/
+"""
+
+import os
+
+from django.core.wsgi import get_wsgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Aura.settings')
+
+application = get_wsgi_application()
+
+==========================================================================================
+ARQUIVO: core\admin.py
+==========================================================================================
+from django.contrib import admin
+
+from .models import Pagamento
+from produtos.models import Produto
+from pedidos.models import Pedido, ItemPedido
+from usuarios.models import Cliente, Endereco
+
+admin.site.register(Cliente)
+admin.site.register(Endereco)
+
+admin.site.register(Pagamento)
+admin.site.register(Produto)
+
+admin.site.register(Pedido)
+admin.site.register(ItemPedido)
+# Register your models here.
+
+==========================================================================================
+ARQUIVO: core\apps.py
+==========================================================================================
+from django.apps import AppConfig
+
+
+class CoreConfig(AppConfig):
+    name = 'core'
+
+==========================================================================================
+ARQUIVO: core\forms.py
+==========================================================================================
+from django import forms
+from django.contrib.auth.models import User
+from usuarios.models import Cliente, Endereco
+from .models import Pagamento
+from produtos.models import Produto
+from pedidos.models import Pedido, ItemPedido
+
+from PIL import Image
+
+
+class ProdutoForm(forms.ModelForm):
+    class Meta:
+        model = Produto
+        fields = ['nome', 'descricao', 'preco', 'estoque', 'imagem']
+
+    def clean_imagem(self):
+        imagem = self.cleaned_data.get('imagem')
+
+        if imagem:
+            extensoes_permitidas = ['.jpg', '.jpeg', '.png', '.webp']
+            nome = imagem.name.lower()
+
+            if not any(nome.endswith(ext) for ext in extensoes_permitidas):
+                raise forms.ValidationError('Formato não permitido. Use JPG, PNG ou WEBP.')
+
+            limite_mb = 2
+            if imagem.size > limite_mb * 1024 * 1024:
+                raise forms.ValidationError(f'A imagem deve ter no máximo {limite_mb}MB.')
+
+            try:
+                largura, altura = Image.open(imagem).size
+            except Exception:
+                raise forms.ValidationError('Não foi possível processar essa imagem.')
+
+            imagem.seek(0)
+
+            if largura < 400 or altura < 400:
+                raise forms.ValidationError('A imagem deve ter no mínimo 400x400 pixels.')
+
+        return imagem
+
+
+class CadastroForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
+    nome = forms.CharField()
+    sobrenome = forms.CharField()
+
+    sexo = forms.ChoiceField(
+        choices=[('', '---'), ('F', 'Feminino'), ('M', 'Masculino')],
+        required=False
+    )
+
+    dia = forms.CharField(required=False)
+    mes = forms.CharField(required=False)
+    ano = forms.CharField(required=False)
+    cpf = forms.CharField(required=False)
+    telefone = forms.CharField(required=False)
+
+    cep = forms.CharField(required=False)
+    estado = forms.CharField(required=False)
+    cidade = forms.CharField(required=False)
+    bairro = forms.CharField(required=False)
+    rua = forms.CharField(required=False)
+    numero = forms.CharField(required=False)
+    complemento = forms.CharField(required=False)
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'username', 'email']
+
+
+class UsuarioForm(forms.Form):
+    username = forms.CharField()
+    email = forms.EmailField()
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(),
+        required=False
+    )
+
+    nome = forms.CharField()
+    sobrenome = forms.CharField()
+
+    cpf = forms.CharField(required=False)
+    telefone = forms.CharField(required=False)
+    sexo = forms.CharField(required=False)
+
+    dia = forms.CharField(required=False)
+    mes = forms.CharField(required=False)
+    ano = forms.CharField(required=False)
+
+    cep = forms.CharField(required=False)
+    estado = forms.CharField(required=False)
+    cidade = forms.CharField(required=False)
+    bairro = forms.CharField(required=False)
+    rua = forms.CharField(required=False)
+    numero = forms.CharField(required=False)
+    complemento = forms.CharField(required=False)
+
+==========================================================================================
+ARQUIVO: core\models.py
+==========================================================================================
+from django.db import models
+from django.contrib.auth.models import User
+from usuarios.models import Cliente
+
+
+class Pagamento(models.Model):
+    forma_pagamento = models.CharField("Forma de Pagamento", max_length=45)
+    status = models.CharField("Status", max_length=45)
+
+    def __str__(self):
+        return self.forma_pagamento
+
+==========================================================================================
+ARQUIVO: core\tests.py
+==========================================================================================
+from django.test import TestCase
+
+# Create your tests here.
+
+==========================================================================================
+ARQUIVO: core\urls.py
+==========================================================================================
+from django.urls import path
+from .views import *
+
+urlpatterns = [
+    path('', inicial, name='inicial'),
+
+    path('catalogo/', catalogo, name='catalogo'),
+    path('carrinho/', carrinho, name='carrinho'),
+    path('pagamento/', pagamento, name='pagamento'),
+    
+    path('carrinho/adicionar/<int:id>/',adicionar_carrinho, name='adicionar_carrinho'),
+    path('carrinho/remover/<int:id>/',remover_carrinho, name='remover_carrinho'),
+    path('transparencia/',transparencia, name='transparencia'),
+    path('confirmacao/<int:pedido_id>/', confirmacao, name='confirmacao'),
+]
+
+==========================================================================================
+ARQUIVO: core\views.py
+==========================================================================================
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Avg, Min, Max
+from produtos.models import Produto, Categoria
+from pedidos.models import Pedido, ItemPedido
+from usuarios.models import Cliente
+
+
+def inicial(request):
+    produtos = Produto.objects.all()[:6]
+    context = {
+        'produtos': produtos
+    }
+    return render(request, 'home.html', context)
+
+
+def catalogo(request):
+    produtos = Produto.objects.all()
+    context = {
+        'produtos': produtos
+    }
+    return render(request, 'catalogo.html', context)
+
+
+def carrinho(request):
+    carrinho_session = request.session.get('carrinho', {})
+    produtos_carrinho = []
+    total = 0
+
+    for produto_id, quantidade in carrinho_session.items():
+        produto = Produto.objects.filter(pk=produto_id).first()
+        if produto:
+            subtotal = produto.preco * quantidade
+            total += subtotal
+            produtos_carrinho.append({
+                'produto': produto,
+                'quantidade': quantidade,
+                'subtotal': subtotal
+            })
+
+    context = {
+        'produtos': produtos_carrinho,
+        'total': total
+    }
+    return render(request, 'carrinho.html', context)
+
+
+def adicionar_carrinho(request, id):
+    produto = get_object_or_404(Produto, pk=id)
+    carrinho_session = request.session.get('carrinho', {})
+
+    str_id = str(id)
+    carrinho_session[str_id] = carrinho_session.get(str_id, 0) + 1
+
+    request.session['carrinho'] = carrinho_session
+    messages.success(request, f'{produto.nome} adicionado ao carrinho.')
+    return redirect('carrinho')
+
+
+def remover_carrinho(request, id):
+    carrinho_session = request.session.get('carrinho', {})
+    str_id = str(id)
+
+    if str_id in carrinho_session:
+        if carrinho_session[str_id] > 1:
+            carrinho_session[str_id] -= 1
+        else:
+            del carrinho_session[str_id]
+
+    request.session['carrinho'] = carrinho_session
+    messages.success(request, 'Item removido do carrinho.')
+    return redirect('carrinho')
+
+
+@login_required
+def pagamento(request):
+    carrinho_session = request.session.get('carrinho', {})
+
+    if not carrinho_session:
+        messages.error(request, 'Seu carrinho está vazio.')
+        return redirect('catalogo')
+
+    cliente = Cliente.objects.filter(usuario=request.user).first()
+
+    if request.method == 'POST':
+        forma_pagamento = request.POST.get('forma_pagamento', 'Cartão de Crédito')
+
+        pedido = Pedido.objects.create(
+            cliente=cliente,
+            status='Concluído'
+        )
+
+        for produto_id, quantidade in carrinho_session.items():
+            produto = Produto.objects.filter(pk=produto_id).first()
+            if produto:
+                ItemPedido.objects.create(
+                    pedido=pedido,
+                    produto=produto,
+                    quantidade=quantidade,
+                    preco_unitario=produto.preco
+                )
+
+                if produto.estoque >= quantidade:
+                    produto.estoque -= quantidade
+                else:
+                    produto.estoque = 0
+                produto.save()
+
+        request.session['carrinho'] = {}
+        messages.success(request, 'Compra finalizada com sucesso!')
+        return redirect('confirmacao', pedido_id=pedido.id)
+
+    produtos_carrinho = []
+    total = 0
+
+    for produto_id, quantidade in carrinho_session.items():
+        produto = Produto.objects.filter(pk=produto_id).first()
+        if produto:
+            subtotal = produto.preco * quantidade
+            total += subtotal
+            produtos_carrinho.append({
+                'produto': produto,
+                'quantidade': quantidade,
+                'subtotal': subtotal
+            })
+
+    context = {
+        'produtos': produtos_carrinho,
+        'total': total,
+        'cliente': cliente
+    }
+    return render(request, 'pagamento.html', context)
+
+
+@login_required
+def confirmacao(request, pedido_id):
+    pedido = get_object_or_404(Pedido, pk=pedido_id)
+    itens = ItemPedido.objects.filter(pedido=pedido)
+
+    total = sum(item.quantidade * item.preco_unitario for item in itens)
+
+    context = {
+        'pedido': pedido,
+        'itens': itens,
+        'total': total
+    }
+    return render(request, 'confirmacao.html', context)
+
+
+def transparencia(request):
+    qtd_produtos = Produto.objects.count()
+    qtd_categorias = Categoria.objects.count()
+    qtd_clientes = Cliente.objects.count()
+    qtd_pedidos = Pedido.objects.count()
+
+    precos = Produto.objects.aggregate(
+        menor=Min('preco'),
+        media=Avg('preco'),
+        maior=Max('preco')
+    )
+
+    context = {
+        'qtd_produtos': qtd_produtos,
+        'qtd_categorias': qtd_categorias,
+        'qtd_clientes': qtd_clientes,
+        'qtd_pedidos': qtd_pedidos,
+        'menor_preco': precos['menor'] or 0,
+        'media_preco': precos['media'] or 0,
+        'maior_preco': precos['maior'] or 0,
+    }
+    return render(request, 'transparencia.html', context)
+
+==========================================================================================
+ARQUIVO: core\templates\carrinho.html
+==========================================================================================
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}Carrinho{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/catalogo.css' %}">
+{% endblock %}
+
+{% block conteudo %}
+<main class="catalogo">
+    <h1>Meu Carrinho</h1>
+
+    {% if produtos %}
+    <div class="produto-detalhe" style="max-width:1000px; margin:auto; display:block;">
+        <table style="width:100%; border-collapse:collapse; color:white;">
+            <thead>
+                <tr style="border-bottom:1px solid #333;">
+                    <th scope="col" style="padding:15px; text-align:left;">Produto</th>
+                    <th scope="col" style="padding:15px;">Preço</th>
+                    <th scope="col" style="padding:15px;">Quantidade</th>
+                    <th scope="col" style="padding:15px;">Subtotal</th>
+                    <th scope="col" style="padding:15px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in produtos %}
+                <tr style="border-bottom:1px solid #222;">
+                    <td style="padding:15px;">
+                        <div style="display:flex; align-items:center; gap:15px;">
+                            {% if item.produto.imagem %}
+                            <img src="{{ item.produto.imagem.url }}"
+                                 alt="{{ item.produto.nome }}"
+                                 width="80"
+                                 height="80"
+                                 style="object-fit:contain; background:white; border-radius:8px;">
+                            {% endif %}
+                            <strong>{{ item.produto.nome }}</strong>
+                        </div>
+                    </td>
+                    <td style="text-align:center;">
+                        R$ {{ item.produto.preco }}
+                    </td>
+                    <td style="text-align:center;">
+                        {{ item.quantidade }}
+                    </td>
+                    <td style="text-align:center;">
+                        R$ {{ item.subtotal }}
+                    </td>
+                    <td style="text-align:center;">
+                        <a href="{% url 'adicionar_carrinho' item.produto.id %}" class="botao secundario" aria-label="Adicionar uma unidade de {{ item.produto.nome }}">
+                            Adicionar
+                        </a>
+                        <a href="{% url 'remover_carrinho' item.produto.id %}" class="botao secundario" aria-label="Remover uma unidade de {{ item.produto.nome }}">
+                            Remover
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:30px;">
+            <h2 style="color:white;">
+                Total: R$ {{ total }}
+            </h2>
+            <div style="display:flex; gap:15px;">
+                <a href="{% url 'catalogo' %}" class="botao secundario">
+                    Continuar Comprando
+                </a>
+                <a href="{% url 'pagamento' %}" class="botao primario">
+                    Finalizar Compra
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="produto-detalhe" style="display:block; text-align:center; max-width:700px; margin:auto;">
+        <h2>Seu carrinho está vazio.</h2>
+        <p style="margin:20px 0; color:#eee;">
+            Adicione produtos ao carrinho para continuar.
+        </p>
+        <a href="{% url 'catalogo' %}" class="botao primario">
+            Ir para o Catálogo
+        </a>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: core\templates\catalogo.html
+==========================================================================================
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}Catálogo{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/catalogo.css' %}" />
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'assets/js/catalogo.js' %}"></script>
+{% endblock %}
+
+{% block conteudo %}
+<main class="catalogo">
+  <h1>Catálogo de Produtos</h1>
+  <input type="text" id="campoBusca" placeholder="Barra de pesquisa" aria-label="Buscar produtos no catálogo">
+  
+  <!-- Título h2 inserido para corrigir a hierarquia DOM (WCAG) -->
+  <h2 style="font-size: 20px; margin-bottom: 25px; color: #aaa; font-weight: 400;">Produtos Disponíveis</h2>
+
+  <div class="card-grid" id="lista">
+    {% for produto in produtos %}
+    <a href="{% url 'produto_detalhe' produto.id %}" class="card-link">
+      <div class="card">
+        <div class="card-img">
+          {% if produto.imagem %}
+            <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+          {% endif %}
+          <span class="badge">-30% OFF</span>
+        </div>
+        <h3 class="nome-produto">{{ produto.nome }}</h3>
+        <div class="prices">
+          <span class="new">R$ {{ produto.preco }}</span>
+        </div>
+        <span class="frete">Frete grátis disponível</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</main>
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: core\templates\confirmacao.html
+==========================================================================================
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %} Confirmação do Pedido – Aura {% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/confirmacao.css' %}" />
+{% endblock %}
+
+{% block conteudo %}
+<main class="confirmacao-container">
+  <section class="confirmacao-card">
+    
+    <div class="confirmacao-header">
+      <div class="icone-sucesso">🎉</div>
+      <h1>Pedido Realizado com Sucesso!</h1>
+      <p>Obrigado pela sua compra. Seu pedido foi registrado e já está em processamento.</p>
+    </div>
+
+    <div class="detalhes-pedido-grid">
+      <div class="detalhe-item">
+        <span class="detalhe-label">Número do Pedido</span>
+        <strong class="detalhe-valor">#{{ pedido.id }}</strong>
+      </div>
+      <div class="detalhe-item">
+        <span class="detalhe-label">Status</span>
+        <strong class="status-badge">{{ pedido.status }}</strong>
+      </div>
+      <div class="detalhe-item">
+        <span class="detalhe-label">Cliente</span>
+        <strong class="detalhe-valor">{{ pedido.cliente.nome }} {{ pedido.cliente.sobrenome }}</strong>
+      </div>
+    </div>
+
+    <h2>Resumo do Pedido</h2>
+
+    <div class="table-responsive">
+      <table class="tabela-confirmacao">
+        <thead>
+          <tr>
+            <th scope="col">Produto</th>
+            <th scope="col" class="text-center">Quantidade</th>
+            <th scope="col" class="text-right">Preço Unitário</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in itens %}
+          <tr>
+            <td><strong>{{ item.produto.nome }}</strong></td>
+            <td class="text-center">{{ item.quantidade }}</td>
+            <td class="text-right preco-item">R$ {{ item.preco_unitario }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="total-box">
+      <span class="total-label">Total Pago:</span>
+      <span class="total-valor">R$ {{ total|floatformat:2 }}</span>
+    </div>
+
+    <div class="confirmacao-acoes">
+      <a href="{% url 'catalogo' %}" class="btn-nav btn-primario">
+        Continuar Comprando
+      </a>
+      <a href="{% url 'inicial' %}" class="btn-nav btn-secundario">
+        Voltar ao Início
+      </a>
+    </div>
+
+  </section>
+</main>
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: core\templates\home.html
+==========================================================================================
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %} Home {% endblock %}
+
+{% block estilo %} <link rel="stylesheet" href="{% static 'assets/css/home.css' %}" /> {% endblock %}
+
+{% block scripts %} <script src="{% static 'assets/js/home.js' %}"></script> {% endblock %}
+
+{% block conteudo %}
+  <section class="hero">
+    <video class="videofundo" autoplay muted loop playsinline>
+      <source src="{% static 'assets/imagens/bc.mp4' %}" type="video/mp4"/>
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Aura que transborda</h1>
+      <p>Equipamentos, notícias e paixão pelo esporte — para todo mundo.</p>
+      <div class="hero-cta">
+        <a href="{% url 'catalogo' %}" class="cta">Ver Produtos</a>
+        <a href="#" class="cta secondary">Mais Vendidos</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="slogan">
+    <h2>Qualidade, conforto e design — pensado para torcer</h2>
+  </section>
+
+  <main class="anuncios" id="gridProdutos" role="main" aria-label="Categorias e Produtos em destaque">
+    <article class="imagem-container" data-keywords="basquete bola calçado basquete">
+      <img src="{% static 'assets/imagens/basquete1.jpg' %}" alt="Basquete - equipamentos" loading="lazy" />
+      <a href="#" class="botao-imagens">Basquete</a>
+    </article>
+
+    <article class="imagem-container" data-keywords="futebol chuteira camisa futebol">
+      <img src="{% static 'assets/imagens/futebol.jpg' %}" alt="Futebol - equipamentos" loading="lazy" />
+      <a href="#" class="botao-imagens">Futebol</a>
+    </article>
+
+    <article class="imagem-container" data-keywords="tenis corrida treino tenis">
+      <img src="{% static 'assets/imagens/tenis.jpg' %}" alt="Tênis - corrida" loading="lazy" />
+      <a href="#" class="botao-imagens">Tênis</a>
+    </article>
+  </main>
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: core\templates\mensagens.html
+==========================================================================================
+{% if messages %}
+  {% for message in messages %}
+    <div class="alerta {% if message.tags == 'error' %}alerta-erro{% else %}alerta-sucesso{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+==========================================================================================
+ARQUIVO: core\templates\pagamento.html
+==========================================================================================
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}Pagamento{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/pagamento.css' %}" />
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
+
+{% block conteudo %}
+
+<form method="POST" action="{% url 'pagamento' %}">
+    {% csrf_token %}
+
+    <div class="pagina-pagamento">
+
+        <div class="pagamento-left">
+
+            <h2>Forma de pagamento</h2>
+
+            <div class="opcao-pagamento ativa">
+                <input type="radio" name="forma_pagamento" value="Cartão de Crédito" checked>
+                <div>
+                    <strong>Cartão de crédito</strong>
+                    <p>Pague em até 12x</p>
+                </div>
+            </div>
+
+            <div class="form-cartao">
+
+                <label>Número do cartão</label>
+                <input type="text" placeholder="0000 0000 0000 0000">
+
+                <label>Nome impresso no cartão</label>
+                <input type="text" placeholder="Nome completo">
+
+                <div class="linha">
+                    <div style="flex:1">
+                        <label>Validade</label>
+                        <input type="text" placeholder="MM/AA">
+                    </div>
+                    <div style="flex:1">
+                        <label>CVV</label>
+                        <input type="text" placeholder="123">
+                    </div>
+                </div>
+
+                <label>Parcelas</label>
+                <select>
+                    <option>1x sem juros</option>
+                    <option>2x sem juros</option>
+                    <option>3x sem juros</option>
+                </select>
+
+            </div>
+
+        </div>
+
+        <div class="pagamento-right">
+
+            <h3>Resumo</h3>
+
+            {% for item in produtos %}
+            <div class="linha-resumo">
+                <span>{{ item.produto.nome }} x{{ item.quantidade }}</span>
+                <span>R$ {{ item.subtotal }}</span>
+            </div>
+            {% endfor %}
+
+            <div class="linha-resumo desconto">
+                <span>Desconto</span>
+                <span>R$ 0,00</span>
+            </div>
+
+            <div class="linha-resumo total">
+                <span>Total</span>
+                <span id="valor-total">R$ {{ total }}</span>
+            </div>
+
+            <button type="submit" class="btn-finalizar">
+                Finalizar pagamento
+            </button>
+
+        </div>
+
+    </div>
+</form>
+
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: core\templates\transparencia.html
+==========================================================================================
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}
+Transparência – Aura
+{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/transparencia.css' %}" />
+{% endblock %}
+
+{% block conteudo %}
+<div class="page-header">
+  <div class="page-header-inner">
+    <h1>Painel de Transparência Esportiva</h1>
+  </div>
+</div>
+
+<div class="main-content">
+
+  <!-- ============ BLOCO 1: NÚMEROS GERAIS DO E-COMMERCE ============ -->
+  <div class="section-card">
+    <h2>📊 Métricas Públicas da Plataforma</h2>
+    <p>Resumo de dados operacionais e catálogo de produtos esportivos do sistema Aura.</p>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">Produtos Cadastrados</span>
+        {{ qtd_produtos }}
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Categorias Esportivas</span>
+        {{ qtd_categorias }}
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Clientes Registrados</span>
+        {{ qtd_clientes }}
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Pedidos Efetuados</span>
+        {{ qtd_pedidos }}
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BLOCO 2: PREÇOS E VALORES ============ -->
+  <div class="section-card">
+    <h2>💲 Indicadores de Preços dos Produtos</h2>
+    <p>Menor, média e maior valor entre os artigos esportivos cadastrados.</p>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">Menor Preço</span>
+        R$ {{ menor_preco|floatformat:2 }}
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Preço Médio</span>
+        R$ {{ media_preco|floatformat:2 }}
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Maior Preço</span>
+        R$ {{ maior_preco|floatformat:2 }}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: pedidos\admin.py
+==========================================================================================
+from django.contrib import admin
+
+# Register your models here.
+
+==========================================================================================
+ARQUIVO: pedidos\apps.py
+==========================================================================================
+from django.apps import AppConfig
+
+
+class PedidosConfig(AppConfig):
+    name = 'pedidos'
+
+==========================================================================================
+ARQUIVO: pedidos\forms.py
+==========================================================================================
+from django import forms
+
+from .models import Pedido, ItemPedido
+
+
+class PedidoForm(forms.ModelForm):
+    class Meta:
+        model = Pedido
+        fields = ['cliente', 'status']
+
+
+class ItemPedidoForm(forms.ModelForm):
+    class Meta:
+        model = ItemPedido
+        fields = ['pedido', 'produto', 'quantidade', 'preco_unitario']
+
+==========================================================================================
+ARQUIVO: pedidos\models.py
+==========================================================================================
+from django.db import models
+
+from usuarios.models import Cliente
+from produtos.models import Produto
+
+class Pedido(models.Model):
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.CASCADE,
+        related_name="pedidos"  
+    )
+
+#   pagamento = models.ForeignKey(
+#       Pagamento,
+#       on_delete=models.SET_NULL,
+#       null=True,
+#       blank=True,
+#       related_name="pedidos"
+#   )
+
+    data_pedido = models.DateTimeField("Data do Pedido", auto_now_add=True)
+    status = models.CharField("Status", max_length=45)
+
+    def __str__(self):
+        return f"Pedido #{self.id} - {self.cliente.nome}"
+
+
+class ItemPedido(models.Model):
+    pedido = models.ForeignKey(
+        Pedido,
+        on_delete=models.CASCADE,
+        related_name="itens"
+    )
+
+    produto = models.ForeignKey(
+        Produto,
+        on_delete=models.CASCADE,
+        related_name="itens"
+    )
+
+    quantidade = models.IntegerField("Quantidade")
+    preco_unitario = models.DecimalField(
+        "Preço Unitário",
+        max_digits=10,
+        decimal_places=2
+    )
+
+    def subtotal(self):
+        return self.quantidade * self.preco_unitario
+
+    def __str__(self):
+        return f"{self.produto.nome} x {self.quantidade}"
+
+==========================================================================================
+ARQUIVO: pedidos\tests.py
+==========================================================================================
+from django.test import TestCase
+
+# Create your tests here.
+
+==========================================================================================
+ARQUIVO: pedidos\views.py
+==========================================================================================
+from django.shortcuts import render
+
+# Create your views here.
+
+==========================================================================================
+ARQUIVO: produtos\admin.py
+==========================================================================================
+from django.contrib import admin
+
+# Register your models here.
+
+==========================================================================================
+ARQUIVO: produtos\apps.py
+==========================================================================================
+from django.apps import AppConfig
+
+
+class ProdutosConfig(AppConfig):
+    name = 'produtos'
+
+==========================================================================================
+ARQUIVO: produtos\forms.py
+==========================================================================================
+from django import forms
+from django.contrib.auth.models import User
+from .models import Produto, Categoria
+
+from PIL import Image
+
+class CategoriaForm(forms.ModelForm):
+    class Meta:
+        model = Categoria
+        fields = ['nome']
+
+        
+class ProdutoForm(forms.ModelForm):
+        
+    categoria = forms.ModelChoiceField(
+    queryset=Categoria.objects.all(),
+    empty_label="Selecione uma categoria"
+    )
+    
+    class Meta:
+        model = Produto
+        fields = ['nome', 'descricao', 'categoria', 'preco', 'estoque', 'imagem']
+
+
+    def clean_imagem(self):
+        imagem = self.cleaned_data.get('imagem')
+
+        if imagem:
+            extensoes_permitidas = ['.jpg', '.jpeg', '.png', '.webp']
+            nome = imagem.name.lower()
+
+            if not any(nome.endswith(ext) for ext in extensoes_permitidas):
+                raise forms.ValidationError('Formato não permitido. Use JPG, PNG ou WEBP.')
+
+            limite_mb = 2
+            if imagem.size > limite_mb * 1024 * 1024:
+                raise forms.ValidationError(f'A imagem deve ter no máximo {limite_mb}MB.')
+
+            try:
+                largura, altura = Image.open(imagem).size
+            except Exception:
+                raise forms.ValidationError('Não foi possível processar essa imagem.')
+
+            imagem.seek(0)
+
+            if largura < 400 or altura < 400:
+                raise forms.ValidationError('A imagem deve ter no mínimo 400x400 pixels.')
+
+        return imagem
+
+==========================================================================================
+ARQUIVO: produtos\models.py
+==========================================================================================
+from django.db import models
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class Categoria(models.Model):
+    nome = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nome
+
+
+class Produto(models.Model):
+    nome = models.CharField("Nome", max_length=120)
+    descricao = models.TextField("Descrição")
+    preco = models.DecimalField("Preço", max_digits=10, decimal_places=2)
+    estoque = models.IntegerField("Estoque")
+
+    categoria = models.ForeignKey(
+    Categoria,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
+    imagem = models.ImageField(
+        "Imagem",
+        upload_to="produtos/",
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return self.nome
+    
+
+==========================================================================================
+ARQUIVO: produtos\tests.py
+==========================================================================================
+from django.test import TestCase
+
+# Create your tests here.
+
+==========================================================================================
+ARQUIVO: produtos\urls.py
+==========================================================================================
+from django.urls import path
+from .views import *
+
+urlpatterns = [
+    path('produtos/', produtos, name='produtos'),
+    path('produtos/adicionar/', add_produtos, name='add_produtos'),
+    path('produtos/editar/<int:id>/', produto_editar, name='produto_editar'),
+    path('produtos/excluir/<int:id>/', produto_delete, name='produto_delete'),
+    path('produtos/<int:id>/', produto_detalhe, name='produto_detalhe'),
+
+    path('categoria/adicionar/', add_categoria, name='add_categoria'),
+    path('categoria/editar/<int:id>/', categoria_editar, name='categoria_editar'),
+    path('categoria/excluir/<int:id>/', categoria_delete, name='categoria_delete'),
+]
+
+==========================================================================================
+ARQUIVO: produtos\views.py
+==========================================================================================
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Produto, Categoria
+from .forms import ProdutoForm, CategoriaForm
+
+def staff_required(view_func):
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        if not request.user.is_staff:
+            messages.error(request, 'Acesso restrito a administradores.')
+            return redirect('meus_dados')
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+def produto_detalhe(request, id):
+    produto = get_object_or_404(Produto, pk=id)
+    return render(request, 'produto_detalhe.html', {'produto': produto})
+
+@staff_required
+def produto_editar(request, id):
+    produto = get_object_or_404(Produto, pk=id)
+    form = ProdutoForm(request.POST or None, request.FILES or None, instance=produto)
+
+    context = {
+        "pagina": "produtos_1",
+        'form': form
+    }
+
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Produto atualizado.')
+        return redirect('produtos')
+
+    return render(request, 'privado/add_produtos.html', context)
+
+
+@staff_required
+def produto_delete(request, id):
+    produto = get_object_or_404(Produto, pk=id)
+    produto.delete()
+    messages.success(request, 'Produto removido.')
+    return redirect('produtos')
+
+
+@staff_required
+def add_produtos(request):
+    form = ProdutoForm(request.POST or None, request.FILES or None)
+
+    context = {
+        "pagina": "produtos_1",
+        'form': form
+    }
+
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Produto cadastrado.')
+        return redirect('produtos')
+
+    return render(request, 'privado/add_produtos.html', context)
+
+
+@staff_required
+def produtos(request):
+    produtos = Produto.objects.all()
+    context = {
+        'produtos': produtos,
+        "pagina": "produtos",
+    }
+    return render(request, 'privado/produtos.html', context)
+
+
+@staff_required
+def add_categoria(request):
+    form = CategoriaForm(request.POST or None)
+
+    context = {
+        "pagina": "categorias",
+        'form': form
+    }
+
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Categoria cadastrada com sucesso.')
+        return redirect('produtos')
+
+    return render(request, 'privado/add_categoria.html', context)
+
+
+@staff_required
+def categoria_delete(request, id):
+    categoria = get_object_or_404(Categoria, pk=id)
+    categoria.delete()
+    messages.success(request, 'Categoria removida.')
+    return redirect('produtos')
+
+
+@staff_required
+def categoria_editar(request, id):
+    categoria = get_object_or_404(Categoria, pk=id)
+    form = CategoriaForm(request.POST or None, instance=categoria)
+
+    context = {
+        "pagina": "categoria_1",
+        'form': form
+    }
+
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Categoria atualizada.')
+        return redirect('produtos')
+
+    return render(request, 'privado/add_categoria.html', context)
+
+==========================================================================================
+ARQUIVO: produtos\templates\produto_detalhe.html
+==========================================================================================
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}{{ produto.nome }}{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/catalogo.css' %}">
+{% endblock %}
+
+{% block conteudo %}
+
+<main class="catalogo">
+
+  <section class="produto-detalhe">
+
+    <div class="produto-detalhe-img">
+
+      {% if produto.imagem %}
+      <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+      {% endif %}
+
+    </div>
+
+
+    <div class="produto-detalhe-info">
+
+      <h1>{{ produto.nome }}</h1>
+
+
+      <div class="prices">
+        <span class="new">
+          R$ {{ produto.preco }}
+        </span>
+      </div>
+
+
+      <div class="estoque">
+
+        {% if produto.estoque > 0 %}
+        <span class="disponivel">
+          {{ produto.estoque }} unidades disponíveis
+        </span>
+        {% else %}
+        <span class="indisponivel">
+          Produto fora de estoque
+        </span>
+        {% endif %}
+
+      </div>
+
+
+      <p class="produto-detalhe-desc">
+        {{ produto.descricao }}
+      </p>
+
+
+      <div class="produto-detalhe-acoes">
+
+        {% if produto.estoque > 0 %}
+
+      <a href="{% url 'adicionar_carrinho' produto.id %}" class="botao primario">
+    Adicionar ao carrinho
+</a>
+
+        {% else %}
+
+        <button class="botao primario" disabled>
+          Indisponível
+        </button>
+
+        {% endif %}
+
+
+        <a href="{% url 'catalogo' %}" class="botao secundario">
+          Voltar ao catálogo
+        </a>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: produtos\templates\privado\add_categoria.html
+==========================================================================================
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+    <div>
+        <h1 class="page-title">Cadastrar Produto</h1>
+        <p class="page-subtitle">
+            Preencha os dados do produto abaixo.
+        </p>
+    </div>
+
+    {% include 'mensagens.html' %}
+
+    <div class="section-card">
+
+        <div class="section-card-header">
+            <h2>Informações do Produto</h2>
+        </div>
+
+        <div class="section-card-body">
+
+            <form method="POST" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <div class="form-section">
+
+                    <div class="form-group full">
+                        <label>Nome</label>
+                        {{ form.nome }}
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-form-primary">
+                        Salvar Categoria
+                    </button>
+
+                    <a href="{% url 'produtos' %}" class="btn-form-secondary">
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</main>
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: produtos\templates\privado\add_produtos.html
+==========================================================================================
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+    <div>
+        <h1 class="page-title">Cadastrar Produto</h1>
+        <p class="page-subtitle">
+            Preencha os dados do produto abaixo.
+        </p>
+    </div>
+
+    {% include 'mensagens.html' %}
+
+    <div class="section-card">
+
+        <div class="section-card-header">
+            <h2>Informações do Produto</h2>
+        </div>
+
+        <div class="section-card-body">
+
+            <form method="POST" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <div class="form-section">
+
+                    <div class="form-group full">
+                        <label>Nome</label>
+                        {{ form.nome }}
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Descrição</label>
+                        {{ form.descricao }}
+                    </div>
+
+                    <div class="form-group">
+                        <label aria-placeholder="Selecione a Categoria">Categoria</label>
+                        {{ form.categoria }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Preço</label>
+                        {{ form.preco }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estoque</label>
+                        {{ form.estoque }}
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Imagem</label>
+                        {{ form.imagem }}
+
+                        <span class="hint">
+                            Recomendado: imagem quadrada, fundo branco e tamanho máximo de 2 MB.
+                        </span>
+
+                        {% if form.imagem.errors %}
+                            <span style="color:#dc2626; font-size:.8rem;">
+                                {{ form.imagem.errors|join:", " }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-form-primary">
+                        Salvar Produto
+                    </button>
+
+                    <a href="{% url 'produtos' %}" class="btn-form-secondary">
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</main>
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: produtos\templates\privado\categoria.html
+==========================================================================================
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+    <div>
+        <h1 class="page-title">Categorias</h1>
+        <p class="page-subtitle">
+            Gerencie as categorias cadastradas no sistema.
+        </p>
+    </div>
+
+    {% include 'mensagens.html' %}
+
+    <div class="section-card">
+
+        <div class="section-card-header">
+            <h2>Categorias Cadastradas</h2>
+
+            <a href="{% url 'add_categoria' %}" class="btn-sm btn-primary">
+                Nova Categoria
+            </a>
+        </div>
+
+        <div class="section-card-body">
+
+            <div class="table-wrap">
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome da Categoria</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for categoria in categorias %}
+                        <tr>
+
+                            <td>
+                                {{ categoria.id }}
+                            </td>
+
+                            <td class="td-name">
+                                {{ categoria.nome }}
+                            </td>
+
+                            <td class="td-actions">
+
+                                <a href="{% url 'categoria_editar' categoria.id %}"
+                                   class="btn-sm btn-primary">
+                                    Editar
+                                </a>
+
+                                <a href="{% url 'categoria_delete' categoria.id %}"
+                                   class="btn-sm btn-danger-sm">
+                                    Excluir
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" style="text-align:center;">
+                                Nenhuma categoria cadastrada.
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: produtos\templates\privado\produtos.html
+==========================================================================================
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+    <div>
+        <h1 class="page-title">Produtos</h1>
+        <p class="page-subtitle">
+            Gerencie os produtos cadastrados no sistema.
+        </p>
+    </div>
+
+    {% include 'mensagens.html' %}
+
+    <div class="section-card">
+
+        <div class="section-card-header">
+            <h2>Produtos Cadastrados</h2>
+
+            <a href="{% url 'add_produtos' %}" class="btn-sm btn-primary">
+                Novo Produto
+            </a>
+        </div>
+
+        <div class="section-card-body">
+
+            <div class="table-wrap">
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Imagem</th>
+                            <th>Produto</th>
+                            <th>Preço</th>
+                            <th>Estoque</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for produto in produtos %}
+                        <tr>
+
+                            <td>
+                                {% if produto.imagem %}
+                                    <img src="{{ produto.imagem.url }}"
+                                         width="45"
+                                         height="45"
+                                         style="border-radius:8px; object-fit:cover;">
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+
+                            <td class="td-name">
+                                {{ produto.nome }}
+                                <span>{{ produto.categoria }}</span>
+                            </td>
+
+                            <td>R$ {{ produto.preco }}</td>
+
+                            <td>{{ produto.estoque }}</td>
+
+                            <td class="td-actions">
+
+                                <a href="{% url 'produto_editar' produto.id %}"
+                                   class="btn-sm btn-primary">
+                                    Editar
+                                </a>
+
+                                <a href="{% url 'produto_delete' produto.id %}"
+                                   class="btn-sm btn-danger-sm">
+                                    Excluir
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align:center;">
+                                Nenhum produto cadastrado.
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: static\assets\css\base.css
+==========================================================================================
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #050505;
+  color: white;
+}
+
+.navbar {
+  width: 100%;
+  background: #080808;
+  border-bottom: 1px solid #1e293b;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: auto;
+  padding: 16px 24px;
+
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.logo {
+  justify-self: start;
+
+  display: flex;
+  align-items: center;
+
+  text-decoration: none;
+  color: #dbe4f0;
+}
+
+.logo-text {
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 1px;
+  transition: color 0.3s ease;
+}
+
+.logo:hover .logo-text {
+  color: #3b82f6;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.nav-links a {
+  position: relative;
+
+  text-decoration: none;
+  color: #dbe4f0;
+
+  transition: color 0.3s ease;
+}
+
+.nav-links a::after {
+  content: "";
+
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+
+  width: 0;
+  height: 1px;
+
+  background: #3b82f6;
+
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #3b82f6;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+.nav-divider {
+  width: 1px;
+  height: 25px;
+  background: #334155;
+}
+
+.nav-buttons {
+  justify-self: end;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 12px;
+}
+
+.btn-nav {
+  height: 42px;
+  min-width: 110px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 18px;
+
+  border-radius: 10px;
+
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+
+  border: 1px solid #2563eb;
+  background: transparent;
+  color: #3b82f6 !important;
+
+  transition: 0.3s;
+}
+
+.btn-nav:hover {
+  background: #2563eb;
+  color: white !important;
+  transform: translateY(-1px);
+}
+
+.hamburger {
+  display: none;
+
+  flex-direction: column;
+  gap: 5px;
+
+  background: none;
+  border: none;
+
+  cursor: pointer;
+}
+
+.hamburger span {
+  width: 25px;
+  height: 3px;
+
+  background: white;
+
+  border-radius: 5px;
+}
+
+.footer {
+  margin-top: 80px;
+
+  background: #0b0b0b;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: auto;
+
+  padding: 50px 24px;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+
+  gap: 40px;
+}
+
+.footer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.footer-logo {
+  font-size: 28px;
+  color: #4f8ef7;
+}
+
+.footer-section h3 {
+  color: white;
+  margin-bottom: 8px;
+}
+
+.footer-section p {
+  color: #cbd5e1;
+  line-height: 1.7;
+}
+
+.footer-section a {
+  text-decoration: none;
+  color: #cbd5e1;
+  transition: 0.3s;
+}
+
+.footer-section a:hover {
+  color: #fff;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+  text-align: center;
+
+  padding: 22px;
+
+  color: #cbd5e1;
+
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+
+  .hamburger {
+    display: flex;
+  }
+
+  .nav-inner {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .nav-links {
+    position: absolute;
+
+    top: 80px;
+    right: 20px;
+
+    background: #0f172a;
+
+    flex-direction: column;
+    align-items: flex-start;
+
+    padding: 20px;
+
+    border-radius: 15px;
+
+    display: none;
+
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .nav-links.active {
+    display: flex;
+  }
+
+  .nav-divider {
+    display: none;
+  }
+
+  .logo-text {
+    font-size: 22px;
+  }
+
+  .nav-buttons {
+    width: 100%;
+
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-nav {
+    width: 100%;
+  }
+
+  .footer-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.alerta {
+  padding: 12px 16px;
+
+  border-radius: 8px;
+
+  margin-bottom: 16px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  border-left: 4px solid;
+}
+
+.alerta-sucesso {
+  background: rgba(37, 99, 235, 0.08);
+
+  border-color: #2563eb;
+
+  color: #93c5fd;
+}
+
+.alerta-erro {
+  background: rgba(220, 38, 38, 0.08);
+
+  border-color: #dc2626;
+
+  color: #fca5a5;
+}
+
+==========================================================================================
+ARQUIVO: static\assets\css\cadastro.css
+==========================================================================================
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background-color: #0d0d0d;
+  color: #f5f5f5;
+  line-height: 1.6;
+}
+
+header.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #111;
+  padding: 15px 40px;
+  border-bottom: 2px solid #444;
+}
+
+.logo-header {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 10px #fff;
+}
+
+.links-header a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #ccc;
+  transition: color 0.3s;
+}
+
+.links-header a:hover {
+  color: #fff;
+}
+
+.botoes-login a {
+  text-decoration: none;
+  margin-left: 10px;
+  padding: 6px 15px;
+  border-radius: 5px;
+  font-weight: 500;
+  border: 1px solid #fff;
+  transition: all 0.3s ease;
+}
+
+.botoes-login .entrar {
+  background: #000;
+  color: #fff;
+}
+
+.botoes-login .registrar {
+  background: #fff;
+  color: #000;
+}
+
+.botoes-login a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px #fff;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.form-box {
+  background: #1a1a1a;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+  max-width: 800px;
+  width: 100%;
+}
+
+.form-box form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-box h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #fff;
+}
+
+.form-box h3 {
+  margin-top: 25px;
+  margin-bottom: 15px;
+  color: #fff;
+  border-bottom: 1px solid #444;
+  padding-bottom: 8px;
+}
+
+input {
+  width: 100%;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  border-radius: 8px;
+  color: #fff;
+  padding: 12px;
+  margin-bottom: 15px;
+  font-size: 15px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #fff;
+}
+
+.grupo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.grupo.tres {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.sexo {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.sexo input {
+  width: auto;
+  margin-right: 5px;
+}
+
+.titulo {
+  margin-bottom: 10px;
+}
+
+button[type="submit"],
+.botao {
+  width: 100%;
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 25px;
+  transition: 0.3s;
+}
+
+button[type="submit"]:hover,
+.botao:hover {
+  background: #0066ff;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(0, 102, 255, 0.5);
+}
+
+footer.rodape {
+  background: #000;
+  color: #fff;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 30px;
+  padding: 50px 60px;
+  margin-top: 80px;
+}
+
+footer a {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+footer a:hover {
+  color: #fff;
+}
+
+.logo-rodape {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 10px #fff;
+}
+
+.rodape h4 {
+  margin-bottom: 10px;
+}
+
+@media(max-width: 600px) {
+
+  .grupo,
+  .grupo.tres {
+    grid-template-columns: 1fr;
+  }
+
+  .form-box {
+    padding: 25px;
+  }
+
+  .container {
+    padding: 30px 15px;
+  }
+}
+
+==========================================================================================
+ARQUIVO: static\assets\css\carrinho.css
+==========================================================================================
+header.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #111;
+  padding: 15px 40px;
+  border-bottom: 2px solid #444;
+}
+
+.logo-header {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 10px #fff;
+}
+
+.links-header a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #ccc;
+  transition: color 0.3s;
+}
+
+.links-header a:hover {
+  color: #fff;
+}
+
+.botoes-login a {
+  text-decoration: none;
+  margin-left: 10px;
+  padding: 6px 15px;
+  border-radius: 5px;
+  font-weight: 500;
+  border: 1px solid #fff;
+  transition: all 0.3s ease;
+}
+
+.botoes-login .entrar {
+  background: #000;
+  color: #fff;
+}
+
+.botoes-login .registrar {
+  background: #fff;
+  color: #000;
+}
+
+.botoes-login a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px #fff;
+}
+
+body {
+  background: #0b0b0b;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  margin: 0;
+}
+
+.steps {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 20px;
+  border-bottom: 1px solid #222;
+}
+
+.steps span {
+  color: #777;
+  font-size: 13px;
+}
+
+.steps .ativo {
+  color: #fff;
+  border-bottom: 2px solid #4f8ef7;
+  padding-bottom: 6px;
+}
+
+.pagina-carrinho {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+}
+
+.lista-produtos {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.item-carrinho {
+  background: #111;
+  border-radius: 12px;
+  padding: 15px;
+  display: grid;
+  grid-template-columns: 80px 1fr auto auto auto;
+  gap: 15px;
+  align-items: center;
+}
+
+.item-carrinho img {
+  width: 80px;
+}
+
+.controle-qtd button {
+  background: #1a1a1a;
+  border: none;
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+}
+
+.resumo {
+  background: #111;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.linha {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.total {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.btn-continuar {
+  width: 100%;
+  padding: 14px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(90deg, #1e5dc6, #4f8ef7);
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.voltar {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  color: #aaa;
+  font-size: 13px;
+}
+
+.excluir {
+  background: none;
+  border: none;
+  color: #ff4f4f;
+  cursor: pointer;
+}
+
+==========================================================================================
+ARQUIVO: static\assets\css\catalogo.css
+==========================================================================================
+/* ==========================================
+   CONFIGURAÇÕES GERAIS / RESET
+   ========================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+body {
+  background-color: #000;
+  color: #fff;
+  min-height: 100vh;
+}
+
+/* ==========================================
+   HEADER / TOPO
+   ========================================== */
+header.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #111;
+  padding: 15px 40px;
+  border-bottom: 2px solid #444;
+}
+
+.logo-header {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 10px #fff;
+}
+
+.links-header a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #ccc;
+  transition: color 0.3s;
+}
+
+.links-header a:hover {
+  color: #fff;
+}
+
+.botoes-login a {
+  text-decoration: none;
+  margin-left: 10px;
+  padding: 6px 15px;
+  border-radius: 5px;
+  font-weight: 500;
+  border: 1px solid #fff;
+  transition: all 0.3s ease;
+}
+
+.botoes-login .entrar {
+  background: #000;
+  color: #fff;
+}
+
+.botoes-login .registrar {
+  background: #fff;
+  color: #000;
+}
+
+.botoes-login a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px #fff;
+}
+
+/* ==========================================
+   CATÁLOGO E GRID
+   ========================================== */
+.catalogo {
+  padding: 50px;
+  text-align: center;
+  min-height: 100vh; 
+  
+}
+
+#campoBusca{
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  margin: 20px auto 35px;
+  padding: 14px 18px;
+  font-size: 16px;
+  color: #333;
+  background: #fff;
+  border: 2px solid #dcdcdc;
+  border-radius: 30px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+#campoBusca::placeholder {
+  color: #999;
+}
+
+#campoBusca:hover {
+  border-color: #1e5dc6;
+  box-shadow: 0 0 0 4px rgba(30, 93, 198, 0.15);
+}
+
+.catalogo h1 {
+  font-size: 28px;
+  margin-bottom: 40px;
+  color: #fff;
+}
+
+/* Força exatamente 6 colunas por linha */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); 
+  gap: 25px;
+}
+
+/* Remove qualquer estilização padrão de link do bloco do card */
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+/* ==========================================
+   CARDS DE PRODUTO (Com Animação de Hover)
+   ========================================== */
+.card {
+  background: #101010;
+  border:1px solid rgba(79, 142, 247, 0.35);
+  border-radius: 12px;
+  padding: 15px;
+  text-align: left;
+  transition: .2s ease-in-out; /* Transição suave para a animação */
+  height: 100%; 
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================
+   A ANIMAÇÃO DE HOVER ESTÁ AQUI
+   Ao passar o mouse no link, o card sobe 
+   e uma sombra brilhante aparece.
+   ========================================== */
+.card-link:hover .card {
+  transform: translateY(-6px); /* Sobe o card */
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1); /* Adiciona sombra brilhante */
+}
+
+.card-img {
+  background: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.card-img img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+}
+
+.badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: #d1ff34;
+  color: #000;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.card h3 {
+  color: #fff;
+  font-size: 17px;
+  margin-bottom: 8px;
+  text-decoration: none; /* Garante que não tenha sublinhado */
+}
+
+.stars {
+  color: #ffd500;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.prices {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 15px;
+}
+
+.prices .old {
+  color: #777;
+  text-decoration: line-through;
+  font-size: 13px;
+}
+
+.prices .new {
+  color: #d1ff34;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.prices .parcel {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.frete {
+  margin-top: auto; 
+  background: #d1ff34;
+  color: #000;
+  padding: 4px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
+  text-align: center;
+  display: inline-block;
+  width: max-content;
+}
+
+/* ==========================================
+   FOOTER / RODAPÉ
+   ========================================== */
+footer.rodape {
+  background-color: #000;
+  color: #fff;
+  padding: 40px;
+  margin-top: 60px;
+  border-top: 1px solid #222;
+}
+
+.rodape-conteudo {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.logo-rodape {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* ==========================================
+   RESPONSIVIDADE (Media Queries)
+   ========================================== */
+@media (max-width: 1400px) {
+  .card-grid {
+    grid-template-columns: repeat(4, 1fr); 
+  }
+}
+
+@media (max-width: 950px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr); 
+  }
+  .catalogo {
+    padding: 30px 20px;
+  }
+}
+
+@media (max-width: 650px) {
+  header.topo {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .botoes-login {
+    margin-top: 10px;
+  }
+
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 15px;
+  }
+}
+
+/* ==========================================
+   PRODUTO INDIVIDUAL (novo)
+   ========================================== */
+.produto-detalhe {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  gap: 40px;
+  text-align: left;
+  background: #101010;
+  border: 1px solid #1e1e1e;
+  border-radius: 12px;
+  padding: 30px;
+}
+
+.produto-detalhe-img {
+  flex: 1;
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.produto-detalhe-img img {
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+}
+
+.produto-detalhe-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.produto-detalhe-info h1 {
+  color: #fff;
+  font-size: 26px;
+}
+
+.produto-detalhe-desc {
+  color: #ccc;
+  line-height: 1.6;
+}
+
+.produto-detalhe-info .frete {
+  width: max-content;
+}
+
+.produto-detalhe .botao {
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+  text-align: center;
+  text-decoration: none;
+  width: max-content;
+}
+
+.produto-detalhe .secundario {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.produto-detalhe .secundario:hover {
+  background: #fff;
+  color: #000;
+}
+
+@media (max-width: 700px) {
+  .produto-detalhe {
+    flex-direction: column;
+  }
+}
+
+.produto-detalhe-acoes {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.produto-detalhe .botao {
+    padding: 12px 22px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: .3s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.produto-detalhe .primario {
+    background: #d1ff34;
+    color: #000;
+}
+
+.produto-detalhe .primario:hover {
+    opacity: .85;
+    transform: translateY(-2px);
+}
+
+
+
+.produto-detalhe .secundario {
+    background: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+}
+
+.produto-detalhe .secundario:hover {
+    background: #fff;
+    color: #000;
+    transform: translateY(-2px);
+}
+
+
+
+.produto-detalhe button:disabled {
+    background: #555;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+==========================================================================================
+ARQUIVO: static\assets\css\confirmacao.css
+==========================================================================================
+.confirmacao-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.confirmacao-card {
+  background: #101010;
+  padding: 35px;
+  border-radius: 12px;
+  border: 1px solid rgba(79, 142, 247, 0.35);
+  color: #fff;
+}
+
+.confirmacao-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.icone-sucesso {
+  font-size: 50px;
+  margin-bottom: 10px;
+}
+
+.confirmacao-header h1 {
+  color: #d1ff34;
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.confirmacao-header p {
+  color: #cbd5e1;
+  font-size: 16px;
+}
+
+.detalhes-pedido-grid {
+  background: #151515;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.detalhe-label {
+  color: #94a3b8;
+  font-size: 13px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.detalhe-valor {
+  color: #fff;
+  font-size: 18px;
+}
+
+.status-badge {
+  color: #d1ff34;
+  font-size: 18px;
+}
+
+.confirmacao-card h2 {
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #222;
+  padding-bottom: 10px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  margin-bottom: 25px;
+}
+
+.tabela-confirmacao {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.tabela-confirmacao th {
+  padding: 12px 10px;
+  color: #94a3b8;
+  font-size: 14px;
+  border-bottom: 1px solid #333;
+}
+
+.tabela-confirmacao td {
+  padding: 14px 10px;
+  border-bottom: 1px solid #222;
+  color: #cbd5e1;
+}
+
+.tabela-confirmacao td strong {
+  color: #f8fafc;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.preco-item {
+  color: #4f8ef7;
+  font-weight: 600;
+}
+
+.total-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #080808;
+  padding: 18px 24px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  border: 1px solid #222;
+}
+
+.total-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.total-valor {
+  font-size: 24px;
+  font-weight: bold;
+  color: #d1ff34;
+}
+
+.confirmacao-acoes {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-primario {
+  background: #d1ff34;
+  color: #000 !important;
+  padding: 12px 28px;
+  border-radius: 6px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn-primario:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
+}
+
+.btn-secundario {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff !important;
+  padding: 12px 28px;
+  border-radius: 6px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn-secundario:hover {
+  background: #fff;
+  color: #000 !important;
+  transform: translateY(-2px);
+}
+
+==========================================================================================
+ARQUIVO: static\assets\css\home.css
+==========================================================================================
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: #0b0b0b;
+  color: #eee;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cabeca {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 4%;
+  background: linear-gradient(180deg, #000000 0%, #000000 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 22px;
+  color: #e6eae4;
+  letter-spacing: 0.6px;
+}
+
+.logo-area .logo {
+  display: inline-block;
+}
+
+.buscacontainer {
+  flex: 1;
+  max-width: 600px;
+  margin: 0 10px;
+}
+
+.buscacontainer input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  color: #fff;
+  outline: none;
+  transition: box-shadow .18s ease, border-color .18s ease;
+}
+
+.buscacontainer input::placeholder {
+  color: #9b9b9b;
+}
+
+.buscacontainer input:focus {
+  box-shadow: 0 6px 20px rgba(30, 93, 198, 0.12);
+  border-color: rgba(30, 93, 198, 0.6);
+}
+
+.botoes-cabeca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.botao-cabeca {
+  padding: 8px 12px;
+  border-radius: 9px;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #e6f0ff;
+  font-weight: 600;
+  transition: transform .12s ease, background .12s ease;
+}
+
+.botao-cabeca.outline {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.botao-cabeca.cart {
+  background: linear-gradient(90deg, #1e5dc6, #4f8ef7);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(30, 93, 198, 0.18);
+}
+
+.botao-cabeca:hover {
+  transform: translateY(-4px);
+}
+
+.hero {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.videofundo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(.9) brightness(.5);
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.55));
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: #fff;
+  padding: 0 20px;
+  max-width: 980px;
+}
+
+.hero-content h1 {
+  font-size: clamp(28px, 5vw, 52px);
+  letter-spacing: -1px;
+  margin-bottom: 10px;
+  font-weight: 800;
+}
+
+.hero-content p {
+  color: #d0d7e9;
+  margin-bottom: 18px;
+  font-size: 1.05rem;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cta {
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: #323335;
+  color: #fff;
+  font-weight: 700;
+
+}
+
+.cta:hover{
+  box-shadow: 0 10px 30px rgba(30,93,198,0.14);
+  color: #3b82f6;
+  transition: all 0.3s ease;
+}
+
+.cta.secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.cta.secondary:hover{
+  box-shadow: 0 10px 30px rgba(30,93,198,0.14);
+  color: #3b82f6;
+  border-color: #3b82f6 ;
+  transition: all 0.3s ease;
+}
+
+.slogan {
+  background: linear-gradient(90deg, #050505, #0b0b0b);
+  padding: 36px 4%;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.slogan h2 {
+  font-size: clamp(16px, 2.4vw, 24px);
+  color: #dfe9ff;
+  font-weight: 600;
+}
+
+.anuncios {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 50px 4%;
+  align-items: stretch;
+}
+
+.imagem-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.imagem-container img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  display: block;
+  transition: transform .36s ease;
+}
+
+.imagem-container:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  border-color: rgba(30, 93, 198, 0.3);
+}
+
+.imagem-container:hover img {
+  transform: scale(1.05);
+}
+
+.botao-imagens {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 18px;
+  z-index: 3;
+  background: linear-gradient(90deg, #292a2b, #4f8ef7);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  box-shadow: 0 10px 26px rgba(30, 93, 198, 0.16);
+}
+
+.rodape {
+  background: #000;
+  color: #fff;
+  padding: 36px 4% 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.rodape-grid {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.rodape-col {
+  flex: 1;
+  min-width: 180px;
+}
+
+.rodape-col h4 {
+  color: #fff;
+  margin-bottom: 10px;
+  font-size: 1.05rem;
+}
+
+.rodape-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rodape-col li {
+  margin-bottom: 8px;
+}
+
+.rodape-col a {
+  color: #cfcfcf;
+  text-decoration: none;
+  transition: color .12s ease;
+}
+
+.rodape-col a:hover {
+  color: #2f3033;
+}
+
+.rodape-copy {
+  text-align: center;
+  margin-top: 18px;
+  color: #bdbdbd;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 980px) {
+  .anuncios {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .videofundo {
+    display: block;
+  }
+}
+
+@media (max-width: 640px) {
+  .cabeca {
+    padding: 12px 3%;
+    gap: 8px;
+  }
+
+  .buscacontainer {
+    display: none;
+  }
+
+  .anuncios {
+    grid-template-columns: 1fr;
+    padding: 24px 3%;
+    gap: 18px;
+  }
+
+  .hero {
+    height: 48vh;
+    min-height: 260px;
+  }
+
+  .hero-content h1 {
+    font-size: 28px;
+  }
+}
+
+==========================================================================================
+ARQUIVO: static\assets\css\login.css
+==========================================================================================
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background-color: #0e0e0e;
+  color: #f0f0f0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+header.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 40px;
+  background-color: #111;
+  border-bottom: 2px solid #444;
+}
+
+.logo-header {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 10px #fff;
+  text-decoration: none;
+  color: #fff;
+}
+
+.links-header a {
+  margin: 0 12px;
+  text-decoration: none;
+  color: #ddd;
+  transition: color 0.3s;
+}
+
+.links-header a:hover {
+  color: #fff;
+}
+
+.botoes-login a {
+  text-decoration: none;
+  margin-left: 10px;
+  padding: 6px 15px;
+  border-radius: 5px;
+  font-weight: 500;
+  border: 1px solid #fff;
+  transition: all 0.3s ease;
+}
+
+.botoes-login .entrar {
+  background: #000;
+  color: #fff;
+}
+
+.botoes-login .registrar {
+  background: #fff;
+  color: #000;
+}
+
+.botoes-login a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px #fff;
+}
+
+/* LOGIN AREA */
+.login-area {
+  flex: 1;
+  width: 100%;
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.login-container {
+  display: flex;
+  gap: 80px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 60px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.login-box,
+.cadastro-box {
+  flex: 1;
+}
+
+/* FORM ORGANIZAÇÃO */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* TITULOS */
+h2 {
+  color: #fff;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* INPUTS */
+input {
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  background: #2a2a2a;
+  color: #fff;
+  width: 100%;
+}
+
+/* CAMPO SENHA */
+.senha-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.senha-input input {
+  width: 100%;
+  padding-right: 35px;
+}
+
+.mostrar-senha {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* LINKS */
+.link-senha {
+  color: #ccc;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.link-senha:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* BOTÕES */
+.botao {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.primario {
+  background: #fff;
+  color: #000;
+}
+
+.primario:hover {
+  background: #ddd;
+}
+
+.secundario {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.secundario:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* DIVISOR */
+.divisor {
+  width: 2px;
+  background: #333;
+  border-radius: 2px;
+}
+
+/* RODAPÉ */
+footer.rodape {
+  background: #000;
+  color: #fff;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 30px;
+  padding: 0;
+}
+
+footer a {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+footer a:hover {
+  color: #fff;
+}
+
+.logo-rodape {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 10px #fff;
+}
+
+.rodape h4 {
+  margin-bottom: 10px;
+}
+
+/* RESPONSIVO */
+@media (max-width: 900px) {
+  .login-container {
+    flex-direction: column;
+    padding: 40px 20px;
+  }
+
+  .divisor {
+    display: none;
+  }
+}
+
+==========================================================================================
+ARQUIVO: static\assets\css\pagamento.css
+==========================================================================================
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: Inter, system-ui, Arial;
+  background: #0b0b0b;
+  color: #eee;
+}
+
+.pagina-pagamento {
+  max-width: 1100px;
+  margin: 30px auto;
+  display: flex;
+  gap: 24px;
+  padding: 0 4%;
+}
+
+.pagamento-left,
+.pagamento-right {
+  background: linear-gradient(180deg, #0f0f0f, #111);
+  border-radius: 14px;
+  padding: 26px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.pagamento-left { width: 65%; }
+.pagamento-right { width: 35%; }
+
+.pagamento-left h2,
+.pagamento-right h3 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  border-left: 4px solid #1e5dc6;
+  padding-left: 12px;
+}
+
+.opcao-pagamento {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 20px;
+}
+
+.form-cartao label {
+  display: block;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.form-cartao input,
+.form-cartao select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #fff;
+}
+
+.linha {
+  display: flex;
+  gap: 14px;
+}
+
+.linha-resumo {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.linha-resumo.desconto {
+  color: #4f8ef7;
+}
+
+.linha-resumo.total {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.btn-finalizar {
+  width: 100%;
+  margin-top: 22px;
+  padding: 14px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(90deg, #1e5dc6, #4f8ef7);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+==========================================================================================
+ARQUIVO: static\assets\css\painel.css
+==========================================================================================
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  font-family: "Poppins", sans-serif;
+}
+
+/* =========================
+   BODY
+========================= */
+
+body {
+  background: #0d0d0d;
+  color: #f5f5f5;
+  min-height: 100vh;
+}
+
+main {
+    min-height: 100vh;
+}
+
+/* =========================
+   CONTAINERS
+========================= */
+
+.painel-container,
+.form-container,
+.gerenciar-container {
+  width: 100%;
+  max-width: 1200px;
+
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+/* =========================
+   TITULOS
+========================= */
+
+.painel-header,
+.form-header,
+.topo {
+  text-align: center;
+
+  margin-bottom: 35px;
+}
+
+.painel-header h1,
+.form-header h1,
+.topo h1 {
+  font-size: 38px;
+  font-weight: 700;
+
+  color: #fff;
+
+  margin-bottom: 10px;
+}
+
+.painel-header p,
+.form-header p {
+  color: #aaa;
+}
+
+/* =========================
+   CAIXA CENTRAL
+========================= */
+
+.cards,
+form,
+.tabela-container {
+  background: #1a1a1a;
+
+  border: 1px solid #2d2d2d;
+
+  border-radius: 16px;
+
+  box-shadow:
+  0 0 25px rgba(0, 0, 0, 0.4);
+
+  overflow: hidden;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.cards {
+  display: grid;
+
+  grid-template-columns:
+  repeat(auto-fit, minmax(250px, 1fr));
+
+  gap: 20px;
+
+  padding: 25px;
+}
+
+.card {
+  background: #222;
+
+  border: 1px solid #333;
+
+  border-radius: 12px;
+
+  padding: 30px;
+
+  text-decoration: none;
+
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+
+  border-color: #2563eb;
+
+  box-shadow:
+  0 0 15px rgba(37, 99, 235, 0.2);
+}
+
+.card h2 {
+  color: #fff;
+
+  margin-bottom: 12px;
+}
+
+.card p {
+  color: #bbb;
+
+  line-height: 1.6;
+}
+
+/* =========================
+   FORMULÁRIO
+========================= */
+
+form {
+  max-width: 750px;
+
+  margin: auto;
+
+  padding: 40px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  margin-bottom: 8px;
+
+  font-weight: 500;
+
+  color: #ddd;
+}
+
+.input-group input,
+.input-group textarea {
+  background: #2a2a2a;
+
+  border: 1px solid #444;
+
+  border-radius: 8px;
+
+  padding: 14px;
+
+  color: white;
+
+  outline: none;
+
+  transition: 0.3s;
+
+  font-size: 15px;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+  0 0 10px rgba(37, 99, 235, 0.2);
+}
+
+textarea {
+  resize: none;
+}
+
+/* =========================
+   BOTÃO
+========================= */
+
+.btn-submit {
+  width: 100%;
+
+  background:
+  linear-gradient(
+    135deg,
+    #2563eb,
+    #1d4ed8
+  );
+
+  color: white;
+
+  border: none;
+
+  border-radius: 8px;
+
+  padding: 14px;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+  0 0 15px rgba(37, 99, 235, 0.3);
+}
+
+/* =========================
+   TABELA
+========================= */
+
+.tabela-container {
+  padding: 20px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+
+  border-collapse: collapse;
+}
+
+thead {
+  background: #222;
+}
+
+thead th {
+  padding: 18px;
+
+  text-align: left;
+
+  color: white;
+}
+
+tbody td {
+  padding: 18px;
+
+  border-top: 1px solid #333;
+
+  color: #ccc;
+}
+
+/* =========================
+   AÇÕES
+========================= */
+
+.acoes {
+  display: flex;
+
+  gap: 10px;
+}
+
+.btn-editar,
+.btn-remover {
+  border: none;
+
+  padding: 10px 16px;
+
+  border-radius: 8px;
+
+  color: white;
+
+  cursor: pointer;
+
+  font-weight: 600;
+
+  transition: 0.3s;
+}
+
+.btn-editar {
+  background: #2563eb;
+}
+
+.btn-remover {
+  background: #dc2626;
+}
+
+.btn-editar:hover,
+.btn-remover:hover {
+  transform: translateY(-2px);
+
+  opacity: 0.9;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media (max-width: 768px) {
+
+  .painel-header h1,
+  .form-header h1,
+  .topo h1 {
+    font-size: 30px;
+  }
+
+  form {
+    padding: 25px;
+  }
+
+  .acoes {
+    flex-direction: column;
+  }
+
+  table {
+    font-size: 14px;
+  }
+
+}
+
+a.btn-editar, a.btn-remover, a.btn-submit {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+
+==========================================================================================
+ARQUIVO: static\assets\css\perfil.css
+==========================================================================================
+/* perfil.html – dashboard */
+
+:root {
+  --primary: #141d4d;
+  --primary-dark: #141d4d;
+  --primary-light: #0f172a;
+  --accent: #ffcc00;
+  --accent-dark: #e6b800;
+  --text: #1a1a2e;
+  --text-muted: #6b7280;
+  --bg: #f0f2f5;
+  --white: #ffffff;
+  --border: #e5e7eb;
+  --radius: 8px;
+  --shadow: 0 2px 8px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 20px rgba(0,0,0,.12);
+  --sidebar-w: 260px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+a { text-decoration: none; color: inherit; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w); background: var(--primary-dark); color: var(--white);
+  display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0;
+  z-index: 200; transition: transform .3s ease; overflow-y: auto;
+}
+.sidebar-header {
+  padding: 1.75rem 1.5rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: .75rem;
+}
+.avatar {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem; font-weight: 800; color: var(--primary-dark);
+  border: 3px solid rgba(255,255,255,.3);
+}
+.user-name { font-weight: 700; font-size: 1rem; }
+.user-role { font-size: .75rem; opacity: .65; }
+
+.sidebar-nav { flex: 1; padding: 1rem 0; }
+.nav-section { padding: .5rem 1.5rem .25rem; font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; opacity: .5; }
+.nav-item {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .65rem 1.5rem; font-size: .9rem; cursor: pointer;
+  transition: background .2s; border-left: 3px solid transparent;
+}
+.nav-item:hover { background: rgba(255,255,255,.08); }
+.nav-item.active { background: rgba(255,255,255,.12); border-left-color: var(--accent); color: var(--white); font-weight: 600; }
+.nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+.nav-item.danger { color: #f87171; }
+.nav-item.danger:hover { background: rgba(248,113,113,.1); }
+
+.sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,.1); font-size: .75rem; opacity: .5; text-align: center; }
+
+/* ── TOPBAR (mobile) ── */
+.topbar {
+  display: none; background: var(--primary-dark); color: var(--white);
+  position: fixed; top: 0; left: 0; right: 0; height: 56px; z-index: 150;
+  align-items: center; justify-content: space-between; padding: 0 1rem;
+}
+.topbar .logo-text { font-weight: 700; font-size: 1rem; }
+.topbar .logo-text span { display: block; font-size: .65rem; opacity: .7; }
+.hamburger { display: flex; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: .4rem; }
+.hamburger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; transition: all .3s; }
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 190; }
+.sidebar-overlay.show { display: block; }
+
+/* ── MAIN ── */
+.main { margin-left: var(--sidebar-w); flex: 1; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+.page-title { font-size: 1.5rem; font-weight: 800; }
+.page-subtitle { font-size: .9rem; color: var(--text-muted); }
+
+/* ── STAT CARDS ── */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.25rem; }
+.stat-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem; }
+.stat-icon { width: 52px; height: 52px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+.stat-icon.green { background: var(--primary-light); }
+.stat-icon.yellow { background: #fef9c3; }
+.stat-icon.blue { background: #dbeafe; }
+.stat-icon.purple { background: #f3e8ff; }
+.stat-body .stat-value { font-size: 1.65rem; font-weight: 800; line-height: 1; }
+.stat-body .stat-label { font-size: .8rem; color: var(--text-muted); margin-top: .2rem; }
+.stat-body .stat-change { font-size: .75rem; color: #16a34a; margin-top: .2rem; }
+
+/* ── SECTION CARD ── */
+.section-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.section-card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; }
+.section-card-header h2 { font-size: 1rem; font-weight: 700; }
+.section-card-body { padding: 1.5rem; }
+
+/* ── TABLE TOOLBAR ── */
+.table-toolbar { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.search-input { flex: 1; min-width: 180px; padding: .55rem .9rem; border: 1.5px solid var(--border); border-radius: var(--radius); font-size: .88rem; outline: none; transition: border-color .2s; }
+.search-input:focus { border-color: var(--primary); }
+.filter-select { padding: .55rem .85rem; border: 1.5px solid var(--border); border-radius: var(--radius); font-size: .85rem; color: var(--text); outline: none; background: var(--white); cursor: pointer; }
+.filter-select:focus { border-color: var(--primary); }
+.btn-sm { padding: .5rem 1rem; border-radius: var(--radius); font-size: .82rem; font-weight: 600; cursor: pointer; transition: all .2s; white-space: nowrap; }
+.btn-primary { background: var(--primary); color: var(--white); border: none; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-outline-sm { background: transparent; border: 1.5px solid var(--border); color: var(--text-muted); }
+.btn-outline-sm:hover { border-color: var(--primary); color: var(--primary); }
+.btn-danger-sm { background: transparent; border: 1.5px solid #fca5a5; color: #dc2626; }
+.btn-danger-sm:hover { background: #fee2e2; }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+thead tr { border-bottom: 2px solid var(--border); }
+thead th { padding: .75rem 1rem; text-align: left; font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--bg); }
+td { padding: .75rem 1rem; vertical-align: middle; }
+.td-img { width: 44px; height: 44px; border-radius: var(--radius); background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+.td-name { font-weight: 600; }
+.td-name span { display: block; font-size: .78rem; color: var(--text-muted); font-weight: 400; }
+.badge { display: inline-block; padding: .2rem .65rem; border-radius: 20px; font-size: .72rem; font-weight: 600; text-transform: capitalize; }
+.badge-info { background: #dbeafe; color: #1d4ed8; }
+.badge-events { background: #fef9c3; color: #854d0e; }
+.badge-mec { background: #dcfce7; color: #166534; }
+.td-actions { display: flex; gap: .5rem; }
+
+/* ── PAGINATION ── */
+.pagination { display: flex; align-items: center; gap: .35rem; margin-top: 1.25rem; flex-wrap: wrap; }
+.page-btn { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--white); color: var(--text); font-size: .82rem; cursor: pointer; transition: all .2s; }
+.page-btn:hover { border-color: var(--primary); color: var(--primary); }
+.page-btn.active { background: var(--primary); border-color: var(--primary); color: var(--white); font-weight: 700; }
+
+/* ── FORM ── */
+.form-section { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.form-group { display: flex; flex-direction: column; gap: .35rem; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label { font-size: .8rem; font-weight: 600; color: var(--text); }
+.form-group .required { color: #dc2626; }
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group input[type="url"],
+.form-group input[type="time"],
+.form-group select,
+.form-group textarea {
+  padding: .6rem .9rem; border: 1.5px solid var(--border); border-radius: var(--radius);
+  font-size: .9rem; font-family: inherit; outline: none; transition: border-color .2s, box-shadow .2s;
+  color: var(--text); background: var(--white);
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,102,51,.1); }
+.form-group textarea { resize: vertical; min-height: 100px; }
+.form-group .hint { font-size: .73rem; color: var(--text-muted); }
+
+.radio-group, .check-group { display: flex; flex-wrap: wrap; gap: .65rem; }
+.radio-item, .check-item {
+  display: flex; align-items: center; gap: .45rem; font-size: .88rem; cursor: pointer;
+  background: var(--bg); border: 1.5px solid var(--border); padding: .4rem .85rem; border-radius: 20px; transition: all .2s;
+}
+.radio-item:has(input:checked), .check-item:has(input:checked) { background: var(--primary-light); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+.radio-item input, .check-item input { accent-color: var(--primary); }
+
+input[type="range"] { width: 100%; accent-color: var(--primary); }
+.range-row { display: flex; align-items: center; gap: .75rem; }
+.range-value { min-width: 40px; text-align: center; font-weight: 700; color: var(--primary); font-size: .9rem; }
+
+.file-drop { border: 2px dashed var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; cursor: pointer; transition: all .2s; }
+.file-drop:hover { border-color: var(--primary); background: var(--primary-light); }
+.file-drop input[type="file"] { display: none; }
+.file-drop label { cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: .5rem; }
+.file-drop .file-icon { font-size: 2rem; }
+.file-drop .file-text { font-size: .88rem; color: var(--text-muted); }
+.file-drop .file-link { color: var(--primary); font-weight: 600; }
+
+input[type="color"] { padding: .2rem; width: 48px; height: 40px; border: 1.5px solid var(--border); border-radius: var(--radius); cursor: pointer; }
+
+.toggle-row { display: flex; align-items: center; gap: .75rem; }
+.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; inset: 0; background: var(--border); border-radius: 24px; cursor: pointer; transition: background .2s; }
+.toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: transform .2s; }
+.toggle input:checked + .toggle-slider { background: var(--primary); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+.toggle-label { font-size: .88rem; }
+
+.form-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: .5rem; }
+.btn-form-primary { padding: .7rem 1.75rem; background: var(--primary); color: var(--white); border: none; border-radius: var(--radius); font-size: .92rem; font-weight: 700; cursor: pointer; transition: background .2s; }
+.btn-form-primary:hover { background: var(--primary-dark); }
+.btn-form-secondary { padding: .7rem 1.75rem; background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); border-radius: var(--radius); font-size: .92rem; font-weight: 600; cursor: pointer; transition: all .2s; }
+.btn-form-secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .topbar { display: flex; }
+  .main { margin-left: 0; padding: 5rem 1rem 1.5rem; }
+  .form-section { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: auto; }
+}
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .section-card-header { flex-direction: column; align-items: flex-start; }
+}
+
+==========================================================================================
+ARQUIVO: static\assets\css\transparencia.css
+==========================================================================================
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+  font-family: Inter, system-ui, Arial, sans-serif;
+  background: #0b0b0b;
+  color: #f1f1f1;
+}
+
+.transparencia {
+  width: 100%;
+  max-width: 1150px;
+  margin: 45px auto;
+  padding: 0 45px 50px;
+}
+
+.transparencia-header {
+  margin-bottom: 35px;
+}
+.page-header {
+    margin: 26px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page-header-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.transparencia-header h1 {
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+    color: #ffffff;
+}
+
+.section-card {
+  background: linear-gradient(180deg, #121212 0%, #0f0f0f 100%);
+  border-radius: 16px;
+  padding: 25px;
+  margin: 40px;
+  border: 1px solid rgba(79, 142, 247, 0.35);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.section-card h2 {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  font-size: 21px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 12px;
+  padding-left: 14px;
+  border-left: 4px solid #2d6fd2;
+}
+
+.section-card p {
+  color: #b7b7b7;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.detail-item {
+  min-height: 115px;
+  padding: 20px;
+  border-radius: 13px;
+  background: #151515;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 0.2s ease, border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.detail-item:hover {
+  transform: translateY(-2px);
+  background: #181818;
+  border-color: rgba(79, 142, 247, 0.35);
+}
+
+.detail-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #bcbcbc;
+  letter-spacing: 0.2px;
+}
+
+.detail-item strong {
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 800;
+  color: #6fa3ff;
+}
+
+.grafico {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  padding: 10px;
+  border-radius: 12px;
+  background: #101010;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 900px) {
+  .transparencia {
+    padding: 0 30px 40px;
+  }
+
+  .detail-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .transparencia {
+    margin: 30px auto;
+    padding: 0 20px 35px;
+  }
+
+  .transparencia-header {
+    margin-bottom: 28px;
+  }
+
+  .transparencia-header h1 {
+    font-size: 25px;
+  }
+
+  .section-card {
+    padding: 22px 18px;
+    margin-bottom: 20px;
+  }
+
+  .section-card h2 {
+    font-size: 19px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .detail-item {
+    min-height: 100px;
+  }
+
+  .detail-item strong {
+    font-size: 25px;
+  }
+
+  .grafico {
+    height: 280px;
+  }
+}
+
+==========================================================================================
+ARQUIVO: static\assets\js\cadastro.js
+==========================================================================================
+document.addEventListener("DOMContentLoaded", function() {
+
+    const tabFisica = document.getElementById('tab-fisica');
+    const tabJuridica = document.getElementById('tab-juridica');
+    const formFisica = document.getElementById('form-fisica');
+    const formJuridica = document.getElementById('form-juridica');
+
+    function ativarFisica() {
+        tabFisica.classList.add('active');
+        tabJuridica.classList.remove('active');
+        formFisica.classList.add('active');
+        formJuridica.classList.remove('active');
+    }
+
+    function ativarJuridica() {
+        tabJuridica.classList.add('active');
+        tabFisica.classList.remove('active');
+        formJuridica.classList.add('active');
+        formFisica.classList.remove('active');
+    }
+
+    tabFisica.onclick = ativarFisica;
+    tabJuridica.onclick = ativarJuridica;
+
+    formFisica.onsubmit = e => {
+        alert('Cadastro realizado com sucesso! (simulação)');
+    };
+
+    formJuridica.onsubmit = e => {
+         alert('Cadastro empresarial realizado com sucesso! (simulação)');
+    };
+
+});
+
+==========================================================================================
+ARQUIVO: static\assets\js\carrinho.js
+==========================================================================================
+const lista = document.getElementById("lista-carrinho");
+const subtotalEl = document.getElementById("subtotal");
+const totalEl = document.getElementById("total");
+
+let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+
+function renderizar() {
+  lista.innerHTML = "";
+  let total = 0;
+
+  carrinho.forEach((p, index) => {
+    total += p.preco * p.quantidade;
+
+    lista.innerHTML += `
+      <div class="item-carrinho">
+        <img src="${p.imagem}">
+        <div>
+          <p>${p.nome}</p>
+          <small>Quantidade: ${p.quantidade}</small>
+        </div>
+
+        <div class="controle-qtd">
+          <button onclick="alterarQtd(${index}, -1)">−</button>
+          <span>${p.quantidade}</span>
+          <button onclick="alterarQtd(${index}, 1)">+</button>
+        </div>
+
+        <div>R$ ${(p.preco * p.quantidade).toFixed(2)}</div>
+
+        <button class="excluir" onclick="remover(${index})">✕</button>
+      </div>
+    `;
+  });
+
+  subtotalEl.innerText = `R$ ${total.toFixed(2)}`;
+  totalEl.innerText = `R$ ${total.toFixed(2)}`;
+
+  localStorage.setItem("carrinho", JSON.stringify(carrinho));
+}
+
+function alterarQtd(i, valor) {
+  carrinho[i].quantidade += valor;
+  if (carrinho[i].quantidade < 1) carrinho[i].quantidade = 1;
+  renderizar();
+}
+
+function remover(i) {
+  carrinho.splice(i, 1);
+  renderizar();
+}
+
+function irParaPagamento() {
+  window.location.href = "../pagamento/pagamento.html";
+}
+
+renderizar();
+
+function irParaEntrega() {
+  window.location.href = "../PG_06_Alterar_Endereco/Alterar_Endereco.html";
+}
+
+
+
+
+==========================================================================================
+ARQUIVO: static\assets\js\catalogo.js
+==========================================================================================
+document.addEventListener("DOMContentLoaded", () => {
+
+  const busca = document.getElementById("campoBusca");
+  const lista = document.getElementById("lista");
+
+  if (busca && lista) {
+
+    busca.addEventListener("keyup", () => {
+
+      const termo = busca.value.toLowerCase();
+
+      const produtos = lista.querySelectorAll(".card-link");
+
+      produtos.forEach(produto => {
+
+        const nome = produto
+          .querySelector(".nome-produto")
+          .textContent
+          .toLowerCase();
+
+        produto.style.display = nome.includes(termo)
+          ? "block"
+          : "none";
+
+      });
+
+    });
+
+  }
+
+
+  document.querySelectorAll(".imagem-container, .botao-imagens").forEach(el => {
+
+    el.addEventListener("click", () => {
+
+      const target = el.tagName.toLowerCase() === "a"
+        ? el
+        : el.querySelector("a");
+
+      if (target && target.href) {
+        window.location.href = target.href;
+      }
+
+    });
+
+  });
+
+
+});
+
+==========================================================================================
+ARQUIVO: static\assets\js\pagamento.js
+==========================================================================================
+document.addEventListener("DOMContentLoaded", () => {
+  const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+
+  if (carrinho.length === 0) {
+    alert("Carrinho vazio.");
+    window.location.href = "../carrinho/carrinho.html";
+    return;
+  }
+
+  let total = 0;
+
+  carrinho.forEach(p => {
+    total += p.preco * p.quantidade;
+  });
+
+  document.getElementById("valor-produtos").innerText =
+    `R$ ${total.toFixed(2).replace(".", ",")}`;
+
+  document.getElementById("valor-total").innerText =
+    `R$ ${total.toFixed(2).replace(".", ",")}`;
+});
+
+function finalizarPagamento() {
+  window.location.href = "../confirmacao/confirmacao.html";
+}
+
+==========================================================================================
+ARQUIVO: static\assets\js\perfil.js
+==========================================================================================
+const hamburger = document.getElementById('hamburger');
+const sidebar   = document.getElementById('sidebar');
+const overlay   = document.getElementById('sidebar-overlay');
+
+function openSidebar() {
+  sidebar.classList.add('open');
+  overlay.classList.add('show');
+  hamburger.classList.add('open');
+}
+function closeSidebar() {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('show');
+  hamburger.classList.remove('open');
+}
+
+hamburger.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
+overlay.addEventListener('click', closeSidebar);
+
+document.querySelectorAll('.page-btn:not(.disabled)').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+/*
+document.getElementById('course-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  alert('Curso salvo com sucesso!');
+});
+*/
+/*
+document.querySelectorAll('.btn-danger-sm').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (confirm('Deseja remover este curso?')) {
+      btn.closest('tr').style.opacity = '.3';
+      setTimeout(() => btn.closest('tr').remove(), 300);
+    }
+  });
+});
+*/
+
+==========================================================================================
+ARQUIVO: static\assets\js\script.js
+==========================================================================================
+const mostrarSenha = document.querySelector(".mostrar-senha");
+const campoSenha = document.querySelector('input[type="password"]');
+if (mostrarSenha && campoSenha) {
+  mostrarSenha.addEventListener("click", () => {
+    const tipo = campoSenha.type === "password" ? "text" : "password";
+    campoSenha.type = tipo;
+    mostrarSenha.textContent = tipo === "password" ? "👁️" : "🙈";
+  });
+}
+
+document.getElementById("form-login")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  alert("✅ Login efetuado com sucesso! (simulação)");
+});
+
+document.getElementById("form-cadastro")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  alert("📝 Conta criada! (simulação)");
+});
+
+==========================================================================================
+ARQUIVO: templates\base.html
+==========================================================================================
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Aura - {% block titulo %}{% endblock %}</title>
+
+  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}" />
+
+
+{% block estilo %}
+{% endblock %}
+
+  
+</head>
+<body>
+
+{% include 'menu.html' %}
+
+
+{% block conteudo %}
+{% endblock %}
+
+{% include 'rodape.html' %}
+
+{% block scripts %}
+{% endblock %}
+</body>
+</html>
+
+==========================================================================================
+ARQUIVO: templates\menu.html
+==========================================================================================
+<nav class="navbar">
+
+  <div class="nav-inner">
+
+    <a href="{% url 'inicial' %}" class="logo" aria-label="Aura Esportes - Página Inicial">
+      <div class="logo-text">
+        Aura
+      </div>
+    </a>
+
+    <button class="hamburger" id="hamburger" aria-label="Abrir menu de navegação">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="nav-links" id="nav-links">
+      <a href="{% url 'inicial' %}">
+        Inicial
+      </a>
+
+      <a href="{% url 'catalogo' %}">
+        Catálogo
+      </a>
+
+      <a href="{% url 'carrinho' %}">
+        Carrinho
+      </a>
+
+      <a href="{% url 'transparencia' %}">
+        Transparência
+      </a>
+    </div>
+
+    <div class="nav-buttons">
+      {% if user.is_authenticated %}
+      {% if user.is_staff %}
+      <a href="{% url 'painel' %}" class="btn-nav" aria-label="Acessar painel administrativo">Meu Painel</a>
+      {% else %}
+      <a href="{% url 'meus_dados' %}" class="btn-nav" aria-label="Acessar meus dados cadastrais">Meus Dados</a>
+      {% endif %}
+      <a href="{% url 'logout' %}" class="btn-nav" aria-label="Sair da conta">Sair</a>
+      {% else %}
+      <a href="{% url 'login' %}" class="btn-nav" aria-label="Fazer login">Entrar</a>
+      <a href="{% url 'cadastro' %}" class="btn-nav" aria-label="Cadastrar nova conta">Cadastrar</a>
+      {% endif %}
+    </div>
+
+  </div>
+
+</nav>
+
+<script>
+  const hamburger = document.getElementById("hamburger");
+  const navLinks = document.getElementById("nav-links");
+
+  hamburger.addEventListener("click", () => {
+    navLinks.classList.toggle("active");
+  });
+</script>
+
+==========================================================================================
+ARQUIVO: templates\rodape.html
+==========================================================================================
+<footer class="footer">
+
+  <div class="footer-container">
+    <div class="footer-section">
+
+      <h2 class="footer-logo">
+        Aura
+      </h2>
+      <p>
+        Plataforma desenvolvida como projeto acadêmico
+        por alunos do IFRN Campus Canguaretama.
+      </p>
+      <p>
+        Interface moderna focada em acessibilidade,
+        organização e experiência do usuário.
+      </p>
+
+    </div>
+
+    <div class="footer-section">
+
+      <h3>
+        Navegação
+      </h3>
+
+      <nav aria-label="Navegação do rodapé" style="display:flex; flex-direction:column; gap:14px;">
+        <a href="{% url 'inicial' %}">
+          Página Inicial
+        </a>
+
+        <a href="{% url 'login' %}">
+          Entrar
+        </a>
+
+        <a href="{% url 'cadastro' %}">
+          Cadastro
+        </a>
+
+        <a href="{% url 'painel' %}">
+          Perfil
+        </a>
+      </nav>
+
+    </div>
+
+    <div class="footer-section">
+
+      <h3>
+        Instituição
+      </h3>
+
+      <p>
+        Instituto Federal do Rio Grande do Norte
+      </p>
+
+      <p>
+        Campus Canguaretama
+      </p>
+
+      <p>
+        Projeto acadêmico sem fins comerciais.
+      </p>
+
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+
+    © 2026 Aura — Desenvolvido por alunos do IFRN Campus Canguaretama.
+
+  </div>
+
+</footer>
+
+==========================================================================================
+ARQUIVO: templates\privado\base.html
+==========================================================================================
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard – Aura</title>
+  <link rel="stylesheet" href="{% static 'assets/css/perfil.css' %}" />
+</head>
+
+<body>
+
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="avatar">{{ user.username|slice:":2"|upper }}</div>
+      <div>
+        <div class="user-name"></div>
+        <div class="user-role">Administrador</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Navegação do painel administrativo">
+      <div class="nav-section">Principal</div>
+      <a href="{% url 'painel' %}" class="nav-item {% if pagina == 'painel' %}active{% endif %}"><span
+          class="nav-icon">🏠</span> Inicial</a>
+      <a href="{% url 'meus_dados' %}" class="nav-item {% if pagina == 'meus_dados' %}active{% endif %}"><span
+          class="nav-icon">👤</span> Meus Dados</a>
+
+      <div class="nav-section">Gerenciamento</div>
+      <a href="{% url 'produtos' %}" class="nav-item {% if pagina == 'produtos' %}active{% endif %}"><span
+          class="nav-icon">📚</span> Produtos </a>
+      <a href="{% url 'usuarios' %}" class="nav-item {% if pagina == 'usuarios' %}active{% endif %}"><span
+          class="nav-icon">🔑</span> Usuários</a>
+
+      <div class="nav-section">Cadastro/Edição</div>
+      <a href="{% url 'add_produtos' %}" class="nav-item {% if pagina == 'produtos_1' %}active{% endif %}"><span
+          class="nav-icon">📚</span> Produtos </a>
+      <a href="{% url 'add_usuario' %}" class="nav-item {% if pagina == 'usuarios_1' %}active{% endif %}"><span
+          class="nav-icon">🔑</span> Usuários</a>
+      <a href="{% url 'add_categoria' %}" class="nav-item {% if pagina == 'usuarios_1' %}active{% endif %}"><span
+          class="nav-icon">🏷️</span> Categoria</a>
+
+      <div class="nav-section">Sessão</div>
+      <a href="{% url 'inicial' %}" class="nav-item "><span class="nav-icon">🏠</span> Home</a>
+      <a href="{% url 'logout' %}" class="nav-item danger"><span class="nav-icon">🚪</span> Sair</a>
+    </nav>
+
+    <div class="sidebar-footer">IFRN AURA © 2026</div>
+  </aside>
+
+  <div class="topbar">
+    <button class="hamburger" id="hamburger" aria-label="Abrir menu do painel">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="logo-text">IFRN AURA<span>Dashboard</span></div>
+    <div class="avatar" style="width:36px;height:36px;font-size:1rem;">{{ user.username|slice:":2"|upper }}</div>
+  </div>
+
+  {% block conteudo %}
+  {% endblock %}
+
+  <script src="{% static 'assets/js/perfil.js' %}"></script>
+</body>
+
+</html>
+
+==========================================================================================
+ARQUIVO: usuarios\admin.py
+==========================================================================================
+from django.contrib import admin
+
+# Register your models here.
+
+==========================================================================================
+ARQUIVO: usuarios\apps.py
+==========================================================================================
+from django.apps import AppConfig
+
+
+class UsuariosConfig(AppConfig):
+    name = 'usuarios'
+
+==========================================================================================
+ARQUIVO: usuarios\forms.py
+==========================================================================================
+from django import forms
+from django.contrib.auth.models import User
+from .models import Cliente, Endereco
+
+from PIL import Image
+
+class CadastroForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
+    nome = forms.CharField()
+    sobrenome = forms.CharField()
+
+    sexo = forms.ChoiceField(
+        choices=[('', '---'), ('F', 'Feminino'), ('M', 'Masculino')],
+        required=False
+    )
+
+    dia = forms.CharField(required=False)
+    mes = forms.CharField(required=False)
+    ano = forms.CharField(required=False)
+    cpf = forms.CharField(required=False)
+    telefone = forms.CharField(required=False)
+
+    cep = forms.CharField(required=False)
+    estado = forms.CharField(required=False)
+    cidade = forms.CharField(required=False)
+    bairro = forms.CharField(required=False)
+    rua = forms.CharField(required=False)
+    numero = forms.CharField(required=False)
+    complemento = forms.CharField(required=False)
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'username', 'email']
+
+
+class UsuarioForm(forms.Form):
+    username = forms.CharField()
+    email = forms.EmailField()
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(),
+        required=False
+    )
+
+    nome = forms.CharField()
+    sobrenome = forms.CharField()
+
+    cpf = forms.CharField(required=False)
+    telefone = forms.CharField(required=False)
+    sexo = forms.CharField(required=False)
+
+    dia = forms.CharField(required=False)
+    mes = forms.CharField(required=False)
+    ano = forms.CharField(required=False)
+
+    cep = forms.CharField(required=False)
+    estado = forms.CharField(required=False)
+    cidade = forms.CharField(required=False)
+    bairro = forms.CharField(required=False)
+    rua = forms.CharField(required=False)
+    numero = forms.CharField(required=False)
+    complemento = forms.CharField(required=False)
+
+==========================================================================================
+ARQUIVO: usuarios\models.py
+==========================================================================================
+from django.db import models
+
+from django.contrib.auth.models import User
+
+
+class Cliente(models.Model):
+    usuario = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="cliente",
+        null=True,
+        blank=True
+    )
+
+    nome = models.CharField("Nome", max_length=120)
+    sobrenome = models.CharField("Sobrenome", max_length=120, blank=True, default="")
+    email = models.EmailField("E-mail", unique=True)
+    senha = models.CharField("Senha", max_length=128)
+    telefone = models.CharField("Telefone", max_length=20, blank=True, default="")
+
+    sexo = models.CharField("Sexo", max_length=1, blank=True, default="")
+    data_nascimento = models.DateField("Data de Nascimento", null=True, blank=True)
+    cpf = models.CharField("CPF", max_length=14, blank=True, default="")
+
+    def __str__(self):
+        return self.nome
+
+
+class Endereco(models.Model):
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.CASCADE,
+        related_name="enderecos"
+    )
+    rua = models.CharField("Rua", max_length=45)
+    numero = models.CharField("Número", max_length=10, blank=True, default="")
+    complemento = models.CharField("Complemento", max_length=60, blank=True, default="")
+    bairro = models.CharField("Bairro", max_length=60, blank=True, default="")
+    cidade = models.CharField("Cidade", max_length=45)
+    estado = models.CharField("Estado", max_length=45)
+    cep = models.CharField("CEP", max_length=20)
+
+    def __str__(self):
+        return f"{self.rua} - {self.cidade}"
+
+
+==========================================================================================
+ARQUIVO: usuarios\tests.py
+==========================================================================================
+from django.test import TestCase
+
+# Create your tests here.
+
+==========================================================================================
+ARQUIVO: usuarios\urls.py
+==========================================================================================
+  
+from django.urls import path
+from .views import *
+
+urlpatterns = [
+
+    path('login/', login, name='login'),
+    path('logout/', logout, name='logout'),
+    path('cadastro/', cadastro, name='cadastro'),
+
+    path('usuarios/', usuarios, name='usuarios'),
+    path('usuarios/adicionar/', add_usuario, name='add_usuario'),
+    path('usuarios/editar/<int:id>/', usuario_editar, name='usuario_editar'),
+    path('usuarios/excluir/<int:id>/', usuario_delete, name='usuario_delete'),
+
+    path('meus_dados/', meus_dados, name='meus_dados'),
+
+    path('painel/', painel, name='painel')
+]
+
+==========================================================================================
+ARQUIVO: usuarios\views.py
+==========================================================================================
+import datetime
+
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.db.models import Sum, F, DecimalField
+
+from .forms import CadastroForm, UsuarioForm
+from produtos.forms import ProdutoForm, Categoria
+from produtos.models import Produto, Categoria
+from pedidos.forms import PedidoForm
+from pedidos.models import Pedido, ItemPedido
+from .models import Cliente, Endereco
+
+
+def staff_required(view_func):
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        if not request.user.is_staff:
+            messages.error(request, 'Acesso restrito a administradores.')
+            return redirect('meus_dados')
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+
+def cadastro(request):
+    if request.user.is_authenticated:
+        return redirect('inicial')
+
+    form = CadastroForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            cpf = form.cleaned_data.get('cpf')
+
+            if User.objects.filter(username=username).exists():
+                messages.error(request, 'Usuário já existe.')
+                return render(request, 'cadastro.html', {'form': form})
+
+            if User.objects.filter(email=email).exists() or Cliente.objects.filter(email=email).exists():
+                messages.error(request, 'E-mail já cadastrado.')
+                return render(request, 'cadastro.html', {'form': form})
+
+            if cpf and Cliente.objects.filter(cpf=cpf).exists():
+                messages.error(request, 'CPF já cadastrado.')
+                return render(request, 'cadastro.html', {'form': form})
+
+            usuario = User.objects.create_user(
+                username=username,
+                email=email,
+                password=form.cleaned_data['password']
+            )
+
+            data_nascimento = None
+            dia = form.cleaned_data.get('dia')
+            mes = form.cleaned_data.get('mes')
+            ano = form.cleaned_data.get('ano')
+
+            if dia and mes and ano:
+                try:
+                    data_nascimento = datetime.date(int(ano), int(mes), int(dia))
+                except ValueError:
+                    data_nascimento = None
+
+            cliente = Cliente.objects.create(
+                usuario=usuario,
+                nome=form.cleaned_data['nome'],
+                sobrenome=form.cleaned_data['sobrenome'],
+                email=email,
+                telefone=form.cleaned_data.get('telefone') or '',
+                sexo=form.cleaned_data.get('sexo') or '',
+                data_nascimento=data_nascimento,
+                cpf=cpf or ''
+            )
+
+            rua = form.cleaned_data.get('rua')
+            cidade = form.cleaned_data.get('cidade')
+            estado = form.cleaned_data.get('estado')
+            cep = form.cleaned_data.get('cep')
+
+            if rua and cidade and estado and cep:
+                Endereco.objects.create(
+                    cliente=cliente,
+                    rua=rua,
+                    numero=form.cleaned_data.get('numero') or '',
+                    complemento=form.cleaned_data.get('complemento') or '',
+                    bairro=form.cleaned_data.get('bairro') or '',
+                    cidade=cidade,
+                    estado=estado,
+                    cep=cep
+                )
+
+            messages.success(request, 'Cadastro realizado com sucesso!')
+            return redirect('login')
+
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+
+            return render(request, 'cadastro.html', {'form': form})
+
+    return render(request, 'cadastro.html', {'form': form})
+
+
+def login(request):
+    if request.user.is_authenticated:
+        return redirect('inicial')
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        usuario = authenticate(request, username=username, password=password)
+
+        if usuario is not None:
+            auth_login(request, usuario)
+            return redirect('inicial')
+
+        messages.error(request, 'Usuário ou senha inválidos.')
+
+    return render(request, 'login.html')
+
+
+@login_required
+def logout(request):
+    auth_logout(request)
+    return redirect('inicial')
+
+
+@staff_required
+def painel(request):
+    total_produtos = Produto.objects.count()
+    total_clientes = Cliente.objects.count()
+    total_pedidos = Pedido.objects.count()
+    total_categorias = Categoria.objects.count()
+
+    estoque_total = Produto.objects.aggregate(
+        total=Sum("estoque")
+    )["total"] or 0
+
+    faturamento_total = ItemPedido.objects.aggregate(
+        total=Sum(F('quantidade') * F('preco_unitario'), output_field=DecimalField())
+    )['total'] or 0
+
+    ticket_medio = (faturamento_total / total_pedidos) if total_pedidos > 0 else 0
+
+    produtos_estoque_baixo = Produto.objects.filter(estoque__lte=5)
+
+    context = {
+        "total_produtos": total_produtos,
+        "total_clientes": total_clientes,
+        "total_categorias": total_categorias,
+        "estoque_total": estoque_total,
+        "faturamento_total": faturamento_total,
+        "ticket_medio": ticket_medio,
+        "produtos_estoque_baixo": produtos_estoque_baixo,
+        "qtd_estoque_baixo": produtos_estoque_baixo.count(),
+        "pagina": "painel",
+    }
+
+    return render(request, "privado/painel.html", context)
+
+
+@staff_required
+def usuarios(request):
+    lista = User.objects.all()
+
+    context = {
+        "pagina": "usuarios",
+        "usuarios": lista,
+    }
+
+    return render(request, "privado/usuarios.html", context)
+
+
+@staff_required
+def add_usuario(request):
+    form = UsuarioForm(request.POST or None)
+
+    context = {
+        "pagina": "usuarios_1",
+        "form": form,
+    }
+
+    if request.method == "POST":
+        if form.is_valid():
+            username = form.cleaned_data["username"]
+            email = form.cleaned_data["email"]
+
+            if User.objects.filter(username=username).exists():
+                messages.error(request, "Usuário já existe.")
+                return render(request, "privado/add_usuario.html", context)
+
+            if User.objects.filter(email=email).exists():
+                messages.error(request, "E-mail já cadastrado.")
+                return render(request, "privado/add_usuario.html", context)
+
+            usuario = User.objects.create_user(
+                username=username,
+                email=email,
+                password=form.cleaned_data["password"]
+            )
+
+            Cliente.objects.create(
+                usuario=usuario,
+                nome=form.cleaned_data["nome"],
+                sobrenome=form.cleaned_data["sobrenome"],
+                cpf=form.cleaned_data.get("cpf") or "",
+                telefone=form.cleaned_data.get("telefone") or "",
+                sexo=form.cleaned_data.get("sexo") or "",
+                email=email
+            )
+
+            messages.success(request, "Usuário cadastrado com sucesso.")
+            return redirect("usuarios")
+
+    return render(request, "privado/add_usuario.html", context)
+
+
+@staff_required
+def usuario_delete(request, id):
+    usuario = get_object_or_404(User, pk=id)
+    usuario.delete()
+    messages.success(request, 'Usuário removido.')
+    return redirect('usuarios')
+
+
+@staff_required
+def usuario_editar(request, id):
+    usuario = get_object_or_404(User, pk=id)
+    cliente = Cliente.objects.filter(usuario=usuario).first()
+
+    endereco = None
+    if cliente:
+        endereco = Endereco.objects.filter(cliente=cliente).first()
+
+    dados = {
+        "username": usuario.username,
+        "email": usuario.email,
+        "nome": cliente.nome if cliente else "",
+        "sobrenome": cliente.sobrenome if cliente else "",
+        "cpf": cliente.cpf if cliente else "",
+        "telefone": cliente.telefone if cliente else "",
+        "sexo": cliente.sexo if cliente else "",
+        "cep": endereco.cep if endereco else "",
+        "estado": endereco.estado if endereco else "",
+        "cidade": endereco.cidade if endereco else "",
+        "bairro": endereco.bairro if endereco else "",
+        "rua": endereco.rua if endereco else "",
+        "numero": endereco.numero if endereco else "",
+        "complemento": endereco.complemento if endereco else "",
+    }
+
+    form = UsuarioForm(
+        request.POST or None,
+        initial=dados
+    )
+
+    if request.method == "POST":
+        if form.is_valid():
+            usuario.username = form.cleaned_data["username"]
+            usuario.email = form.cleaned_data["email"]
+            usuario.save()
+
+            if cliente:
+                cliente.nome = form.cleaned_data["nome"]
+                cliente.sobrenome = form.cleaned_data["sobrenome"]
+                cliente.cpf = form.cleaned_data["cpf"]
+                cliente.telefone = form.cleaned_data["telefone"]
+                cliente.sexo = form.cleaned_data["sexo"]
+                cliente.save()
+
+            messages.success(request, "Usuário atualizado com sucesso.")
+            return redirect("usuarios")
+
+    context = {
+        "pagina": "usuarios_1",
+        "form": form,
+    }
+
+    return render(request, "privado/add_usuario.html", context)
+
+
+@login_required
+def meus_dados(request):
+    context = {
+        "pagina": "meus_dados",
+    }
+    return render(request, 'privado/meus_dados.html', context)
+
+==========================================================================================
+ARQUIVO: usuarios\templates\cadastro.html
+==========================================================================================
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block titulo %}Cadastro{% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/cadastro.css' %}">
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'assets/js/cadastro.js' %}"></script>
+{% endblock %}
+
+{% block conteudo %}
+
+<main class="container">
+
+    <div class="form-box">
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <h1>Criar Cadastro</h1>
+
+            <h2>Dados de acesso</h2>
+
+            <div class="grupo">
+                <input type="text" id="username" name="username" placeholder="Usuário" aria-label="Usuário" required>
+                <input type="password" id="password" name="password" placeholder="Senha" aria-label="Senha" required>
+            </div>
+
+            <h2>Dados pessoais</h2>
+
+            <div class="grupo">
+                <input type="text" id="nome" name="nome" placeholder="Nome" aria-label="Nome" required>
+                <input type="text" id="sobrenome" name="sobrenome" placeholder="Sobrenome" aria-label="Sobrenome" required>
+            </div>
+
+            <p class="titulo">Sexo</p>
+
+            <div class="sexo">
+                <label>
+                    <input type="radio" name="sexo" value="F" aria-label="Feminino">
+                    Feminino
+                </label>
+
+                <label>
+                    <input type="radio" name="sexo" value="M" aria-label="Masculino">
+                    Masculino
+                </label>
+            </div>
+
+            <h2>Informações pessoais</h2>
+
+            <div class="grupo tres">
+                <input type="text" id="dia" name="dia" placeholder="Dia" aria-label="Dia de nascimento">
+                <input type="text" id="mes" name="mes" placeholder="Mês" aria-label="Mês de nascimento">
+                <input type="text" id="ano" name="ano" placeholder="Ano" aria-label="Ano de nascimento">
+            </div>
+
+            <div class="grupo">
+                <input type="text" id="cpf" name="cpf" placeholder="CPF" aria-label="CPF">
+                <input type="text" id="telefone" name="telefone" placeholder="Celular" aria-label="Celular">
+            </div>
+
+            <input type="email" id="email" name="email" placeholder="Email" aria-label="Endereço de e-mail">
+
+            <h2>Endereço</h2>
+
+            <div class="grupo">
+                <input type="text" id="cep" name="cep" placeholder="CEP" aria-label="CEP">
+                <input type="text" id="estado" name="estado" placeholder="Estado" aria-label="Estado">
+            </div>
+
+            <div class="grupo">
+                <input type="text" id="cidade" name="cidade" placeholder="Cidade" aria-label="Cidade">
+                <input type="text" id="bairro" name="bairro" placeholder="Bairro" aria-label="Bairro">
+            </div>
+
+            <div class="grupo">
+                <input type="text" id="rua" name="rua" placeholder="Rua" aria-label="Rua">
+                <input type="text" id="numero" name="numero" placeholder="Número" aria-label="Número">
+            </div>
+
+            <input type="text" id="complemento" name="complemento" placeholder="Complemento" aria-label="Complemento">
+
+            <button type="submit">
+                Cadastrar
+            </button>
+
+        </form>
+
+    </div>
+
+</main>
+
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: usuarios\templates\login.html
+==========================================================================================
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block titulo %} Login {% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/login.css' %}" />
+{% endblock %}
+
+{% block scripts %} 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get('cadastro') === 'sucesso') {
+      const form = document.getElementById('form-login');
+
+      const aviso = document.createElement('div');
+      aviso.className = 'alerta alerta-sucesso';
+      aviso.textContent = 'Cadastro realizado com sucesso! Faça login para continuar.';
+
+      form.parentNode.insertBefore(aviso, form);
+    }
+  });
+</script>
+{% endblock %}
+
+{% block conteudo %}
+
+<main class="login-area">
+  <section class="login-container">
+
+    <div class="login-box">
+      <h1>Já sou cliente</h1>
+
+      {% include 'mensagens.html' %}
+
+      <form id="form-login" method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
+
+        <input type="text" id="username" name="username" placeholder="Usuário" aria-label="Usuário" required>
+
+        <div class="senha-input">
+          <input type="password" id="password" name="password" placeholder="Senha" aria-label="Senha" required>
+          <span class="mostrar-senha" role="button" tabindex="0" aria-label="Alternar visibilidade da senha">👁️</span>
+        </div>
+
+        <a href="#" class="link-senha">Esqueci minha senha</a>
+
+        <button type="submit" class="botao primario">
+          Acessar conta
+        </button>
+      </form>
+    </div>
+
+  </section>
+</main>
+
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: usuarios\templates\privado\add_usuario.html
+==========================================================================================
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+    <div>
+        <h1 class="page-title">Cadastrar Usuário</h1>
+        <p class="page-subtitle">
+            Preencha as informações do usuário.
+        </p>
+    </div>
+
+    {% include 'mensagens.html' %}
+
+    <div class="section-card">
+
+        <div class="section-card-header">
+            <h2>Informações do Usuário</h2>
+        </div>
+
+        <div class="section-card-body">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="form-section">
+
+                    <div class="form-group">
+                        <label>Usuário</label>
+                        {{ form.username }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        {{ form.email }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Senha</label>
+                        {{ form.password }}
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Nome</label>
+                        {{ form.nome }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sobrenome</label>
+                        {{ form.sobrenome }}
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>CPF</label>
+                        {{ form.cpf }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        {{ form.telefone }}
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Sexo</label>
+                        {{ form.sexo }}
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Dia de nascimento</label>
+                        {{ form.dia }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mês de nascimento</label>
+                        {{ form.mes }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ano de nascimento</label>
+                        {{ form.ano }}
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>CEP</label>
+                        {{ form.cep }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estado</label>
+                        {{ form.estado }}
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Cidade</label>
+                        {{ form.cidade }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bairro</label>
+                        {{ form.bairro }}
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Rua</label>
+                        {{ form.rua }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Número</label>
+                        {{ form.numero }}
+                    </div>
+
+
+                    <div class="form-group full">
+                        <label>Complemento</label>
+                        {{ form.complemento }}
+                    </div>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button type="submit" class="btn-form-primary">
+                        Salvar Usuário
+                    </button>
+
+                    <a href="{% url 'usuarios' %}" class="btn-form-secondary">
+                        Cancelar
+                    </a>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+</main>
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: usuarios\templates\privado\meus_dados.html
+==========================================================================================
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Bem-vindo de volta, {{ user.username }}. Confira o resumo abaixo.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="section-card-header">
+        <h2>Meu Perfil</h2>
+    </div>
+
+    <div class="section-card-body">
+        <table>
+            <tbody>
+                <tr>
+                    <td><strong>Nome</strong></td>
+                    <td>{{ user.get_full_name|default:user.username }}</td>
+                </tr>
+
+                <tr>
+                    <td><strong>Usuário</strong></td>
+                    <td>{{ user.username }}</td>
+                </tr>
+
+                <tr>
+                    <td><strong>E-mail</strong></td>
+                    <td>{{ user.email }}</td>
+                </tr>
+
+                <tr>
+                    <td><strong>Tipo de Conta</strong></td>
+                    <td>
+                        {% if user.is_superuser %}
+                            Administrador
+                        {% elif user.is_staff %}
+                            Funcionário
+                        {% else %}
+                            Usuário
+                        {% endif %}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><strong>Data de Cadastro</strong></td>
+                    <td>{{ user.date_joined|date:"d/m/Y" }}</td>
+                </tr>
+
+                <tr>
+                    <td><strong>Último Acesso</strong></td>
+                    <td>{{ user.last_login|date:"d/m/Y H:i" }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</main>
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: usuarios\templates\privado\painel.html
+==========================================================================================
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Bem-vindo de volta, {{ user.username }}. Confira o resumo abaixo.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px;">
+    
+    <div class="section-card">
+      <div class="section-card-body">
+        <h3>💰 Faturamento</h3>
+        <h1>R$ {{ faturamento_total|floatformat:2 }}</h1>
+        <p>Valor total de vendas</p>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-body">
+        <h3>🎯 Ticket Médio</h3>
+        <h1>R$ {{ ticket_medio|floatformat:2 }}</h1>
+        <p>Média por pedido</p>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-body">
+        <h3>📦 Produtos</h3>
+        <h1>{{ total_produtos }}</h1>
+        <p>Produtos cadastrados</p>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-body">
+        <h3>👥 Clientes</h3>
+        <h1>{{ total_clientes }}</h1>
+        <p>Clientes cadastrados</p>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-body">
+        <h3>🏷️ Categorias</h3>
+        <h1>{{ total_categorias }}</h1>
+        <p>Categorias criadas</p>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-body">
+        <h3>📋 Estoque</h3>
+        <h1>{{ estoque_total }}</h1>
+        <p>Itens disponíveis</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-card" style="margin-top: 25px;">
+    <div class="section-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="color: #f87171; font-size: 18px;">⚠️ Alerta de Reposição de Estoque (SAD)</h2>
+      <span style="background: rgba(239, 68, 68, 0.2); color: #f87171; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold;">
+        {{ qtd_estoque_baixo }} Críticos
+      </span>
+    </div>
+
+    <div class="section-card-body">
+      {% if produtos_estoque_baixo %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Preço</th>
+              <th>Estoque Atual</th>
+              <th>Status</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for produto in produtos_estoque_baixo %}
+            <tr>
+              <td><strong>{{ produto.nome }}</strong></td>
+              <td>R$ {{ produto.preco }}</td>
+              <td style="color: #f87171; font-weight: bold;">{{ produto.estoque }} un</td>
+              <td><span style="color: #f87171;">Reposição Urgente</span></td>
+              <td>
+                <a href="{% url 'produto_editar' produto.id %}" class="btn-sm btn-primary">
+                  Repor Estoque
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p style="color: #4ade80;">Todos os produtos possuem níveis de estoque adequados no momento.</p>
+      {% endif %}
+    </div>
+  </div>
+
+</main>
+{% endblock %}
+
+==========================================================================================
+ARQUIVO: usuarios\templates\privado\usuarios.html
+==========================================================================================
+{% extends 'privado/base.html' %}
+
+{% block conteudo %}
+<main class="main">
+
+  <div>
+    <h1 class="page-title">Usuários</h1>
+    <p class="page-subtitle">
+      Gerencie os usuários cadastrados no sistema.
+    </p>
+  </div>
+
+  {% include 'mensagens.html' %}
+
+  <div class="section-card">
+    <div class="section-card-header">
+      <h2>Usuários Cadastrados</h2>
+    </div>
+
+    <div class="section-card-body">
+      <table>
+        <thead>
+          <tr>
+            <th>Usuário</th>
+            <th>E-mail</th>
+            <th>Tipo</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for usuario in usuarios %}
+          <tr>
+            <td>{{ usuario.username }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>
+              {% if usuario.is_superuser %}
+              Administrador
+              {% elif usuario.is_staff %}
+              Funcionário
+              {% else %}
+              Usuário
+              {% endif %}
+            </td>
+            <td class="td-actions">
+              <a href="{% url 'usuario_editar' usuario.id %}" class="btn-sm btn-primary">
+                Editar
+              </a>
+
+              <a href="{% url 'usuario_delete' usuario.id %}" class="btn-sm btn-danger-sm">
+                Excluir
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" style="text-align: center;">
+              Nenhum usuário cadastrado.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+{% endblock %}
