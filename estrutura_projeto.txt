@@ -1,7 +1,7 @@
 ##########################################################################################
 # EXTRAÇÃO COMPLETA DO PROJETO
 # Raiz do projeto: C:\Users\João Guilherme\Aura-main
-# Gerado em: 2026-10-11 20:54:46
+# Gerado em: 2026-10-12 17:55:44
 ##########################################################################################
 
 ==========================================================================================
@@ -859,27 +859,26 @@ def confirmacao(request, pedido_id):
     }
     return render(request, 'confirmacao.html', context)
 
-
 def transparencia(request):
-    qtd_produtos = Produto.objects.count()
-    qtd_categorias = Categoria.objects.count()
-    qtd_clientes = Cliente.objects.count()
-    qtd_pedidos = Pedido.objects.count()
+    total_produtos = Produto.objects.count()
+    total_categorias = Categoria.objects.count()
+    total_clientes = Cliente.objects.count()
+    total_pedidos = Pedido.objects.count()
 
-    precos = Produto.objects.aggregate(
-        menor=Min('preco'),
-        media=Avg('preco'),
-        maior=Max('preco')
+    agregados = Produto.objects.aggregate(
+        min_p=Min('preco'),
+        avg_p=Avg('preco'),
+        max_p=Max('preco')
     )
 
     context = {
-        'qtd_produtos': qtd_produtos,
-        'qtd_categorias': qtd_categorias,
-        'qtd_clientes': qtd_clientes,
-        'qtd_pedidos': qtd_pedidos,
-        'menor_preco': precos['menor'] or 0,
-        'media_preco': precos['media'] or 0,
-        'maior_preco': precos['maior'] or 0,
+        'total_produtos': total_produtos,
+        'total_categorias': total_categorias,
+        'total_clientes': total_clientes,
+        'total_pedidos': total_pedidos,
+        'preco_min': agregados['min_p'] if agregados['min_p'] is not None else 0,
+        'preco_medio': agregados['avg_p'] if agregados['avg_p'] is not None else 0,
+        'preco_max': agregados['max_p'] if agregados['max_p'] is not None else 0,
     }
     return render(request, 'transparencia.html', context)
 
@@ -1010,10 +1009,25 @@ ARQUIVO: core\templates\catalogo.html
           {% endif %}
           <span class="badge">-30% OFF</span>
         </div>
+
+        <div class="card-info-top">
+          {% if produto.categoria %}
+          <span class="card-categoria">{{ produto.categoria.nome }}</span>
+          {% endif %}
+
+          {% if produto.estoque > 0 %}
+          <span class="disponivel card-estoque">Em estoque</span>
+          {% else %}
+          <span class="indisponivel card-estoque">Esgotado</span>
+          {% endif %}
+        </div>
+
         <h3 class="nome-produto">{{ produto.nome }}</h3>
+
         <div class="prices">
           <span class="new">R$ {{ produto.preco }}</span>
         </div>
+
         <span class="frete">Frete grátis disponível</span>
       </div>
     </a>
@@ -1263,68 +1277,67 @@ ARQUIVO: core\templates\transparencia.html
 {% extends 'base.html' %}
 {% load static %}
 
-{% block titulo %}
-Transparência – Aura
-{% endblock %}
-
-{% block estilo %}
-<link rel="stylesheet" href="{% static 'assets/css/transparencia.css' %}" />
-{% endblock %}
+{% block titulo %} Transparência Esportiva – Aura {% endblock %}
 
 {% block conteudo %}
-<div class="page-header">
-  <div class="page-header-inner">
-    <h1>Painel de Transparência Esportiva</h1>
+<main style="max-width: 1200px; margin: 40px auto; padding: 0 20px; color: #fff;">
+
+  <div style="text-align: center; margin-bottom: 35px;">
+    <h1 style="font-size: 28px; font-weight: 700; color: #ffffff;">Painel de Transparência Esportiva</h1>
+    <p style="color: #94a3b8; font-size: 15px; margin-top: 6px;">Dados abertos e estatísticas consolidadas do e-commerce Aura.</p>
   </div>
-</div>
 
-<div class="main-content">
+  <!-- Bloco 1: Métricas de Volume -->
+  <div style="background-color: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+    <h2 style="font-size: 18px; color: #38bdf8; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+      📊 Métricas Públicas da Plataforma
+    </h2>
+    <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">Resumo de dados operacionais e catálogo de produtos esportivos.</p>
 
-  <!-- ============ BLOCO 1: NÚMEROS GERAIS DO E-COMMERCE ============ -->
-  <div class="section-card">
-    <h2>📊 Métricas Públicas da Plataforma</h2>
-    <p>Resumo de dados operacionais e catálogo de produtos esportivos do sistema Aura.</p>
-    <div class="detail-grid">
-      <div class="detail-item">
-        <span class="detail-label">Produtos Cadastrados</span>
-        {{ qtd_produtos }}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+      <div style="background-color: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 8px;">
+        <span style="color: #94a3b8; font-size: 13px; display: block;">Produtos Cadastrados</span>
+        <strong style="font-size: 22px; color: #ffffff; margin-top: 4px; display: block;">{{ total_produtos }}</strong>
       </div>
-      <div class="detail-item">
-        <span class="detail-label">Categorias Esportivas</span>
-        {{ qtd_categorias }}
+      <div style="background-color: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 8px;">
+        <span style="color: #94a3b8; font-size: 13px; display: block;">Categorias Esportivas</span>
+        <strong style="font-size: 22px; color: #ffffff; margin-top: 4px; display: block;">{{ total_categorias }}</strong>
       </div>
-      <div class="detail-item">
-        <span class="detail-label">Clientes Registrados</span>
-        {{ qtd_clientes }}
+      <div style="background-color: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 8px;">
+        <span style="color: #94a3b8; font-size: 13px; display: block;">Clientes Registrados</span>
+        <strong style="font-size: 22px; color: #ffffff; margin-top: 4px; display: block;">{{ total_clientes }}</strong>
       </div>
-      <div class="detail-item">
-        <span class="detail-label">Pedidos Efetuados</span>
-        {{ qtd_pedidos }}
+      <div style="background-color: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 8px;">
+        <span style="color: #94a3b8; font-size: 13px; display: block;">Pedidos Efetuados</span>
+        <strong style="font-size: 22px; color: #ffffff; margin-top: 4px; display: block;">{{ total_pedidos }}</strong>
       </div>
     </div>
   </div>
 
-  <!-- ============ BLOCO 2: PREÇOS E VALORES ============ -->
-  <div class="section-card">
-    <h2>💲 Indicadores de Preços dos Produtos</h2>
-    <p>Menor, média e maior valor entre os artigos esportivos cadastrados.</p>
-    <div class="detail-grid">
-      <div class="detail-item">
-        <span class="detail-label">Menor Preço</span>
-        R$ {{ menor_preco|floatformat:2 }}
+  <!-- Bloco 2: Indicadores de Preço -->
+  <div style="background-color: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 25px;">
+    <h2 style="font-size: 18px; color: #4ade80; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+      💲 Indicadores de Preços dos Produtos
+    </h2>
+    <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">Menor, média e maior valor entre os artigos esportivos cadastrados.</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+      <div style="background-color: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 8px;">
+        <span style="color: #94a3b8; font-size: 13px; display: block;">Menor Preço</span>
+        <strong style="font-size: 20px; color: #4ade80; margin-top: 4px; display: block;">R$ {{ preco_min|floatformat:2 }}</strong>
       </div>
-      <div class="detail-item">
-        <span class="detail-label">Preço Médio</span>
-        R$ {{ media_preco|floatformat:2 }}
+      <div style="background-color: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 8px;">
+        <span style="color: #94a3b8; font-size: 13px; display: block;">Preço Médio</span>
+        <strong style="font-size: 20px; color: #60a5fa; margin-top: 4px; display: block;">R$ {{ preco_medio|floatformat:2 }}</strong>
       </div>
-      <div class="detail-item">
-        <span class="detail-label">Maior Preço</span>
-        R$ {{ maior_preco|floatformat:2 }}
+      <div style="background-color: #1e293b; border: 1px solid #334155; padding: 16px; border-radius: 8px;">
+        <span style="color: #94a3b8; font-size: 13px; display: block;">Maior Preço</span>
+        <strong style="font-size: 20px; color: #f87171; margin-top: 4px; display: block;">R$ {{ preco_max|floatformat:2 }}</strong>
       </div>
     </div>
   </div>
 
-</div>
+</main>
 {% endblock %}
 
 ==========================================================================================
@@ -1699,6 +1712,16 @@ ARQUIVO: produtos\templates\produto_detalhe.html
 
 <main class="catalogo">
 
+  <nav class="breadcrumb" aria-label="Caminho de navegação">
+    <a href="{% url 'catalogo' %}">Catálogo</a>
+    <span>/</span>
+    {% if produto.categoria %}
+    <span>{{ produto.categoria.nome }}</span>
+    <span>/</span>
+    {% endif %}
+    <span class="breadcrumb-atual">{{ produto.nome }}</span>
+  </nav>
+
   <section class="produto-detalhe">
 
     <div class="produto-detalhe-img">
@@ -1711,6 +1734,10 @@ ARQUIVO: produtos\templates\produto_detalhe.html
 
 
     <div class="produto-detalhe-info">
+
+      {% if produto.categoria %}
+      <span class="produto-detalhe-categoria">{{ produto.categoria.nome }}</span>
+      {% endif %}
 
       <h1>{{ produto.nome }}</h1>
 
@@ -1737,9 +1764,33 @@ ARQUIVO: produtos\templates\produto_detalhe.html
       </div>
 
 
-      <p class="produto-detalhe-desc">
-        {{ produto.descricao }}
-      </p>
+      <div class="produto-detalhe-descricao-bloco">
+        <h2>Descrição do produto</h2>
+        <p class="produto-detalhe-desc">
+          {{ produto.descricao }}
+        </p>
+      </div>
+
+
+      <div class="produto-detalhe-specs">
+        <h2>Informações do produto</h2>
+        <ul class="specs-lista">
+          <li>
+            <span class="specs-label">Categoria</span>
+            <span class="specs-valor">{{ produto.categoria.nome|default:"Não informada" }}</span>
+          </li>
+          <li>
+            <span class="specs-label">Código do produto</span>
+            <span class="specs-valor">#{{ produto.id }}</span>
+          </li>
+          <li>
+            <span class="specs-label">Disponibilidade</span>
+            <span class="specs-valor">
+              {% if produto.estoque > 0 %}Pronta entrega{% else %}Indisponível no momento{% endif %}
+            </span>
+          </li>
+        </ul>
+      </div>
 
 
       <div class="produto-detalhe-acoes">
@@ -1777,56 +1828,67 @@ ARQUIVO: produtos\templates\produto_detalhe.html
 ARQUIVO: produtos\templates\privado\add_categoria.html
 ==========================================================================================
 {% extends 'privado/base.html' %}
+{% load static %}
+
+{% block titulo %} Gerenciar Categorias - Aura Admin {% endblock %}
 
 {% block conteudo %}
-<main class="main">
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Gerenciar Categorias</h1>
+    <p class="page-subtitle">Cadastre novas categorias esportivas para organizar seu catálogo.</p>
+  </div>
+</div>
 
-    <div>
-        <h1 class="page-title">Cadastrar Produto</h1>
-        <p class="page-subtitle">
-            Preencha os dados do produto abaixo.
-        </p>
-    </div>
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
 
-    {% include 'mensagens.html' %}
+  <!-- Formulário -->
+  <div class="panel-section">
+    <h2 style="font-size: 16px; color: #fff; margin-bottom: 16px;">Nova Categoria</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="id_nome">Nome da Categoria</label>
+        <input type="text" id="id_nome" name="nome" class="form-control" placeholder="Ex: Basquete, Futebol..." required>
+      </div>
+      <button type="submit" class="btn-action btn-action-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+        Cadastrar Categoria
+      </button>
+    </form>
+  </div>
 
-    <div class="section-card">
+  <!-- Tabela de Categorias -->
+  <div class="panel-section">
+    <h2 style="font-size: 16px; color: #fff; margin-bottom: 16px;">Categorias Existentes</h2>
+    {% if categorias %}
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Nome</th>
+          <th scope="col" style="text-align: right;">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cat in categorias %}
+        <tr>
+          <td>#{{ cat.id }}</td>
+          <td><strong style="color: #fff;">{{ cat.nome }}</strong></td>
+          <td style="text-align: right;">
+            <a href="{% url 'categoria_delete' cat.id %}" class="btn-action btn-action-delete" onclick="return confirm('Deseja excluir esta categoria?');">
+              🗑️ Excluir
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="color: #94a3b8; font-size: 14px;">Nenhuma categoria cadastrada.</p>
+    {% endif %}
+  </div>
 
-        <div class="section-card-header">
-            <h2>Informações do Produto</h2>
-        </div>
-
-        <div class="section-card-body">
-
-            <form method="POST" enctype="multipart/form-data">
-
-                {% csrf_token %}
-
-                <div class="form-section">
-
-                    <div class="form-group full">
-                        <label>Nome</label>
-                        {{ form.nome }}
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn-form-primary">
-                        Salvar Categoria
-                    </button>
-
-                    <a href="{% url 'produtos' %}" class="btn-form-secondary">
-                        Cancelar
-                    </a>
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
-</main>
+</div>
 {% endblock %}
 
 ==========================================================================================
@@ -2014,103 +2076,79 @@ ARQUIVO: produtos\templates\privado\categoria.html
 ARQUIVO: produtos\templates\privado\produtos.html
 ==========================================================================================
 {% extends 'privado/base.html' %}
+{% load static %}
+
+{% block titulo %} Gerenciar Produtos - Aura Admin {% endblock %}
 
 {% block conteudo %}
-<main class="main">
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Gerenciar Produtos</h1>
+    <p class="page-subtitle">Consulte, cadastre e edite os artigos esportivos do seu catálogo.</p>
+  </div>
+  <a href="{% url 'add_produtos' %}" class="btn-action btn-action-primary">
+    + Novo Produto
+  </a>
+</div>
 
-    <div>
-        <h1 class="page-title">Produtos</h1>
-        <p class="page-subtitle">
-            Gerencie os produtos cadastrados no sistema.
-        </p>
+{% if messages %}
+  {% for message in messages %}
+    <div style="padding: 12px; border-radius: 6px; margin-bottom: 20px; background-color: rgba(34, 197, 94, 0.15); color: #4ade80; font-size: 14px;">
+      {{ message }}
     </div>
+  {% endfor %}
+{% endif %}
 
-    {% include 'mensagens.html' %}
-
-    <div class="section-card">
-
-        <div class="section-card-header">
-            <h2>Produtos Cadastrados</h2>
-
-            <a href="{% url 'add_produtos' %}" class="btn-sm btn-primary">
-                Novo Produto
-            </a>
-        </div>
-
-        <div class="section-card-body">
-
-            <div class="table-wrap">
-                <table>
-
-                    <thead>
-                        <tr>
-                            <th>Imagem</th>
-                            <th>Produto</th>
-                            <th>Preço</th>
-                            <th>Estoque</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        {% for produto in produtos %}
-                        <tr>
-
-                            <td>
-                                {% if produto.imagem %}
-                                    <img src="{{ produto.imagem.url }}"
-                                         width="45"
-                                         height="45"
-                                         style="border-radius:8px; object-fit:cover;">
-                                {% else %}
-                                    —
-                                {% endif %}
-                            </td>
-
-                            <td class="td-name">
-                                {{ produto.nome }}
-                                <span>{{ produto.categoria }}</span>
-                            </td>
-
-                            <td>R$ {{ produto.preco }}</td>
-
-                            <td>{{ produto.estoque }}</td>
-
-                            <td class="td-actions">
-
-                                <a href="{% url 'produto_editar' produto.id %}"
-                                   class="btn-sm btn-primary">
-                                    Editar
-                                </a>
-
-                                <a href="{% url 'produto_delete' produto.id %}"
-                                   class="btn-sm btn-danger-sm">
-                                    Excluir
-                                </a>
-
-                            </td>
-
-                        </tr>
-
-                        {% empty %}
-                        <tr>
-                            <td colspan="5" style="text-align:center;">
-                                Nenhum produto cadastrado.
-                            </td>
-                        </tr>
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-            </div>
-
-        </div>
-
-    </div>
-
-</main>
+<div class="panel-section">
+  {% if produtos %}
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th scope="col" style="width: 70px;">Imagem</th>
+        <th scope="col">Produto</th>
+        <th scope="col" style="text-align: center;">Preço</th>
+        <th scope="col" style="text-align: center;">Estoque</th>
+        <th scope="col" style="text-align: right;">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for produto in produtos %}
+      <tr>
+        <td>
+          {% if produto.imagem %}
+            <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" class="product-thumb">
+          {% else %}
+            <div class="product-thumb-empty">📷</div>
+          {% endif %}
+        </td>
+        <td>
+          <strong style="color: #fff; font-size: 15px;">{{ produto.nome }}</strong>
+          {% if produto.categoria %}
+            <br><small style="color: #94a3b8;">{{ produto.categoria.nome }}</small>
+          {% endif %}
+        </td>
+        <td style="text-align: center; font-weight: 600;">R$ {{ produto.preco }}</td>
+        <td style="text-align: center;">
+          {% if produto.estoque <= 5 %}
+            <span style="color: #f87171; font-weight: bold;">{{ produto.estoque }} un</span>
+          {% else %}
+            <span style="color: #4ade80; font-weight: bold;">{{ produto.estoque }} un</span>
+          {% endif %}
+        </td>
+        <td style="text-align: right;">
+          <div class="btn-action-group">
+            <a href="{% url 'produto_editar' produto.id %}" class="btn-action btn-action-edit">✏️ Editar</a>
+            <a href="{% url 'produto_delete' produto.id %}" class="btn-action btn-action-delete" onclick="return confirm('Excluir este produto?');">🗑️ Excluir</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color: #94a3b8; font-size: 14px;">Nenhum produto cadastrado no momento.</p>
+  {% endif %}
+</div>
 {% endblock %}
 
 ==========================================================================================
@@ -2424,6 +2462,218 @@ body {
 
   color: #fca5a5;
 }
+
+/* ==========================================================================
+   Aura Admin - Estilos do Painel Privado (SIG / SAD)
+   ========================================================================== */
+
+body.body-privado {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  background-color: #0b0f19 !important;
+  color: #f8fafc !important;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.layout-privado {
+  display: flex !important;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Sidebar Lateral */
+.sidebar-privado {
+  width: 250px !important;
+  min-width: 250px !important;
+  background-color: #0f172a !important;
+  border-right: 1px solid #1e293b !important;
+  padding: 24px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box;
+}
+
+.sidebar-brand {
+  font-size: 20px;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 28px;
+  padding-left: 8px;
+}
+
+.sidebar-menu {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  color: #94a3b8 !important;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+.sidebar-link.ativo {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.sidebar-divider {
+  height: 1px;
+  background-color: #1e293b;
+  margin: 16px 0;
+}
+
+.sidebar-link.logout {
+  color: #f87171 !important;
+}
+
+/* Área de Conteúdo Principal */
+.main-content {
+  flex: 1 !important;
+  padding: 32px 40px !important;
+  background-color: #0b0f19 !important;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #f8fafc !important;
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #94a3b8 !important;
+}
+
+/* Seções SIG e SAD */
+.section-title-sig {
+  font-size: 15px;
+  font-weight: 700;
+  color: #38bdf8 !important;
+  margin: 24px 0 14px 0;
+  text-transform: uppercase;
+}
+
+.section-title-sad {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f87171 !important;
+  margin: 32px 0 14px 0;
+  text-transform: uppercase;
+}
+
+/* Grid de Cards */
+.cards-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 16px !important;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8 !important;
+  text-transform: uppercase;
+}
+
+.stat-card-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #f8fafc !important;
+}
+
+.stat-card-value.green { color: #4ade80 !important; }
+.stat-card-value.blue { color: #60a5fa !important; }
+.stat-card-value.compact { font-size: 16px !important; }
+
+.stat-card-sub {
+  font-size: 12px;
+  color: #64748b !important;
+}
+
+/* Tabelas Privadas */
+.panel-section {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.panel-section-critical { border-color: rgba(239, 68, 68, 0.4) !important; }
+.panel-section-warning { border-color: rgba(245, 158, 11, 0.4) !important; }
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.admin-table th {
+  background-color: #0f172a !important;
+  color: #94a3b8 !important;
+  padding: 10px 14px;
+  border-bottom: 1px solid #334155;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.admin-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0 !important;
+}
+
+/* Botões */
+.btn-action {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+.btn-action-primary { background-color: #2563eb; color: #fff !important; }
+.btn-action-edit { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa !important; }
+.btn-action-delete { background-color: rgba(239, 68, 68, 0.2); color: #f87171 !important; }
 
 ==========================================================================================
 ARQUIVO: static\assets\css\cadastro.css
@@ -2967,7 +3217,7 @@ header.topo {
 
 .card-img img {
   width: 100%;
-  height: 180px;
+  height: 130px;
   object-fit: contain;
 }
 
@@ -2988,6 +3238,27 @@ header.topo {
   font-size: 17px;
   margin-bottom: 8px;
   text-decoration: none; /* Garante que não tenha sublinhado */
+}
+
+.card-info-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+.card-categoria {
+  display: inline-block;
+  background: rgba(79, 142, 247, 0.15);
+  color: #7ab0ff;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 20px;
 }
 
 .stars {
@@ -3018,6 +3289,38 @@ header.topo {
 .prices .parcel {
   font-size: 14px;
   color: #ccc;
+}
+
+/* Indicador de estoque — usado no card e na página de detalhe do produto */
+.disponivel,
+.indisponivel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.disponivel {
+  color: #4ade80;
+}
+
+.indisponivel {
+  color: #f87171;
+}
+
+.disponivel::before,
+.indisponivel::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.card-estoque {
+  font-size: 11px;
 }
 
 .frete {
@@ -3094,10 +3397,36 @@ footer.rodape {
 /* ==========================================
    PRODUTO INDIVIDUAL (novo)
    ========================================== */
+.breadcrumb {
+  max-width: 900px;
+  margin: 0 auto 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #888;
+  text-align: left;
+}
+
+.breadcrumb a {
+  color: #888;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: #fff;
+}
+
+.breadcrumb-atual {
+  color: #ccc;
+}
+
 .produto-detalhe {
   max-width: 900px;
   margin: 0 auto;
   display: flex;
+  align-items: flex-start;
   gap: 40px;
   text-align: left;
   background: #101010;
@@ -3134,41 +3463,70 @@ footer.rodape {
   font-size: 26px;
 }
 
+.produto-detalhe-categoria {
+  display: inline-block;
+  align-self: flex-start;
+  background: rgba(79, 142, 247, 0.15);
+  color: #7ab0ff;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
 .produto-detalhe-desc {
   color: #ccc;
   line-height: 1.6;
+}
+
+.produto-detalhe-descricao-bloco h2,
+.produto-detalhe-specs h2 {
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.produto-detalhe-specs {
+  border-top: 1px solid #1e1e1e;
+  padding-top: 16px;
+}
+
+.specs-lista {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.specs-lista li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  border-bottom: 1px solid #1e1e1e;
+  padding-bottom: 10px;
+}
+
+.specs-label {
+  color: #888;
+}
+
+.specs-valor {
+  color: #fff;
+  font-weight: 500;
+  text-align: right;
 }
 
 .produto-detalhe-info .frete {
   width: max-content;
 }
 
-.produto-detalhe .botao {
-  padding: 12px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s;
-  text-align: center;
-  text-decoration: none;
-  width: max-content;
-}
-
-.produto-detalhe .secundario {
-  background: transparent;
-  border: 1px solid #fff;
-  color: #fff;
-}
-
-.produto-detalhe .secundario:hover {
-  background: #fff;
-  color: #000;
-}
-
 @media (max-width: 700px) {
   .produto-detalhe {
     flex-direction: column;
+    align-items: stretch;
   }
 }
 
@@ -3186,12 +3544,13 @@ footer.rodape {
     cursor: pointer;
     font-weight: 600;
     transition: .3s;
+    text-align: center;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: max-content;
 }
-
 
 .produto-detalhe .primario {
     background: #d1ff34;
@@ -3202,8 +3561,6 @@ footer.rodape {
     opacity: .85;
     transform: translateY(-2px);
 }
-
-
 
 .produto-detalhe .secundario {
     background: transparent;
@@ -3216,8 +3573,6 @@ footer.rodape {
     color: #000;
     transform: translateY(-2px);
 }
-
-
 
 .produto-detalhe button:disabled {
     background: #555;
@@ -4090,341 +4445,255 @@ html, body {
 ==========================================================================================
 ARQUIVO: static\assets\css\painel.css
 ==========================================================================================
+/* ==========================================================================
+   Aura Admin - Painel Privado (painel.css)
+   ========================================================================== */
+
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-
-  font-family: "Poppins", sans-serif;
 }
 
-/* =========================
-   BODY
-========================= */
-
-body {
-  background: #0d0d0d;
-  color: #f5f5f5;
+body.body-privado {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  background-color: #0b0f19 !important;
+  color: #f8fafc !important;
   min-height: 100vh;
 }
 
-main {
-    min-height: 100vh;
-}
-
-/* =========================
-   CONTAINERS
-========================= */
-
-.painel-container,
-.form-container,
-.gerenciar-container {
+.layout-privado {
+  display: flex !important;
+  min-height: 100vh;
   width: 100%;
-  max-width: 1200px;
-
-  margin: 60px auto;
-  padding: 0 20px;
 }
 
-/* =========================
-   TITULOS
-========================= */
-
-.painel-header,
-.form-header,
-.topo {
-  text-align: center;
-
-  margin-bottom: 35px;
+/* Sidebar Lateral */
+.sidebar-privado {
+  width: 250px !important;
+  min-width: 250px !important;
+  background-color: #0f172a !important;
+  border-right: 1px solid #1e293b !important;
+  padding: 24px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
-.painel-header h1,
-.form-header h1,
-.topo h1 {
-  font-size: 38px;
+.sidebar-brand {
+  font-size: 20px;
   font-weight: 700;
-
-  color: #fff;
-
-  margin-bottom: 10px;
+  color: #38bdf8;
+  margin-bottom: 28px;
+  padding-left: 8px;
 }
 
-.painel-header p,
-.form-header p {
-  color: #aaa;
+.sidebar-menu {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
 }
 
-/* =========================
-   CAIXA CENTRAL
-========================= */
-
-.cards,
-form,
-.tabela-container {
-  background: #1a1a1a;
-
-  border: 1px solid #2d2d2d;
-
-  border-radius: 16px;
-
-  box-shadow:
-  0 0 25px rgba(0, 0, 0, 0.4);
-
-  overflow: hidden;
-}
-
-/* =========================
-   CARDS
-========================= */
-
-.cards {
-  display: grid;
-
-  grid-template-columns:
-  repeat(auto-fit, minmax(250px, 1fr));
-
-  gap: 20px;
-
-  padding: 25px;
-}
-
-.card {
-  background: #222;
-
-  border: 1px solid #333;
-
-  border-radius: 12px;
-
-  padding: 30px;
-
-  text-decoration: none;
-
-  transition: 0.3s;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-
-  border-color: #2563eb;
-
-  box-shadow:
-  0 0 15px rgba(37, 99, 235, 0.2);
-}
-
-.card h2 {
-  color: #fff;
-
-  margin-bottom: 12px;
-}
-
-.card p {
-  color: #bbb;
-
-  line-height: 1.6;
-}
-
-/* =========================
-   FORMULÁRIO
-========================= */
-
-form {
-  max-width: 750px;
-
-  margin: auto;
-
-  padding: 40px;
-}
-
-.input-group {
+.sidebar-link {
   display: flex;
-  flex-direction: column;
-
-  margin-bottom: 20px;
-}
-
-.input-group label {
-  margin-bottom: 8px;
-
-  font-weight: 500;
-
-  color: #ddd;
-}
-
-.input-group input,
-.input-group textarea {
-  background: #2a2a2a;
-
-  border: 1px solid #444;
-
-  border-radius: 8px;
-
-  padding: 14px;
-
-  color: white;
-
-  outline: none;
-
-  transition: 0.3s;
-
-  font-size: 15px;
-}
-
-.input-group input:focus,
-.input-group textarea:focus {
-  border-color: #2563eb;
-
-  box-shadow:
-  0 0 10px rgba(37, 99, 235, 0.2);
-}
-
-textarea {
-  resize: none;
-}
-
-/* =========================
-   BOTÃO
-========================= */
-
-.btn-submit {
-  width: 100%;
-
-  background:
-  linear-gradient(
-    135deg,
-    #2563eb,
-    #1d4ed8
-  );
-
-  color: white;
-
-  border: none;
-
-  border-radius: 8px;
-
-  padding: 14px;
-
-  font-size: 16px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: 0.3s;
-}
-
-.btn-submit:hover {
-  transform: translateY(-2px);
-
-  box-shadow:
-  0 0 15px rgba(37, 99, 235, 0.3);
-}
-
-/* =========================
-   TABELA
-========================= */
-
-.tabela-container {
-  padding: 20px;
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-
-  border-collapse: collapse;
-}
-
-thead {
-  background: #222;
-}
-
-thead th {
-  padding: 18px;
-
-  text-align: left;
-
-  color: white;
-}
-
-tbody td {
-  padding: 18px;
-
-  border-top: 1px solid #333;
-
-  color: #ccc;
-}
-
-/* =========================
-   AÇÕES
-========================= */
-
-.acoes {
-  display: flex;
-
+  align-items: center;
   gap: 10px;
-}
-
-.btn-editar,
-.btn-remover {
-  border: none;
-
-  padding: 10px 16px;
-
+  padding: 10px 14px;
+  color: #94a3b8 !important;
+  font-size: 14px;
+  font-weight: 500;
   border-radius: 8px;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+}
 
-  color: white;
+.sidebar-link:hover {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
 
-  cursor: pointer;
-
+.sidebar-link.ativo {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
   font-weight: 600;
-
-  transition: 0.3s;
 }
 
-.btn-editar {
-  background: #2563eb;
+.sidebar-divider {
+  height: 1px;
+  background-color: #1e293b;
+  margin: 16px 0;
 }
 
-.btn-remover {
-  background: #dc2626;
+.sidebar-link.logout {
+  color: #f87171 !important;
 }
 
-.btn-editar:hover,
-.btn-remover:hover {
-  transform: translateY(-2px);
-
-  opacity: 0.9;
+/* Área de Conteúdo Principal */
+.main-content {
+  flex: 1 !important;
+  padding: 32px 40px !important;
+  background-color: #0b0f19 !important;
+  overflow-y: auto;
 }
 
-/* =========================
-   RESPONSIVO
-========================= */
-
-@media (max-width: 768px) {
-
-  .painel-header h1,
-  .form-header h1,
-  .topo h1 {
-    font-size: 30px;
-  }
-
-  form {
-    padding: 25px;
-  }
-
-  .acoes {
-    flex-direction: column;
-  }
-
-  table {
-    font-size: 14px;
-  }
-
+/* Cabeçalho de Páginas */
+.page-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 24px !important;
 }
 
-a.btn-editar, a.btn-remover, a.btn-submit {
-  display: inline-block;
-  text-decoration: none;
-  text-align: center;
+.page-title {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+}
+
+.page-subtitle {
+  font-size: 14px !important;
+  color: #94a3b8 !important;
+  margin-top: 4px !important;
+}
+
+/* Seções e Cards */
+.panel-section {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+/* Trava Estrita de Miniatura da Tabela de Produtos */
+.product-thumb {
+  width: 50px !important;
+  height: 50px !important;
+  max-width: 50px !important;
+  max-height: 50px !important;
+  object-fit: cover !important;
+  border-radius: 6px !important;
+  border: 1px solid #334155 !important;
+  display: block !important;
+}
+
+.product-thumb-empty {
+  width: 50px !important;
+  height: 50px !important;
+  background-color: #0f172a !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #64748b !important;
+}
+
+/* Tabelas Administrativas */
+.admin-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  text-align: left !important;
+  font-size: 14px !important;
+}
+
+.admin-table th {
+  background-color: #0f172a !important;
+  color: #94a3b8 !important;
+  padding: 12px 16px !important;
+  border-bottom: 1px solid #334155 !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+}
+
+.admin-table td {
+  padding: 14px 16px !important;
+  border-bottom: 1px solid #334155 !important;
+  color: #e2e8f0 !important;
+  vertical-align: middle !important;
+}
+
+/* Formulários Privados */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+/* Botões de Ação */
+.btn-action-group {
+  display: flex !important;
+  gap: 8px !important;
+  justify-content: flex-end !important;
+}
+
+.btn-action {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 8px 14px !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+.btn-action-primary {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+.btn-action-edit {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+}
+
+.btn-action-delete {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+.badge-role {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-admin {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.badge-user {
+  background-color: rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
 }
 
 ==========================================================================================
@@ -5250,73 +5519,64 @@ ARQUIVO: templates\rodape.html
 ARQUIVO: templates\privado\base.html
 ==========================================================================================
 {% load static %}
-
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard – Aura</title>
-  <link rel="stylesheet" href="{% static 'assets/css/perfil.css' %}" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block titulo %}Painel Administrativo - Aura{% endblock %}</title>
+  
+  <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/css/painel.css' %}">
 </head>
+<body class="body-privado">
 
-<body>
+  <div class="layout-privado">
+    <aside class="sidebar-privado" aria-label="Menu Lateral do Painel">
+      <div class="sidebar-brand">⚡ Aura Admin</div>
 
-  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+      <nav>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="{% url 'painel' %}" class="sidebar-link {% if pagina == 'painel' %}ativo{% endif %}">
+              📊 Dashboard (SIG/SAD)
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'produtos' %}" class="sidebar-link {% if pagina == 'produtos' %}ativo{% endif %}">
+              📦 Gerenciar Produtos
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'add_categoria' %}" class="sidebar-link {% if pagina == 'categorias' %}ativo{% endif %}">
+              🏷️ Gerenciar Categorias
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'usuarios' %}" class="sidebar-link {% if pagina == 'usuarios' %}ativo{% endif %}">
+              👥 Gerenciar Usuários
+            </a>
+          </li>
+          
+          <li class="sidebar-divider"></li>
+          
+          <li>
+            <a href="{% url 'inicial' %}" class="sidebar-link">🌐 Voltar para a Loja</a>
+          </li>
+          <li>
+            <a href="{% url 'logout' %}" class="sidebar-link logout">🚪 Sair</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
 
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="avatar">{{ user.username|slice:":2"|upper }}</div>
-      <div>
-        <div class="user-name"></div>
-        <div class="user-role">Administrador</div>
-      </div>
-    </div>
-
-    <nav class="sidebar-nav" aria-label="Navegação do painel administrativo">
-      <div class="nav-section">Principal</div>
-      <a href="{% url 'painel' %}" class="nav-item {% if pagina == 'painel' %}active{% endif %}"><span
-          class="nav-icon">🏠</span> Inicial</a>
-      <a href="{% url 'meus_dados' %}" class="nav-item {% if pagina == 'meus_dados' %}active{% endif %}"><span
-          class="nav-icon">👤</span> Meus Dados</a>
-
-      <div class="nav-section">Gerenciamento</div>
-      <a href="{% url 'produtos' %}" class="nav-item {% if pagina == 'produtos' %}active{% endif %}"><span
-          class="nav-icon">📚</span> Produtos </a>
-      <a href="{% url 'usuarios' %}" class="nav-item {% if pagina == 'usuarios' %}active{% endif %}"><span
-          class="nav-icon">🔑</span> Usuários</a>
-
-      <div class="nav-section">Cadastro/Edição</div>
-      <a href="{% url 'add_produtos' %}" class="nav-item {% if pagina == 'produtos_1' %}active{% endif %}"><span
-          class="nav-icon">📚</span> Produtos </a>
-      <a href="{% url 'add_usuario' %}" class="nav-item {% if pagina == 'usuarios_1' %}active{% endif %}"><span
-          class="nav-icon">🔑</span> Usuários</a>
-      <a href="{% url 'add_categoria' %}" class="nav-item {% if pagina == 'usuarios_1' %}active{% endif %}"><span
-          class="nav-icon">🏷️</span> Categoria</a>
-
-      <div class="nav-section">Sessão</div>
-      <a href="{% url 'inicial' %}" class="nav-item "><span class="nav-icon">🏠</span> Home</a>
-      <a href="{% url 'logout' %}" class="nav-item danger"><span class="nav-icon">🚪</span> Sair</a>
-    </nav>
-
-    <div class="sidebar-footer">IFRN AURA © 2026</div>
-  </aside>
-
-  <div class="topbar">
-    <button class="hamburger" id="hamburger" aria-label="Abrir menu do painel">
-      <span></span><span></span><span></span>
-    </button>
-    <div class="logo-text">IFRN AURA<span>Dashboard</span></div>
-    <div class="avatar" style="width:36px;height:36px;font-size:1rem;">{{ user.username|slice:":2"|upper }}</div>
+    <main class="main-content">
+      {% block conteudo %}
+      {% endblock %}
+    </main>
   </div>
 
-  {% block conteudo %}
-  {% endblock %}
-
-  <script src="{% static 'assets/js/perfil.js' %}"></script>
 </body>
-
 </html>
 
 ==========================================================================================
@@ -5485,7 +5745,6 @@ ARQUIVO: usuarios\views.py
 ==========================================================================================
 import datetime
 
-from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
@@ -5495,11 +5754,9 @@ from django.contrib import messages
 from django.db.models import Sum, F, DecimalField
 
 from .forms import CadastroForm, UsuarioForm
-from produtos.forms import ProdutoForm, Categoria
-from produtos.models import Produto, Categoria
-from pedidos.forms import PedidoForm
-from pedidos.models import Pedido, ItemPedido
 from .models import Cliente, Endereco
+from produtos.models import Produto, Categoria
+from pedidos.models import Pedido, ItemPedido
 
 
 def staff_required(view_func):
@@ -5631,23 +5888,48 @@ def painel(request):
         total=Sum("estoque")
     )["total"] or 0
 
+    # --- SIG: CÁLCULOS GERENCIAIS ---
     faturamento_total = ItemPedido.objects.aggregate(
         total=Sum(F('quantidade') * F('preco_unitario'), output_field=DecimalField())
     )['total'] or 0
 
     ticket_medio = (faturamento_total / total_pedidos) if total_pedidos > 0 else 0
 
+    top_produto_item = ItemPedido.objects.values('produto__nome').annotate(
+        total_vendido=Sum('quantidade')
+    ).order_by('-total_vendido').first()
+
+    top_produto_nome = top_produto_item['produto__nome'] if top_produto_item else "Nenhum pedido"
+    top_produto_qtd = top_produto_item['total_vendido'] if top_produto_item else 0
+
+    # --- SAD: ALERTAS INTELIGENTES ---
     produtos_estoque_baixo = Produto.objects.filter(estoque__lte=5)
+    qtd_estoque_baixo = produtos_estoque_baixo.count()
+
+    alertas_reabastecimento = []
+    for p in produtos_estoque_baixo:
+        alertas_reabastecimento.append({
+            'produto': p,
+            'qtd_sugerida_comprar': max(20 - p.estoque, 10)
+        })
+
+    # CORREÇÃO AQUI: 'itens__isnull=True' utiliza o related_name 'itens' do model ItemPedido
+    produtos_sem_giro = Produto.objects.filter(itens__isnull=True, estoque__gt=0)
 
     context = {
         "total_produtos": total_produtos,
         "total_clientes": total_clientes,
         "total_categorias": total_categorias,
+        "total_pedidos": total_pedidos,
         "estoque_total": estoque_total,
         "faturamento_total": faturamento_total,
         "ticket_medio": ticket_medio,
+        "top_produto_nome": top_produto_nome,
+        "top_produto_qtd": top_produto_qtd,
         "produtos_estoque_baixo": produtos_estoque_baixo,
-        "qtd_estoque_baixo": produtos_estoque_baixo.count(),
+        "qtd_estoque_baixo": qtd_estoque_baixo,
+        "alertas_reabastecimento": alertas_reabastecimento,
+        "produtos_sem_giro": produtos_sem_giro,
         "pagina": "painel",
     }
 
@@ -5776,8 +6058,43 @@ def usuario_editar(request, id):
 
 @login_required
 def meus_dados(request):
+    cliente = Cliente.objects.filter(usuario=request.user).first()
+    endereco = Endereco.objects.filter(cliente=cliente).first() if cliente else None
+
+    if request.method == 'POST':
+        if cliente:
+            cliente.nome = request.POST.get('nome', cliente.nome)
+            cliente.sobrenome = request.POST.get('sobrenome', cliente.sobrenome)
+            cliente.telefone = request.POST.get('telefone', cliente.telefone)
+            cliente.cpf = request.POST.get('cpf', cliente.cpf)
+            cliente.save()
+
+            if endereco:
+                endereco.rua = request.POST.get('rua', endereco.rua)
+                endereco.numero = request.POST.get('numero', endereco.numero)
+                endereco.bairro = request.POST.get('bairro', endereco.bairro)
+                endereco.cidade = request.POST.get('cidade', endereco.cidade)
+                endereco.estado = request.POST.get('estado', endereco.estado)
+                endereco.cep = request.POST.get('cep', endereco.cep)
+                endereco.save()
+            elif request.POST.get('cep'):
+                Endereco.objects.create(
+                    cliente=cliente,
+                    rua=request.POST.get('rua', ''),
+                    numero=request.POST.get('numero', ''),
+                    bairro=request.POST.get('bairro', ''),
+                    cidade=request.POST.get('cidade', ''),
+                    estado=request.POST.get('estado', ''),
+                    cep=request.POST.get('cep', '')
+                )
+
+            messages.success(request, 'Seus dados foram atualizados com sucesso!')
+            return redirect('meus_dados')
+
     context = {
-        "pagina": "meus_dados",
+        'cliente': cliente,
+        'endereco': endereco,
+        'pagina': 'meus_dados'
     }
     return render(request, 'privado/meus_dados.html', context)
 
@@ -6104,66 +6421,83 @@ ARQUIVO: usuarios\templates\privado\add_usuario.html
 ==========================================================================================
 ARQUIVO: usuarios\templates\privado\meus_dados.html
 ==========================================================================================
-{% extends 'privado/base.html' %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %} Meus Dados – Aura {% endblock %}
 
 {% block conteudo %}
-<main class="main">
+<main class="container" style="max-width: 700px; margin: 40px auto; padding: 0 20px;">
+  <section style="background: #0f172a; padding: 30px; border-radius: 12px; border: 1px solid #1e293b; color: #fff;">
+    <h1 style="font-size: 24px; color: #fff; margin-bottom: 8px;">Meus Dados Cadastrais</h1>
+    <p style="color: #94a3b8; font-size: 14px; margin-bottom: 25px;">Mantenha suas informações pessoais e endereço de entrega atualizados.</p>
 
-  <div>
-    <h1 class="page-title">Dashboard</h1>
-    <p class="page-subtitle">Bem-vindo de volta, {{ user.username }}. Confira o resumo abaixo.</p>
-  </div>
+    {% if messages %}
+      {% for message in messages %}
+        <div style="padding: 12px; border-radius: 6px; margin-bottom: 20px; background: #166534; color: #4ade80;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
 
-  <div class="section-card">
-    <div class="section-card-header">
-        <h2>Meu Perfil</h2>
-    </div>
+    <form method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+      {% csrf_token %}
 
-    <div class="section-card-body">
-        <table>
-            <tbody>
-                <tr>
-                    <td><strong>Nome</strong></td>
-                    <td>{{ user.get_full_name|default:user.username }}</td>
-                </tr>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_nome">Nome</label>
+          <input type="text" id="id_nome" name="nome" value="{{ cliente.nome|default:'' }}" required style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_sobrenome">Sobrenome</label>
+          <input type="text" id="id_sobrenome" name="sobrenome" value="{{ cliente.sobrenome|default:'' }}" required style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+      </div>
 
-                <tr>
-                    <td><strong>Usuário</strong></td>
-                    <td>{{ user.username }}</td>
-                </tr>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_cpf">CPF</label>
+          <input type="text" id="id_cpf" name="cpf" value="{{ cliente.cpf|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_telefone">Telefone</label>
+          <input type="text" id="id_telefone" name="telefone" value="{{ cliente.telefone|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+      </div>
 
-                <tr>
-                    <td><strong>E-mail</strong></td>
-                    <td>{{ user.email }}</td>
-                </tr>
+      <h2 style="font-size: 18px; color: #60a5fa; margin-top: 15px; border-bottom: 1px solid #334155; padding-bottom: 8px;">Endereço de Entrega</h2>
 
-                <tr>
-                    <td><strong>Tipo de Conta</strong></td>
-                    <td>
-                        {% if user.is_superuser %}
-                            Administrador
-                        {% elif user.is_staff %}
-                            Funcionário
-                        {% else %}
-                            Usuário
-                        {% endif %}
-                    </td>
-                </tr>
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_rua">Rua / Logradouro</label>
+          <input type="text" id="id_rua" name="rua" value="{{ endereco.rua|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_numero">Número</label>
+          <input type="text" id="id_numero" name="numero" value="{{ endereco.numero|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+      </div>
 
-                <tr>
-                    <td><strong>Data de Cadastro</strong></td>
-                    <td>{{ user.date_joined|date:"d/m/Y" }}</td>
-                </tr>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_bairro">Bairro</label>
+          <input type="text" id="id_bairro" name="bairro" value="{{ endereco.bairro|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_cidade">Cidade</label>
+          <input type="text" id="id_cidade" name="cidade" value="{{ endereco.cidade|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_cep">CEP</label>
+          <input type="text" id="id_cep" name="cep" value="{{ endereco.cep|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+      </div>
 
-                <tr>
-                    <td><strong>Último Acesso</strong></td>
-                    <td>{{ user.last_login|date:"d/m/Y H:i" }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
+      <button type="submit" style="margin-top: 15px; background: #2563eb; color: #fff; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+        Salvar Alterações
+      </button>
+    </form>
+  </section>
 </main>
 {% endblock %}
 
@@ -6171,182 +6505,189 @@ ARQUIVO: usuarios\templates\privado\meus_dados.html
 ARQUIVO: usuarios\templates\privado\painel.html
 ==========================================================================================
 {% extends 'privado/base.html' %}
+{% load static %}
+
+{% block titulo %} Dashboard Gerencial (SIG/SAD) - Aura Admin {% endblock %}
 
 {% block conteudo %}
-<main class="main">
+<div class="page-header">
+  <h1 class="page-title">Dashboard Gerencial (SIG / SAD)</h1>
+  <p class="page-subtitle">Bem-vindo de volta, <strong>{{ user.username }}</strong>. Acompanhe os indicadores estratégicos e tomada de decisão.</p>
+</div>
 
-  <div>
-    <h1 class="page-title">Dashboard</h1>
-    <p class="page-subtitle">Bem-vindo de volta, {{ user.username }}. Confira o resumo abaixo.</p>
+<!-- MÓDULO SIG -->
+<h2 class="section-title-sig">📈 SIG – Sistema de Informação Gerencial</h2>
+
+<div class="cards-grid">
+  <div class="stat-card">
+    <div class="stat-card-title">💰 Faturamento Total</div>
+    <div class="stat-card-value green">R$ {{ faturamento_total|floatformat:2 }}</div>
+    <div class="stat-card-sub">Valor bruto de vendas</div>
   </div>
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px;">
-    
-    <div class="section-card">
-      <div class="section-card-body">
-        <h3>💰 Faturamento</h3>
-        <h1>R$ {{ faturamento_total|floatformat:2 }}</h1>
-        <p>Valor total de vendas</p>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <div class="section-card-body">
-        <h3>🎯 Ticket Médio</h3>
-        <h1>R$ {{ ticket_medio|floatformat:2 }}</h1>
-        <p>Média por pedido</p>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <div class="section-card-body">
-        <h3>📦 Produtos</h3>
-        <h1>{{ total_produtos }}</h1>
-        <p>Produtos cadastrados</p>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <div class="section-card-body">
-        <h3>👥 Clientes</h3>
-        <h1>{{ total_clientes }}</h1>
-        <p>Clientes cadastrados</p>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <div class="section-card-body">
-        <h3>🏷️ Categorias</h3>
-        <h1>{{ total_categorias }}</h1>
-        <p>Categorias criadas</p>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <div class="section-card-body">
-        <h3>📋 Estoque</h3>
-        <h1>{{ estoque_total }}</h1>
-        <p>Itens disponíveis</p>
-      </div>
-    </div>
-
+  <div class="stat-card">
+    <div class="stat-card-title">🎯 Ticket Médio</div>
+    <div class="stat-card-value blue">R$ {{ ticket_medio|floatformat:2 }}</div>
+    <div class="stat-card-sub">Média por pedido</div>
   </div>
 
-  <div class="section-card" style="margin-top: 25px;">
-    <div class="section-card-header" style="display: flex; justify-content: space-between; align-items: center;">
-      <h2 style="color: #f87171; font-size: 18px;">⚠️ Alerta de Reposição de Estoque (SAD)</h2>
-      <span style="background: rgba(239, 68, 68, 0.2); color: #f87171; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold;">
-        {{ qtd_estoque_baixo }} Críticos
-      </span>
-    </div>
-
-    <div class="section-card-body">
-      {% if produtos_estoque_baixo %}
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Produto</th>
-              <th>Preço</th>
-              <th>Estoque Atual</th>
-              <th>Status</th>
-              <th>Ação</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for produto in produtos_estoque_baixo %}
-            <tr>
-              <td><strong>{{ produto.nome }}</strong></td>
-              <td>R$ {{ produto.preco }}</td>
-              <td style="color: #f87171; font-weight: bold;">{{ produto.estoque }} un</td>
-              <td><span style="color: #f87171;">Reposição Urgente</span></td>
-              <td>
-                <a href="{% url 'produto_editar' produto.id %}" class="btn-sm btn-primary">
-                  Repor Estoque
-                </a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      {% else %}
-      <p style="color: #4ade80;">Todos os produtos possuem níveis de estoque adequados no momento.</p>
-      {% endif %}
-    </div>
+  <div class="stat-card">
+    <div class="stat-card-title">⭐ Mais Vendido</div>
+    <div class="stat-card-value compact">{{ top_produto_nome }}</div>
+    <div class="stat-card-sub">{{ top_produto_qtd }} un. vendidas</div>
   </div>
 
-</main>
+  <div class="stat-card">
+    <div class="stat-card-title">📦 Produtos</div>
+    <div class="stat-card-value">{{ total_produtos }}</div>
+    <div class="stat-card-sub">No catálogo</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-title">👥 Clientes</div>
+    <div class="stat-card-value">{{ total_clientes }}</div>
+    <div class="stat-card-sub">Cadastrados</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-title">📋 Estoque Geral</div>
+    <div class="stat-card-value">{{ estoque_total }}</div>
+    <div class="stat-card-sub">Unidades totais</div>
+  </div>
+</div>
+
+<!-- MÓDULO SAD -->
+<h2 class="section-title-sad">🧠 SAD – Sistema de Apoio à Decisão (Ações Recomendadas)</h2>
+
+<!-- Alerta Ruptura -->
+<div class="panel-section panel-section-critical">
+  <h3 style="color: #f87171; margin-bottom: 12px; font-size: 16px;">⚠️ Alerta de Reposição de Estoque Crítico (Estoque ≤ 5)</h3>
+
+  {% if alertas_reabastecimento %}
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Produto</th>
+        <th>Preço</th>
+        <th>Estoque Atual</th>
+        <th>Sugestão de Compra</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in alertas_reabastecimento %}
+      <tr>
+        <td><strong>{{ item.produto.nome }}</strong></td>
+        <td>R$ {{ item.produto.preco }}</td>
+        <td style="color: #f87171; font-weight: bold;">{{ item.produto.estoque }} un</td>
+        <td style="color: #4ade80; font-weight: bold;">+{{ item.qtd_sugerida_comprar }} un</td>
+        <td>
+          <a href="{% url 'produto_editar' item.produto.id %}" class="btn-action btn-action-primary">
+            Repor Estoque
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color: #4ade80; margin: 0;">✅ Todos os produtos possuem níveis adequados de estoque.</p>
+  {% endif %}
+</div>
+
+<!-- Alerta Capital Parado -->
+<div class="panel-section panel-section-warning">
+  <h3 style="color: #fbbf24; margin-bottom: 12px; font-size: 16px;">💡 Alerta de Capital Parado (Produtos Sem Giro)</h3>
+
+  {% if produtos_sem_giro %}
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Produto</th>
+        <th>Estoque Parado</th>
+        <th>Preço Atual</th>
+        <th>Recomendação</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in produtos_sem_giro %}
+      <tr>
+        <td><strong>{{ p.nome }}</strong></td>
+        <td>{{ p.estoque }} un</td>
+        <td>R$ {{ p.preco }}</td>
+        <td style="color: #fbbf24;">Aplicar desconto ou promoção para liberar caixa</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color: #4ade80; margin: 0;">✅ Todos os produtos possuem histórico de vendas ativo.</p>
+  {% endif %}
+</div>
 {% endblock %}
 
 ==========================================================================================
 ARQUIVO: usuarios\templates\privado\usuarios.html
 ==========================================================================================
 {% extends 'privado/base.html' %}
+{% load static %}
+
+{% block titulo %} Gerenciar Usuários - Aura Admin {% endblock %}
 
 {% block conteudo %}
-<main class="main">
-
+<div class="page-header">
   <div>
-    <h1 class="page-title">Usuários</h1>
-    <p class="page-subtitle">
-      Gerencie os usuários cadastrados no sistema.
-    </p>
+    <h1 class="page-title">Gerenciar Usuários</h1>
+    <p class="page-subtitle">Controle de acesso e contas cadastradas na plataforma.</p>
   </div>
+  <a href="{% url 'add_usuario' %}" class="btn-action btn-action-primary">
+    + Novo Usuário
+  </a>
+</div>
 
-  {% include 'mensagens.html' %}
-
-  <div class="section-card">
-    <div class="section-card-header">
-      <h2>Usuários Cadastrados</h2>
+{% if messages %}
+  {% for message in messages %}
+    <div style="padding: 12px; border-radius: 6px; margin-bottom: 20px; background-color: rgba(34, 197, 94, 0.15); color: #4ade80; font-size: 14px;">
+      {{ message }}
     </div>
+  {% endfor %}
+{% endif %}
 
-    <div class="section-card-body">
-      <table>
-        <thead>
-          <tr>
-            <th>Usuário</th>
-            <th>E-mail</th>
-            <th>Tipo</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {% for usuario in usuarios %}
-          <tr>
-            <td>{{ usuario.username }}</td>
-            <td>{{ usuario.email }}</td>
-            <td>
-              {% if usuario.is_superuser %}
-              Administrador
-              {% elif usuario.is_staff %}
-              Funcionário
-              {% else %}
-              Usuário
-              {% endif %}
-            </td>
-            <td class="td-actions">
-              <a href="{% url 'usuario_editar' usuario.id %}" class="btn-sm btn-primary">
-                Editar
-              </a>
-
-              <a href="{% url 'usuario_delete' usuario.id %}" class="btn-sm btn-danger-sm">
-                Excluir
-              </a>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="4" style="text-align: center;">
-              Nenhum usuário cadastrado.
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-</main>
+<div class="panel-section">
+  {% if usuarios %}
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th scope="col">Usuário</th>
+        <th scope="col">E-mail</th>
+        <th scope="col" style="text-align: center;">Tipo de Acesso</th>
+        <th scope="col" style="text-align: right;">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in usuarios %}
+      <tr>
+        <td><strong style="color: #fff;">{{ u.username }}</strong></td>
+        <td>{{ u.email|default:"Não informado" }}</td>
+        <td style="text-align: center;">
+          {% if u.is_staff or u.is_superuser %}
+            <span class="badge-role badge-admin">Administrador</span>
+          {% else %}
+            <span class="badge-role badge-user">Cliente</span>
+          {% endif %}
+        </td>
+        <td style="text-align: right;">
+          <div class="btn-action-group">
+            <a href="{% url 'usuario_editar' u.id %}" class="btn-action btn-action-edit">✏️ Editar</a>
+            <a href="{% url 'usuario_delete' u.id %}" class="btn-action btn-action-delete" onclick="return confirm('Remover este usuário?');">🗑️ Excluir</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color: #94a3b8; font-size: 14px;">Nenhum usuário cadastrado.</p>
+  {% endif %}
+</div>
 {% endblock %}

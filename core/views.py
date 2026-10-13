@@ -147,26 +147,32 @@ def confirmacao(request, pedido_id):
     }
     return render(request, 'confirmacao.html', context)
 
-
 def transparencia(request):
-    qtd_produtos = Produto.objects.count()
-    qtd_categorias = Categoria.objects.count()
-    qtd_clientes = Cliente.objects.count()
-    qtd_pedidos = Pedido.objects.count()
+    total_produtos = Produto.objects.count()
+    total_categorias = Categoria.objects.count()
+    total_clientes = Cliente.objects.count()
+    total_pedidos = Pedido.objects.count()
 
-    precos = Produto.objects.aggregate(
-        menor=Min('preco'),
-        media=Avg('preco'),
-        maior=Max('preco')
+    agregados = Produto.objects.aggregate(
+        min_p=Min('preco'),
+        avg_p=Avg('preco'),
+        max_p=Max('preco')
     )
 
     context = {
-        'qtd_produtos': qtd_produtos,
-        'qtd_categorias': qtd_categorias,
-        'qtd_clientes': qtd_clientes,
-        'qtd_pedidos': qtd_pedidos,
-        'menor_preco': precos['menor'] or 0,
-        'media_preco': precos['media'] or 0,
-        'maior_preco': precos['maior'] or 0,
+        'total_produtos': total_produtos,
+        'total_categorias': total_categorias,
+        'total_clientes': total_clientes,
+        'total_pedidos': total_pedidos,
+        'preco_min': agregados['min_p'] if agregados['min_p'] is not None else 0,
+        'preco_medio': agregados['avg_p'] if agregados['avg_p'] is not None else 0,
+        'preco_max': agregados['max_p'] if agregados['max_p'] is not None else 0,
     }
     return render(request, 'transparencia.html', context)
+
+
+
+
+# Trecho localizado em: usuarios/views.py (view painel)
+
+produtos_sem_giro = Produto.objects.filter(itens__isnull=True, estoque__gt=0)
