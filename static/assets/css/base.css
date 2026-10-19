@@ -1,26 +1,21 @@
+<<<<<<< HEAD
 /* =========================
    RESET
 ========================= */
 
+=======
+>>>>>>> b3f5752564178900cd89ddb174918ee454616650
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* =========================
-   BODY
-========================= */
-
 body {
   font-family: Arial, sans-serif;
   background: #050505;
   color: white;
 }
-
-/* =========================
-   NAVBAR
-========================= */
 
 .navbar {
   width: 100%;
@@ -40,10 +35,6 @@ body {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
 }
-
-/* =========================
-   LOGO
-========================= */
 
 .logo {
   justify-self: start;
@@ -67,10 +58,6 @@ body {
   color: #3b82f6;
 }
 
-/* =========================
-   LINKS MENU
-========================= */
-
 .nav-links {
   display: flex;
   align-items: center;
@@ -78,32 +65,37 @@ body {
   gap: 18px;
 }
 
+
 .nav-links a {
   position: relative;
-
   text-decoration: none;
-  color: #dbe4f0;
-
-  transition: color 0.3s ease;
+  color: #cbd5e1;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 4px 0;
+  transition: color 0.2s ease;
 }
-
 .nav-links a::after {
   content: "";
-
   position: absolute;
-  bottom: -3px;
+  bottom: -2px;
   left: 0;
-
   width: 0;
-  height: 1px;
-
-  background: #3b82f6;
-
-  transition: width 0.3s ease;
+  height: 3px;
+  background: #38bdf8;
+  border-radius: 2px;
+  transition: width 0.25s ease;
 }
 
-.nav-links a:hover {
-  color: #3b82f6;
+.nav-links a:hover,
+.nav-links a:focus-visible {
+  color: #38bdf8;
+  outline: none;
+}
+
+.nav-links a:hover::after,
+.nav-links a:focus-visible::after {
+  width: 100%;
 }
 
 .nav-links a:hover::after {
@@ -115,10 +107,6 @@ body {
   height: 25px;
   background: #334155;
 }
-
-/* =========================
-   BOTÕES
-========================= */
 
 .nav-buttons {
   justify-self: end;
@@ -146,22 +134,20 @@ body {
   font-size: 14px;
   text-decoration: none;
 
-  border: 1px solid #2563eb;
-  background: transparent;
-  color: #3b82f6 !important;
+  border: none;
+  background: #2563eb;
+  color: #ffffff !important;
 
-  transition: 0.3s;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transition: all 0.3s ease;
 }
 
 .btn-nav:hover {
-  background: #2563eb;
-  color: white !important;
-  transform: translateY(-1px);
+  background: #1d4ed8;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(29, 78, 216, 0.5);
 }
-
-/* =========================
-   MENU MOBILE
-========================= */
 
 .hamburger {
   display: none;
@@ -183,10 +169,6 @@ body {
 
   border-radius: 5px;
 }
-
-/* =========================
-   FOOTER
-========================= */
 
 .footer {
   margin-top: 80px;
@@ -225,18 +207,20 @@ body {
 }
 
 .footer-section p {
-  color: #94a3b8;
+  color: #cbd5e1;
   line-height: 1.7;
 }
 
 .footer-section a {
   text-decoration: none;
-  color: #94a3b8;
+  color: #cbd5e1;
   transition: 0.3s;
 }
 
 .footer-section a:hover {
-  color: #fff;
+  color: #38bdf8;
+  text-decoration: underline;
+  transition: all 0.2s ease;
 }
 
 .footer-bottom {
@@ -246,14 +230,10 @@ body {
 
   padding: 22px;
 
-  color: #64748b;
+  color: #cbd5e1;
 
   font-size: 14px;
 }
-
-/* =========================
-   RESPONSIVO
-========================= */
 
 @media (max-width: 768px) {
 
@@ -314,10 +294,6 @@ body {
   }
 }
 
-/* =========================
-   ALERTAS
-========================= */
-
 .alerta {
   padding: 12px 16px;
 
@@ -345,4 +321,220 @@ body {
   border-color: #dc2626;
 
   color: #fca5a5;
+<<<<<<< HEAD
 }
+=======
+}
+
+/* ==========================================================================
+   Aura Admin - Estilos do Painel Privado (SIG / SAD)
+   ========================================================================== */
+
+body.body-privado {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  background-color: #0b0f19 !important;
+  color: #f8fafc !important;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.layout-privado {
+  display: flex !important;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Sidebar Lateral */
+.sidebar-privado {
+  width: 250px !important;
+  min-width: 250px !important;
+  background-color: #0f172a !important;
+  border-right: 1px solid #1e293b !important;
+  padding: 24px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box;
+}
+
+.sidebar-brand {
+  font-size: 20px;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 28px;
+  padding-left: 8px;
+}
+
+.sidebar-menu {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  color: #94a3b8 !important;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+.sidebar-link.ativo {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.sidebar-divider {
+  height: 1px;
+  background-color: #1e293b;
+  margin: 16px 0;
+}
+
+.sidebar-link.logout {
+  color: #f87171 !important;
+}
+
+/* Área de Conteúdo Principal */
+.main-content {
+  flex: 1 !important;
+  padding: 32px 40px !important;
+  background-color: #0b0f19 !important;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #f8fafc !important;
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #94a3b8 !important;
+}
+
+/* Seções SIG e SAD */
+.section-title-sig {
+  font-size: 15px;
+  font-weight: 700;
+  color: #38bdf8 !important;
+  margin: 24px 0 14px 0;
+  text-transform: uppercase;
+}
+
+.section-title-sad {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f87171 !important;
+  margin: 32px 0 14px 0;
+  text-transform: uppercase;
+}
+
+/* Grid de Cards */
+.cards-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 16px !important;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8 !important;
+  text-transform: uppercase;
+}
+
+.stat-card-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #f8fafc !important;
+}
+
+.stat-card-value.green { color: #4ade80 !important; }
+.stat-card-value.blue { color: #60a5fa !important; }
+.stat-card-value.compact { font-size: 16px !important; }
+
+.stat-card-sub {
+  font-size: 12px;
+  color: #64748b !important;
+}
+
+/* Tabelas Privadas */
+.panel-section {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.panel-section-critical { border-color: rgba(239, 68, 68, 0.4) !important; }
+.panel-section-warning { border-color: rgba(245, 158, 11, 0.4) !important; }
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.admin-table th {
+  background-color: #0f172a !important;
+  color: #94a3b8 !important;
+  padding: 10px 14px;
+  border-bottom: 1px solid #334155;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.admin-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0 !important;
+}
+
+/* Botões */
+.btn-action {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+.btn-action-primary { background-color: #2563eb; color: #fff !important; }
+.btn-action-edit { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa !important; }
+.btn-action-delete { background-color: rgba(239, 68, 68, 0.2); color: #f87171 !important; }
+>>>>>>> b3f5752564178900cd89ddb174918ee454616650

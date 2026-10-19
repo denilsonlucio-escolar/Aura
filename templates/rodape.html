@@ -1,7 +1,6 @@
 <footer class="footer">
 
   <div class="footer-container">
-    <!-- SOBRE -->
     <div class="footer-section">
 
       <h2 class="footer-logo">
@@ -18,32 +17,32 @@
 
     </div>
 
-    <!-- NAVEGAÇÃO -->
     <div class="footer-section">
 
       <h3>
         Navegação
       </h3>
 
-      <a href="{% url 'inicial' %}">
-        Página Inicial
-      </a>
+      <nav aria-label="Navegação do rodapé" style="display:flex; flex-direction:column; gap:14px;">
+        <a href="{% url 'inicial' %}">
+          Página Inicial
+        </a>
 
-      <a href="{% url 'login' %}">
-        Entrar
-      </a>
+        <a href="{% url 'login' %}">
+          Entrar
+        </a>
 
-      <a href="{% url 'cadastro' %}">
-        Cadastro
-      </a>
+        <a href="{% url 'cadastro' %}">
+          Cadastro
+        </a>
 
-      <a href="{% url 'painel' %}">
-        Perfil
-      </a>
+        <a href="{% url 'painel' %}">
+          Perfil
+        </a>
+      </nav>
 
     </div>
 
-    <!-- INSTITUIÇÃO -->
     <div class="footer-section">
 
       <h3>
@@ -66,7 +65,6 @@
 
   </div>
 
-  <!-- PARTE INFERIOR -->
   <div class="footer-bottom">
 
     © 2026 Aura — Desenvolvido por alunos do IFRN Campus Canguaretama.

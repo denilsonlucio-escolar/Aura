@@ -1,336 +1,434 @@
+/* ==========================================================================
+   Aura Admin - Painel Privado (painel.css)
+   ========================================================================== */
+
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-
-  font-family: "Poppins", sans-serif;
 }
 
-/* =========================
-   BODY
-========================= */
-
-body {
-  background: #0d0d0d;
-  color: #f5f5f5;
+body.body-privado {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  background-color: #0b0f19 !important;
+  color: #f8fafc !important;
   min-height: 100vh;
 }
 
-main {
-    min-height: 100vh;
-}
-
-/* =========================
-   CONTAINERS
-========================= */
-
-.painel-container,
-.form-container,
-.gerenciar-container {
+.layout-privado {
+  display: flex !important;
+  min-height: 100vh;
   width: 100%;
-  max-width: 1200px;
-
-  margin: 60px auto;
-  padding: 0 20px;
 }
 
-/* =========================
-   TITULOS
-========================= */
-
-.painel-header,
-.form-header,
-.topo {
-  text-align: center;
-
-  margin-bottom: 35px;
+/* Sidebar Lateral */
+.sidebar-privado {
+  width: 250px !important;
+  min-width: 250px !important;
+  background-color: #0f172a !important;
+  border-right: 1px solid #1e293b !important;
+  padding: 24px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
-.painel-header h1,
-.form-header h1,
-.topo h1 {
-  font-size: 38px;
+.sidebar-brand {
+  font-size: 20px;
   font-weight: 700;
-
-  color: #fff;
-
-  margin-bottom: 10px;
+  color: #38bdf8;
+  margin-bottom: 28px;
+  padding-left: 8px;
 }
 
-.painel-header p,
-.form-header p {
-  color: #aaa;
+.sidebar-menu {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
 }
 
-/* =========================
-   CAIXA CENTRAL
-========================= */
-
-.cards,
-form,
-.tabela-container {
-  background: #1a1a1a;
-
-  border: 1px solid #2d2d2d;
-
-  border-radius: 16px;
-
-  box-shadow:
-  0 0 25px rgba(0, 0, 0, 0.4);
-
-  overflow: hidden;
-}
-
-/* =========================
-   CARDS
-========================= */
-
-.cards {
-  display: grid;
-
-  grid-template-columns:
-  repeat(auto-fit, minmax(250px, 1fr));
-
-  gap: 20px;
-
-  padding: 25px;
-}
-
-.card {
-  background: #222;
-
-  border: 1px solid #333;
-
-  border-radius: 12px;
-
-  padding: 30px;
-
-  text-decoration: none;
-
-  transition: 0.3s;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-
-  border-color: #2563eb;
-
-  box-shadow:
-  0 0 15px rgba(37, 99, 235, 0.2);
-}
-
-.card h2 {
-  color: #fff;
-
-  margin-bottom: 12px;
-}
-
-.card p {
-  color: #bbb;
-
-  line-height: 1.6;
-}
-
-/* =========================
-   FORMULÁRIO
-========================= */
-
-form {
-  max-width: 750px;
-
-  margin: auto;
-
-  padding: 40px;
-}
-
-.input-group {
+.sidebar-link {
   display: flex;
-  flex-direction: column;
-
-  margin-bottom: 20px;
-}
-
-.input-group label {
-  margin-bottom: 8px;
-
-  font-weight: 500;
-
-  color: #ddd;
-}
-
-.input-group input,
-.input-group textarea {
-  background: #2a2a2a;
-
-  border: 1px solid #444;
-
-  border-radius: 8px;
-
-  padding: 14px;
-
-  color: white;
-
-  outline: none;
-
-  transition: 0.3s;
-
-  font-size: 15px;
-}
-
-.input-group input:focus,
-.input-group textarea:focus {
-  border-color: #2563eb;
-
-  box-shadow:
-  0 0 10px rgba(37, 99, 235, 0.2);
-}
-
-textarea {
-  resize: none;
-}
-
-/* =========================
-   BOTÃO
-========================= */
-
-.btn-submit {
-  width: 100%;
-
-  background:
-  linear-gradient(
-    135deg,
-    #2563eb,
-    #1d4ed8
-  );
-
-  color: white;
-
-  border: none;
-
-  border-radius: 8px;
-
-  padding: 14px;
-
-  font-size: 16px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: 0.3s;
-}
-
-.btn-submit:hover {
-  transform: translateY(-2px);
-
-  box-shadow:
-  0 0 15px rgba(37, 99, 235, 0.3);
-}
-
-/* =========================
-   TABELA
-========================= */
-
-.tabela-container {
-  padding: 20px;
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-
-  border-collapse: collapse;
-}
-
-thead {
-  background: #222;
-}
-
-thead th {
-  padding: 18px;
-
-  text-align: left;
-
-  color: white;
-}
-
-tbody td {
-  padding: 18px;
-
-  border-top: 1px solid #333;
-
-  color: #ccc;
-}
-
-/* =========================
-   AÇÕES
-========================= */
-
-.acoes {
-  display: flex;
-
+  align-items: center;
   gap: 10px;
-}
-
-.btn-editar,
-.btn-remover {
-  border: none;
-
-  padding: 10px 16px;
-
+  padding: 10px 14px;
+  color: #94a3b8 !important;
+  font-size: 14px;
+  font-weight: 500;
   border-radius: 8px;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+}
 
-  color: white;
+.sidebar-link:hover {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
 
-  cursor: pointer;
-
+.sidebar-link.ativo {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
   font-weight: 600;
-
-  transition: 0.3s;
 }
 
-.btn-editar {
-  background: #2563eb;
+.sidebar-divider {
+  height: 1px;
+  background-color: #1e293b;
+  margin: 16px 0;
 }
 
-.btn-remover {
-  background: #dc2626;
+.sidebar-link.logout {
+  color: #f87171 !important;
 }
 
-.btn-editar:hover,
-.btn-remover:hover {
-  transform: translateY(-2px);
-
-  opacity: 0.9;
+/* Área de Conteúdo Principal */
+.main-content {
+  flex: 1 !important;
+  padding: 32px 40px !important;
+  background-color: #0b0f19 !important;
+  overflow-y: auto;
 }
 
-/* =========================
-   RESPONSIVO
-========================= */
+/* Cabeçalho de Páginas */
+.page-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 24px !important;
+}
 
-@media (max-width: 768px) {
+.page-title {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+}
 
-  .painel-header h1,
-  .form-header h1,
-  .topo h1 {
-    font-size: 30px;
+.page-subtitle {
+  font-size: 14px !important;
+  color: #94a3b8 !important;
+  margin-top: 4px !important;
+}
+
+/* Seções e Cards */
+.panel-section {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+/* Trava Estrita de Miniatura da Tabela de Produtos */
+.product-thumb {
+  width: 50px !important;
+  height: 50px !important;
+  max-width: 50px !important;
+  max-height: 50px !important;
+  object-fit: cover !important;
+  border-radius: 6px !important;
+  border: 1px solid #334155 !important;
+  display: block !important;
+}
+
+.product-thumb-empty {
+  width: 50px !important;
+  height: 50px !important;
+  background-color: #0f172a !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #64748b !important;
+}
+
+/* Tabelas Administrativas */
+.admin-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  text-align: left !important;
+  font-size: 14px !important;
+}
+
+.admin-table th {
+  background-color: #0f172a !important;
+  color: #94a3b8 !important;
+  padding: 12px 16px !important;
+  border-bottom: 1px solid #334155 !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+}
+
+.admin-table td {
+  padding: 14px 16px !important;
+  border-bottom: 1px solid #334155 !important;
+  color: #e2e8f0 !important;
+  vertical-align: middle !important;
+}
+
+/* Formulários Privados */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+/* Botões de Ação */
+.btn-action-group {
+  display: flex !important;
+  gap: 8px !important;
+  justify-content: flex-end !important;
+}
+
+.btn-action {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 8px 14px !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+.btn-action-primary {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+.btn-action-edit {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+}
+
+.btn-action-delete {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+.badge-role {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-admin {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.badge-user {
+  background-color: rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+}
+
+/* ==========================================
+   CARD DO FORMULÁRIO
+   ========================================== */
+   .section-card {
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 14px;
+    max-width: 900px;
+    margin-top: 24px;
+    overflow: hidden;
   }
-
-  form {
-    padding: 25px;
+  
+  .section-card-header {
+    padding: 20px 28px;
+    border-bottom: 1px solid #1f2937;
   }
-
-  .acoes {
+  
+  .section-card-header h2 {
+    font-size: 18px;
+    color: #fff;
+  }
+  
+  .section-card-body {
+    padding: 28px;
+  }
+  
+  /* ==========================================
+     GRID DOS CAMPOS (2 colunas)
+     ========================================== */
+  .form-section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 24px;
+  }
+  
+  .form-group {
+    display: flex;
     flex-direction: column;
+    gap: 8px;
   }
-
-  table {
+  
+  .form-group.full {
+    grid-column: 1 / -1;   /* ocupa a linha inteira */
+  }
+  
+  .form-group label {
     font-size: 14px;
+    font-weight: 600;
+    color: #cbd5e1;
   }
-
-}
-
-a.btn-editar, a.btn-remover, a.btn-submit {
-  display: inline-block;
-  text-decoration: none;
-  text-align: center;
-}
+  
+  /* ==========================================
+     CAMPOS
+     ========================================== */
+  .form-group input[type="text"],
+  .form-group input[type="number"],
+  .form-group input[type="email"],
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 12px 14px;
+    background: #0b1120;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  
+  .form-group textarea {
+    min-height: 140px;
+    resize: vertical;
+  }
+  
+  .form-group select {
+    cursor: pointer;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+  
+  /* Upload de imagem */
+  .form-group input[type="file"] {
+    padding: 14px;
+    background: #0b1120;
+    border: 1px dashed #334155;
+    border-radius: 8px;
+    color: #94a3b8;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .form-group input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 8px 14px;
+    background: #1e293b;
+    color: #fff;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  
+  .form-group input[type="file"]::file-selector-button:hover {
+    background: #334155;
+  }
+  
+  /* Texto de ajuda ("Recomendado: imagem quadrada...") */
+  .form-group small,
+  .form-group .ajuda,
+  .form-group p {
+    font-size: 12px;
+    color: #64748b;
+  }
+  
+  /* ==========================================
+     BOTÕES
+     ========================================== */
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #1f2937;
+  }
+  
+  .form-actions button,
+  .form-actions a {
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: .2s;
+  }
+  
+  .form-actions button {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+  }
+  
+  .form-actions button:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+  }
+  
+  .form-actions a {
+    background: transparent;
+    color: #cbd5e1;
+    border: 1px solid #334155;
+  }
+  
+  .form-actions a:hover {
+    background: #1e293b;
+    color: #fff;
+  }
+  
+  /* ==========================================
+     RESPONSIVO
+     ========================================== */
+  @media (max-width: 700px) {
+    .form-section {
+      grid-template-columns: 1fr;
+    }
+  
+    .form-actions {
+      flex-direction: column-reverse;
+    }
+  
+    .form-actions button,
+    .form-actions a {
+      width: 100%;
+      text-align: center;
+    }
+  }

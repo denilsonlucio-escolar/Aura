@@ -11,6 +11,16 @@
 
 <main class="catalogo">
 
+  <nav class="breadcrumb" aria-label="Caminho de navegação">
+    <a href="{% url 'catalogo' %}">Catálogo</a>
+    <span>/</span>
+    {% if produto.categoria %}
+    <span>{{ produto.categoria.nome }}</span>
+    <span>/</span>
+    {% endif %}
+    <span class="breadcrumb-atual">{{ produto.nome }}</span>
+  </nav>
+
   <section class="produto-detalhe">
 
     <div class="produto-detalhe-img">
@@ -23,6 +33,10 @@
 
 
     <div class="produto-detalhe-info">
+
+      {% if produto.categoria %}
+      <span class="produto-detalhe-categoria">{{ produto.categoria.nome }}</span>
+      {% endif %}
 
       <h1>{{ produto.nome }}</h1>
 
@@ -49,9 +63,33 @@
       </div>
 
 
-      <p class="produto-detalhe-desc">
-        {{ produto.descricao }}
-      </p>
+      <div class="produto-detalhe-descricao-bloco">
+        <h2>Descrição do produto</h2>
+        <p class="produto-detalhe-desc">
+          {{ produto.descricao }}
+        </p>
+      </div>
+
+
+      <div class="produto-detalhe-specs">
+        <h2>Informações do produto</h2>
+        <ul class="specs-lista">
+          <li>
+            <span class="specs-label">Categoria</span>
+            <span class="specs-valor">{{ produto.categoria.nome|default:"Não informada" }}</span>
+          </li>
+          <li>
+            <span class="specs-label">Código do produto</span>
+            <span class="specs-valor">#{{ produto.id }}</span>
+          </li>
+          <li>
+            <span class="specs-label">Disponibilidade</span>
+            <span class="specs-valor">
+              {% if produto.estoque > 0 %}Pronta entrega{% else %}Indisponível no momento{% endif %}
+            </span>
+          </li>
+        </ul>
+      </div>
 
 
       <div class="produto-detalhe-acoes">
@@ -80,7 +118,50 @@
     </div>
 
   </section>
+</section>
+
+{% if produtos %}
+<section class="relacionados">
+  <h2>Outros produtos</h2>
+
+  <div class="card-grid">
+    {% for item in produtos %}
+    <a href="{% url 'produto_detalhe' item.id %}" class="card-link">
+      <div class="card">
+        <div class="card-img">
+          {% if item.imagem %}
+            <img src="{{ item.imagem.url }}" alt="{{ item.nome }}">
+          {% endif %}
+          <span class="badge">-30% OFF</span>
+        </div>
+
+        <div class="card-info-top">
+          {% if item.categoria %}
+          <span class="card-categoria">{{ item.categoria.nome }}</span>
+          {% endif %}
+
+          {% if item.estoque > 0 %}
+          <span class="disponivel card-estoque">Em estoque</span>
+          {% else %}
+          <span class="indisponivel card-estoque">Esgotado</span>
+          {% endif %}
+        </div>
+
+        <h3 class="nome-produto">{{ item.nome }}</h3>
+
+        <div class="prices">
+          <span class="new">R$ {{ item.preco }}</span>
+        </div>
+
+        <span class="frete">Frete grátis disponível</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
 
 </main>
 
 {% endblock %}
+

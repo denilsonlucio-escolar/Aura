@@ -1,14 +1,26 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Produto
+from .models import Produto, Categoria
 
 from PIL import Image
 
+class CategoriaForm(forms.ModelForm):
+    class Meta:
+        model = Categoria
+        fields = ['nome']
 
+        
 class ProdutoForm(forms.ModelForm):
+        
+    categoria = forms.ModelChoiceField(
+    queryset=Categoria.objects.all(),
+    empty_label="Selecione uma categoria"
+    )
+    
     class Meta:
         model = Produto
-        fields = ['nome', 'descricao', 'preco', 'estoque', 'imagem']
+        fields = ['nome', 'descricao', 'categoria', 'preco', 'estoque', 'imagem']
+
 
     def clean_imagem(self):
         imagem = self.cleaned_data.get('imagem')

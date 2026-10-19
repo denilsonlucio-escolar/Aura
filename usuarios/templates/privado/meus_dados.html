@@ -1,62 +1,79 @@
-{% extends 'privado/base.html' %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %} Meus Dados – Aura {% endblock %}
 
 {% block conteudo %}
-<main class="main">
+<main class="container" style="max-width: 700px; margin: 40px auto; padding: 0 20px;">
+  <section style="background: #0f172a; padding: 30px; border-radius: 12px; border: 1px solid #1e293b; color: #fff;">
+    <h1 style="font-size: 24px; color: #fff; margin-bottom: 8px;">Meus Dados Cadastrais</h1>
+    <p style="color: #94a3b8; font-size: 14px; margin-bottom: 25px;">Mantenha suas informações pessoais e endereço de entrega atualizados.</p>
 
-  <div>
-    <h1 class="page-title">Dashboard</h1>
-    <p class="page-subtitle">Bem-vindo de volta, {{ user.username }}. Confira o resumo abaixo.</p>
-  </div>
+    {% if messages %}
+      {% for message in messages %}
+        <div style="padding: 12px; border-radius: 6px; margin-bottom: 20px; background: #166534; color: #4ade80;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
 
-  <div class="section-card">
-    <div class="section-card-header">
-        <h2>Meu Perfil</h2>
-    </div>
+    <form method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+      {% csrf_token %}
 
-    <div class="section-card-body">
-        <table>
-            <tbody>
-                <tr>
-                    <td><strong>Nome</strong></td>
-                    <td>{{ user.get_full_name|default:user.username }}</td>
-                </tr>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_nome">Nome</label>
+          <input type="text" id="id_nome" name="nome" value="{{ cliente.nome|default:'' }}" required style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_sobrenome">Sobrenome</label>
+          <input type="text" id="id_sobrenome" name="sobrenome" value="{{ cliente.sobrenome|default:'' }}" required style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+      </div>
 
-                <tr>
-                    <td><strong>Usuário</strong></td>
-                    <td>{{ user.username }}</td>
-                </tr>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_cpf">CPF</label>
+          <input type="text" id="id_cpf" name="cpf" value="{{ cliente.cpf|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_telefone">Telefone</label>
+          <input type="text" id="id_telefone" name="telefone" value="{{ cliente.telefone|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+      </div>
 
-                <tr>
-                    <td><strong>E-mail</strong></td>
-                    <td>{{ user.email }}</td>
-                </tr>
+      <h2 style="font-size: 18px; color: #60a5fa; margin-top: 15px; border-bottom: 1px solid #334155; padding-bottom: 8px;">Endereço de Entrega</h2>
 
-                <tr>
-                    <td><strong>Tipo de Conta</strong></td>
-                    <td>
-                        {% if user.is_superuser %}
-                            Administrador
-                        {% elif user.is_staff %}
-                            Funcionário
-                        {% else %}
-                            Usuário
-                        {% endif %}
-                    </td>
-                </tr>
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_rua">Rua / Logradouro</label>
+          <input type="text" id="id_rua" name="rua" value="{{ endereco.rua|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_numero">Número</label>
+          <input type="text" id="id_numero" name="numero" value="{{ endereco.numero|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+      </div>
 
-                <tr>
-                    <td><strong>Data de Cadastro</strong></td>
-                    <td>{{ user.date_joined|date:"d/m/Y" }}</td>
-                </tr>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_bairro">Bairro</label>
+          <input type="text" id="id_bairro" name="bairro" value="{{ endereco.bairro|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_cidade">Cidade</label>
+          <input type="text" id="id_cidade" name="cidade" value="{{ endereco.cidade|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+        <div>
+          <label style="display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px;" for="id_cep">CEP</label>
+          <input type="text" id="id_cep" name="cep" value="{{ endereco.cep|default:'' }}" style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff;">
+        </div>
+      </div>
 
-                <tr>
-                    <td><strong>Último Acesso</strong></td>
-                    <td>{{ user.last_login|date:"d/m/Y H:i" }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
+      <button type="submit" style="margin-top: 15px; background: #2563eb; color: #fff; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+        Salvar Alterações
+      </button>
+    </form>
+  </section>
 </main>
 {% endblock %}

@@ -5,7 +5,8 @@
 {% block titulo %} Login {% endblock %}
 
 {% block estilo %}
-<link rel="stylesheet" href="{% static 'assets/css/login.css' %}" /> {% endblock %}
+<link rel="stylesheet" href="{% static 'assets/css/login.css' %}" />
+{% endblock %}
 
 {% block scripts %} 
 <script>
@@ -30,20 +31,19 @@
 <main class="login-area">
   <section class="login-container">
 
-    <!-- LOGIN -->
     <div class="login-box">
-      <h2>Já sou cliente</h2>
+      <h1>Já sou cliente</h1>
 
       {% include 'mensagens.html' %}
 
       <form id="form-login" method="POST" action="{% url 'login' %}">
         {% csrf_token %}
 
-        <input type="text" name="username" placeholder="Usuário" required>
+        <input type="text" id="username" name="username" placeholder="Usuário" aria-label="Usuário" required>
 
         <div class="senha-input">
-          <input type="password" name="password" placeholder="Senha" required>
-          <span class="mostrar-senha">👁️</span>
+          <input type="password" id="password" name="password" placeholder="Senha" aria-label="Senha" required>
+          <span class="mostrar-senha" role="button" tabindex="0" aria-label="Alternar visibilidade da senha">👁️</span>
         </div>
 
         <a href="#" class="link-senha">Esqueci minha senha</a>

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %} Confirmação do Pedido – Aura {% endblock %}
+
+{% block estilo %}
+<link rel="stylesheet" href="{% static 'assets/css/confirmacao.css' %}" />
+{% endblock %}
+
+{% block conteudo %}
+<main class="confirmacao-container">
+  <section class="confirmacao-card">
+    
+    <div class="confirmacao-header">
+      <div class="icone-sucesso">🎉</div>
+      <h1>Pedido Realizado com Sucesso!</h1>
+      <p>Obrigado pela sua compra. Seu pedido foi registrado e já está em processamento.</p>
+    </div>
+
+    <div class="detalhes-pedido-grid">
+      <div class="detalhe-item">
+        <span class="detalhe-label">Número do Pedido</span>
+        <strong class="detalhe-valor">#{{ pedido.id }}</strong>
+      </div>
+      <div class="detalhe-item">
+        <span class="detalhe-label">Status</span>
+        <strong class="status-badge">{{ pedido.status }}</strong>
+      </div>
+      <div class="detalhe-item">
+        <span class="detalhe-label">Cliente</span>
+        <strong class="detalhe-valor">{{ pedido.cliente.nome }} {{ pedido.cliente.sobrenome }}</strong>
+      </div>
+    </div>
+
+    <h2>Resumo do Pedido</h2>
+
+    <div class="table-responsive">
+      <table class="tabela-confirmacao">
+        <thead>
+          <tr>
+            <th scope="col">Produto</th>
+            <th scope="col" class="text-center">Quantidade</th>
+            <th scope="col" class="text-right">Preço Unitário</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in itens %}
+          <tr>
+            <td><strong>{{ item.produto.nome }}</strong></td>
+            <td class="text-center">{{ item.quantidade }}</td>
+            <td class="text-right preco-item">R$ {{ item.preco_unitario }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="total-box">
+      <span class="total-label">Total Pago:</span>
+      <span class="total-valor">R$ {{ total|floatformat:2 }}</span>
+    </div>
+
+    <div class="confirmacao-acoes">
+      <a href="{% url 'catalogo' %}" class="btn-nav btn-primario">
+        Continuar Comprando
+      </a>
+      <a href="{% url 'inicial' %}" class="btn-nav btn-secundario">
+        Voltar ao Início
+      </a>
+    </div>
+
+  </section>
+</main>
+{% endblock %}
