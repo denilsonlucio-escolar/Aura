@@ -169,10 +169,3 @@ def transparencia(request):
         'preco_max': agregados['max_p'] if agregados['max_p'] is not None else 0,
     }
     return render(request, 'transparencia.html', context)
-
-
-
-
-# Trecho localizado em: usuarios/views.py (view painel)
-
-produtos_sem_giro = Produto.objects.filter(itens__isnull=True, estoque__gt=0)

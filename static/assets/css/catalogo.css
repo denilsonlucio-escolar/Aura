@@ -525,7 +525,18 @@ footer.rodape {
 .relacionados h2 {
   color: #fff;
   font-size: 22px;
-  margin: 40px 0 24px 0;     /* 40px em cima, 24px embaixo */
+  margin: 40px 0 24px 0;   
   padding-bottom: 12px;
   border-bottom: 1px solid #1e1e1e;
+}
+
+
+.card-produto img, 
+.produto-card img {
+    width: 100%;
+    height: 220px;           
+    object-fit: contain;      
+    background-color: #f8fafc;
+    border-radius: 8px 8px 0 0;
+    padding: 12px;
 }
