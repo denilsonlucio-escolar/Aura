@@ -81,7 +81,11 @@ def pagamento(request):
         messages.error(request, 'Seu carrinho está vazio.')
         return redirect('catalogo')
 
-    cliente = Cliente.objects.filter(usuario=request.user).first()
+    # Garante que o cliente existe antes de criar o pedido
+    cliente, _ = Cliente.objects.get_or_create(
+        usuario=request.user,
+        defaults={'nome': request.user.get_full_name() or request.user.username}
+    )
 
     if request.method == 'POST':
         forma_pagamento = request.POST.get('forma_pagamento', 'Cartão de Crédito')
@@ -94,11 +98,12 @@ def pagamento(request):
         for produto_id, quantidade in carrinho_session.items():
             produto = Produto.objects.filter(pk=produto_id).first()
             if produto:
+                preco = getattr(produto, 'preco', getattr(produto, 'preco_unitario', 0))
                 ItemPedido.objects.create(
                     pedido=pedido,
                     produto=produto,
                     quantidade=quantidade,
-                    preco_unitario=produto.preco
+                    preco_unitario=preco
                 )
 
                 if produto.estoque >= quantidade:
@@ -117,7 +122,8 @@ def pagamento(request):
     for produto_id, quantidade in carrinho_session.items():
         produto = Produto.objects.filter(pk=produto_id).first()
         if produto:
-            subtotal = produto.preco * quantidade
+            preco = getattr(produto, 'preco', getattr(produto, 'preco_unitario', 0))
+            subtotal = preco * quantidade
             total += subtotal
             produtos_carrinho.append({
                 'produto': produto,
@@ -131,7 +137,6 @@ def pagamento(request):
         'cliente': cliente
     }
     return render(request, 'pagamento.html', context)
-
 
 @login_required
 def confirmacao(request, pedido_id):
